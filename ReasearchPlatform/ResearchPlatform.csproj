@@ -4,10 +4,12 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>hnet.com-image.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="MahApps.Metro" Version="2.4.3" />
+    <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" />
   </ItemGroup>
 
 </Project>

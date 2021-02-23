@@ -1,4 +1,6 @@
 ﻿using MahApps.Metro.Controls;
+using MahApps.Metro.Controls.Dialogs;
+using ResearchPlatform.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +16,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace ResearchPlatform
+namespace ResearchPlatform.Views
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -24,11 +26,8 @@ namespace ResearchPlatform
         public MainWindow()
         {
             InitializeComponent();
-        }
 
-        private void LaunchSettingsWindow(object sender, RoutedEventArgs e)
-        {
-
+            DataContext = new MainWindowViewModel(DialogCoordinator.Instance);
         }
     }
 }
