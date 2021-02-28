@@ -1,8 +1,11 @@
 ﻿using GalaSoft.MvvmLight.Command;
 using MahApps.Metro.Controls.Dialogs;
+using ResearchPlatform.Models;
+using ResearchPlatform.Views;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
@@ -22,18 +25,13 @@ namespace ResearchPlatform.ViewModels
 
         public async void LaunchSetting()
         {
-            var mySettings = new MetroDialogSettings
-            {
-                AffirmativeButtonText = "Yes"
-            };
+            var dialog = new SettingsWindow(Configuration.CurrentConfiguration);
 
-            var cd = new CustomDialog
-            {
-                VerticalAlignment = VerticalAlignment.Top,
-                VerticalContentAlignment = VerticalAlignment.Top
-            };
+            await _dialogCoordinator.ShowMetroDialogAsync(this, dialog);
 
-            await _dialogCoordinator.ShowMetroDialogAsync(this, cd, mySettings);
+            await Task.Delay(13000);
+
+            await _dialogCoordinator.HideMetroDialogAsync(this, dialog);
         }
     }
 }
