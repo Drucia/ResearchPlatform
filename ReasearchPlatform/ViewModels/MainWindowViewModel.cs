@@ -29,7 +29,7 @@ namespace ResearchPlatform.ViewModels
 
             await _dialogCoordinator.ShowMetroDialogAsync(this, dialog);
 
-            await Task.Delay(13000);
+            await Task.Delay(130000);
 
             await _dialogCoordinator.HideMetroDialogAsync(this, dialog);
         }
