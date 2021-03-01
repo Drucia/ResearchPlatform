@@ -14,24 +14,20 @@ namespace ResearchPlatform.ViewModels
     class MainWindowViewModel
     {
         private readonly IDialogCoordinator _dialogCoordinator;
+        private readonly Configuration _configuration;
 
         public ICommand LaunchSettingsCommand { get; set; }
 
         public MainWindowViewModel(IDialogCoordinator coordinator)
         {
             _dialogCoordinator = coordinator;
+            _configuration = Configuration.CurrentConfiguration;
             LaunchSettingsCommand = new RelayCommand(new Action(LaunchSetting));
         }
 
-        public async void LaunchSetting()
+        private void LaunchSetting()
         {
-            var dialog = new SettingsWindow(Configuration.CurrentConfiguration);
-
-            await _dialogCoordinator.ShowMetroDialogAsync(this, dialog);
-
-            await Task.Delay(130000);
-
-            await _dialogCoordinator.HideMetroDialogAsync(this, dialog);
+            new SettingsWindow(_configuration).ShowDialog();
         }
     }
 }

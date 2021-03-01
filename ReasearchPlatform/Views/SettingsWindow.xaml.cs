@@ -19,7 +19,7 @@ namespace ResearchPlatform.Views
     /// <summary>
     /// Interaction logic for SettingsWindow.xaml
     /// </summary>
-    public partial class SettingsWindow : CustomDialog
+    public partial class SettingsWindow : MetroWindow
     {
         public SettingsWindow(Configuration configuration)
         {
