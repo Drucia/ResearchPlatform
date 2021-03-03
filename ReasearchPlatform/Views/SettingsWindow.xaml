@@ -116,11 +116,11 @@
                                     <Label Grid.Row="2" Grid.Column="0" Content="Profit:" HorizontalAlignment="Left" VerticalAlignment="Center" Height="26" HorizontalContentAlignment="Right" Margin="115,0,0,0" Width="41"></Label>
                                     <Label Grid.Row="3" Content="Amount of completed jobs:" HorizontalAlignment="Center" VerticalAlignment="Center" Height="26" Width="156"/>
                                     <Label Grid.Row="4" Grid.Column="0" Content="Customer reliability:" HorizontalAlignment="Left" VerticalAlignment="Center" Height="26" Margin="41,0,0,0" Width="115" ></Label>
-                                    <mah:NumericUpDown Grid.Column="2" HorizontalAlignment="Center" MinWidth="78" VerticalAlignment="Center" Height="26" Minimum="0" Maximum="100" Width="78" Value="-5"/>
-                                    <mah:NumericUpDown Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center" MinWidth="78" VerticalAlignment="Center" Height="26"  Minimum="0" Maximum="100" Width="78" Value="-5"/>
-                                    <mah:NumericUpDown Grid.Row="2" Grid.Column="2" HorizontalAlignment="Center" MinWidth="78" VerticalAlignment="Center" Height="26"  Minimum="0" Maximum="100" Width="78" Value="-5"/>
-                                    <mah:NumericUpDown Grid.Row="3" Grid.Column="2" HorizontalAlignment="Center" MinWidth="78" VerticalAlignment="Center" Height="26"  Minimum="0" Maximum="100" Width="78" Value="-5"/>
-                                    <mah:NumericUpDown Grid.Row="4" Grid.Column="2" HorizontalAlignment="Center" MinWidth="78" VerticalAlignment="Center" Height="26"  Minimum="0" Maximum="100" Width="78" Value="-5"/>
+                                    <mah:NumericUpDown Grid.Column="2" HorizontalAlignment="Center" MinWidth="78" VerticalAlignment="Center" Height="26" Minimum="0" Maximum="100" Width="78" Value="{Binding Configuration.CriteriaWeights[0]}"/>
+                                    <mah:NumericUpDown Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center" MinWidth="78" VerticalAlignment="Center" Height="26"  Minimum="0" Maximum="100" Width="78" Value="{Binding Configuration.CriteriaWeights[1]}"/>
+                                    <mah:NumericUpDown Grid.Row="2" Grid.Column="2" HorizontalAlignment="Center" MinWidth="78" VerticalAlignment="Center" Height="26"  Minimum="0" Maximum="100" Width="78" Value="{Binding Configuration.CriteriaWeights[2]}"/>
+                                    <mah:NumericUpDown Grid.Row="3" Grid.Column="2" HorizontalAlignment="Center" MinWidth="78" VerticalAlignment="Center" Height="26"  Minimum="0" Maximum="100" Width="78" Value="{Binding Configuration.CriteriaWeights[3]}"/>
+                                    <mah:NumericUpDown Grid.Row="4" Grid.Column="2" HorizontalAlignment="Center" MinWidth="78" VerticalAlignment="Center" Height="26"  Minimum="0" Maximum="100" Width="78" Value="{Binding Configuration.CriteriaWeights[4]}"/>
                                     <Label Grid.Column="3" Content="%" HorizontalAlignment="Left" VerticalAlignment="Center" Height="26" Width="20"/>
                                     <Label Grid.Column="3" Grid.Row="1" Content="%" HorizontalAlignment="Left" VerticalAlignment="Center" Height="26" Width="20"/>
                                     <Label Grid.Column="3" Grid.Row="2" Content="%" HorizontalAlignment="Left" VerticalAlignment="Center" Height="26" Width="20"/>
@@ -130,7 +130,7 @@
                             </StackPanel>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,30,30">
-                            <Button Padding="10 0 10 0" HorizontalAlignment="Right">
+                            <Button Padding="10 0 10 0" HorizontalAlignment="Right" Command="{Binding ResetConfigurationCommand}">
                                 <StackPanel Orientation="Horizontal" Height="25">
                                     <Label Content="Reset to default" FontSize="12"/>
                                     <iconPacks:PackIconFontAwesome Kind="UndoSolid"
@@ -138,7 +138,7 @@
                                             HorizontalAlignment="Center" Margin="3 0 0 0" />
                                 </StackPanel>
                             </Button>
-                            <Button x:Name="SaveButton" Padding="0 5 0 5" Margin="12,0,0,0" Width="70">
+                            <Button x:Name="SaveButton" Padding="0 5 0 5" Margin="12,0,0,0" Width="70" Command="{Binding SaveConfigurationCommand}">
                                 <StackPanel Orientation="Horizontal" Height="25">
                                     <Label Content="Save" FontSize="12" />
                                     <iconPacks:PackIconFontAwesome Kind="SaveSolid"

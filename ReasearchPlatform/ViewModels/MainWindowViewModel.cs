@@ -13,15 +13,14 @@ namespace ResearchPlatform.ViewModels
 {
     class MainWindowViewModel
     {
-        private readonly IDialogCoordinator _dialogCoordinator;
-        private readonly Configuration _configuration;
+        private Configuration _configuration;
 
         public ICommand LaunchSettingsCommand { get; set; }
 
-        public MainWindowViewModel(IDialogCoordinator coordinator)
+        public MainWindowViewModel()
         {
-            _dialogCoordinator = coordinator;
-            _configuration = Configuration.CurrentConfiguration;
+            _configuration = Configuration.Create;
+
             LaunchSettingsCommand = new RelayCommand(new Action(LaunchSetting));
         }
 

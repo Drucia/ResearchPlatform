@@ -27,7 +27,7 @@ namespace ResearchPlatform.Views
         {
             InitializeComponent();
 
-            DataContext = new MainWindowViewModel(DialogCoordinator.Instance);
+            DataContext = new MainWindowViewModel();
         }
     }
 }

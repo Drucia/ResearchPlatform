@@ -25,7 +25,7 @@ namespace ResearchPlatform.Views
         {
             InitializeComponent();
 
-            DataContext = new SettingsDialogViewModel(configuration);
+            DataContext = new SettingsDialogViewModel(configuration, DialogCoordinator.Instance);
         }
     }
 }
