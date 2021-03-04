@@ -3,9 +3,7 @@ using MahApps.Metro.Controls.Dialogs;
 using ResearchPlatform.Models;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Windows.Input;
-using System.Text.Json.Serialization;
 using System.Text.Json;
 
 namespace ResearchPlatform.ViewModels
