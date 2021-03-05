@@ -189,18 +189,18 @@
                                         <RowDefinition/>
                                         <RowDefinition/>
                                     </Grid.RowDefinitions>
-                                    <Label Grid.Column="0" Content="Cargo space depth:" HorizontalAlignment="Left" VerticalAlignment="Center" Height="26" Margin="55,0,0,0" Width="112"/>
-                                    <Label Grid.Row="1" Grid.Column="0" Content="Max load capacity:" HorizontalAlignment="Left" VerticalAlignment="Center" Height="26" Margin="59,0,0,0" Width="108"/>
-                                    <Label Grid.Row="2" Grid.Column="0" Content="Tarpaulin type:" HorizontalAlignment="Left" VerticalAlignment="Center" Height="26" HorizontalContentAlignment="Right" Margin="80,0,0,0" Width="87"/>
-                                    <Label Grid.Row="3" Content="Average fuel consumption:" HorizontalAlignment="Center" VerticalAlignment="Center" Height="26" Width="150"/>
-                                    <Label Grid.Row="4" Grid.Column="0" Content="Fuel cost:" HorizontalAlignment="Left" VerticalAlignment="Center" Height="26" Margin="108,0,0,0" Width="59" />
-                                    <Label Grid.Row="5" Grid.Column="0" Content="Cost of maintaining:" HorizontalAlignment="Left" VerticalAlignment="Center" Height="26" Margin="51,0,0,0" Width="116" />
+                                    <Label Grid.Column="0" Content="Cargo space depth:" HorizontalAlignment="Right" VerticalAlignment="Center" Height="26" Margin="55,0,20,0"/>
+                                    <Label Grid.Row="1" Grid.Column="0" Content="Max load capacity:" HorizontalAlignment="Right" VerticalAlignment="Center" Height="26" Margin="59,0,20,0"/>
+                                    <Label Grid.Row="2" Grid.Column="0" Content="Tarpaulin type:" HorizontalAlignment="Right" VerticalAlignment="Center" Height="26" HorizontalContentAlignment="Right" Margin="80,0,20,0"/>
+                                    <Label Grid.Row="3" Content="Average fuel consumption:" HorizontalAlignment="Right" VerticalAlignment="Center" Height="26" Margin="0,0,20,0"/>
+                                    <Label Grid.Row="4" Grid.Column="0" Content="Fuel cost:" HorizontalAlignment="Right" VerticalAlignment="Center" Height="26" Margin="108,0,20,0" />
+                                    <Label Grid.Row="5" Grid.Column="0" Content="Cost of maintain:" HorizontalAlignment="Right" VerticalAlignment="Center" Height="26" Margin="0,0,20,0" />
                                     <mah:NumericUpDown Grid.Column="1" HorizontalAlignment="Center" MinWidth="78" VerticalAlignment="Center" Height="26" Minimum="100" Maximum="1000" Width="110" Value="{Binding Configuration.TrackDepth}"/>
                                     <mah:NumericUpDown Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" MinWidth="78" VerticalAlignment="Center" Height="26"  Minimum="1" Maximum="10000" Width="110" Value="{Binding Configuration.MaxLoadCapacity}"/>
                                     <ComboBox Grid.Row="2" Grid.Column="1" ItemsSource="{Binding Configuration.PossibleTarpaulinTypes}" HorizontalAlignment="Center" MinWidth="78" VerticalAlignment="Center" Height="26" Width="110" HorizontalContentAlignment="Center" SelectedIndex="0"/>
-                                    <TextBox Grid.Row="3" Grid.Column="1" HorizontalAlignment="Center" MinWidth="78" VerticalAlignment="Center" Height="26" Width="110" Text="{Binding Configuration.CriteriaWeights[2]}"/>
-                                    <TextBox Grid.Row="4" Grid.Column="1" HorizontalAlignment="Center" MinWidth="78" VerticalAlignment="Center" Height="26" Width="110" Text="{Binding Configuration.CriteriaWeights[4]}"/>
-                                    <TextBox Grid.Row="5" Grid.Column="1" HorizontalAlignment="Center" MinWidth="78" VerticalAlignment="Center" Height="26" Width="110" Text="{Binding Configuration.CriteriaWeights[4]}"/>
+                                    <TextBox Grid.Row="3" Grid.Column="1" HorizontalAlignment="Center" MinWidth="78" VerticalAlignment="Center" Height="26" Width="110" Text="{Binding Configuration.AvgFuelConsumption, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}" HorizontalContentAlignment="Right"/>
+                                    <TextBox Grid.Row="4" Grid.Column="1" HorizontalAlignment="Center" MinWidth="78" VerticalAlignment="Center" Height="26" Width="110" Text="{Binding Configuration.FuelCost, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}" HorizontalContentAlignment="Right"/>
+                                    <TextBox Grid.Row="5" Grid.Column="1" HorizontalAlignment="Center" MinWidth="78" VerticalAlignment="Center" Height="26" Width="110" Text="{Binding Configuration.CostOfMaintain, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}" HorizontalContentAlignment="Right"/>
                                     <Label Grid.Column="2" Content="cm" HorizontalAlignment="Left" VerticalAlignment="Center" Height="26" Width="26"/>
                                     <Label Grid.Column="2" Grid.Row="1" Content="kg" HorizontalAlignment="Left" VerticalAlignment="Center" Height="26" Width="23"/>
                                     <Label Grid.Column="2" Grid.Row="2" Content="" HorizontalAlignment="Left" VerticalAlignment="Center" Height="26" Width="20"/>

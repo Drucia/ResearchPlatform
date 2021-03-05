@@ -33,6 +33,9 @@ namespace ResearchPlatform.Models
         public int TrackWidth { get; set; } = 800;
         public int TrackDepth { get; set; } = 200;
         public int MaxLoadCapacity { get; set; } = 2000;
+        public double AvgFuelConsumption { get; set; } = 8.5;
+        public double FuelCost { get; set; } = 5.0;
+        public double CostOfMaintain { get; set; } = 2.5;
 
 
         public static Configuration Create => new Configuration();
@@ -41,6 +44,13 @@ namespace ResearchPlatform.Models
         {
             originalConfiguration.ComparisionMatrix = ComparisionMatrix;
             originalConfiguration.CriteriaWeights = CriteriaWeights;
+            originalConfiguration.TrackHeight = TrackHeight;
+            originalConfiguration.TrackWidth = TrackWidth;
+            originalConfiguration.TrackDepth = TrackDepth;
+            originalConfiguration.MaxLoadCapacity = MaxLoadCapacity;
+            originalConfiguration.AvgFuelConsumption = AvgFuelConsumption;
+            originalConfiguration.FuelCost = FuelCost;
+            originalConfiguration.CostOfMaintain = CostOfMaintain;
         }
 
         public void fillMatrix()
