@@ -7,8 +7,9 @@
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls" x:Class="ResearchPlatform.Views.SettingsWindow"
         xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
         Dialog:DialogParticipation.Register="{Binding}"
-        mc:Ignorable="d" Height="545" Width="1200"
+        mc:Ignorable="d" Height="545" Width="1200" MinHeight="545" MinWidth="1200" MaxHeight="545" MaxWidth="1200"
         xmlns:src="clr-namespace:ResearchPlatform.Helpers"
+        ShowMaxRestoreButton="False"
         Title="Settings">
     <mah:MetroWindow.Resources>
         <src:MatrixItemConverter x:Key="matrixConverter"></src:MatrixItemConverter>
@@ -39,27 +40,27 @@
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                                         <Label Content="Comfort of work" Width="100" Height="50" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#CCFEDE06" BorderBrush="#FFC7C193" BorderThickness="1,1,1,1"/>
                                         <TextBox x:Name="comfortVsComfort" BorderBrush="#FFC7C193" Width="100" Height="50" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Text="{Binding Configuration.ComparisionMatrix[0][0]}" IsEnabled="False"/>
-                                        <ComboBox x:Name="comfortVsTime" ItemsSource="{Binding PossibleComparisionValues}" SelectedItem="{Binding Configuration.ComparisionMatrix[0][1]}"  Width="100" Height="50" BorderBrush="#FFC7C193" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center"/>
-                                        <ComboBox x:Name="comfortVsProfit" ItemsSource="{Binding PossibleComparisionValues}" SelectedItem="{Binding Configuration.ComparisionMatrix[0][2]}" Width="100" Height="50" BorderBrush="#FFC7C193" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center"/>
-                                        <ComboBox x:Name="comfortVsJobs" ItemsSource="{Binding PossibleComparisionValues}" SelectedItem="{Binding Configuration.ComparisionMatrix[0][3]}" Width="100" Height="50" BorderBrush="#FFC7C193" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center"/>
-                                        <ComboBox x:Name="comfortVsCustomer" ItemsSource="{Binding PossibleComparisionValues}" SelectedItem="{Binding Configuration.ComparisionMatrix[0][4]}" Width="100" Height="50" BorderBrush="#FFC7C193" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center"/>
+                                        <ComboBox x:Name="comfortVsTime" ItemsSource="{Binding Configuration.PossibleComparisionValues}" SelectedItem="{Binding Configuration.ComparisionMatrix[0][1]}"  Width="100" Height="50" BorderBrush="#FFC7C193" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center"/>
+                                        <ComboBox x:Name="comfortVsProfit" ItemsSource="{Binding Configuration.PossibleComparisionValues}" SelectedItem="{Binding Configuration.ComparisionMatrix[0][2]}" Width="100" Height="50" BorderBrush="#FFC7C193" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center"/>
+                                        <ComboBox x:Name="comfortVsJobs" ItemsSource="{Binding Configuration.PossibleComparisionValues}" SelectedItem="{Binding Configuration.ComparisionMatrix[0][3]}" Width="100" Height="50" BorderBrush="#FFC7C193" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center"/>
+                                        <ComboBox x:Name="comfortVsCustomer" ItemsSource="{Binding Configuration.PossibleComparisionValues}" SelectedItem="{Binding Configuration.ComparisionMatrix[0][4]}" Width="100" Height="50" BorderBrush="#FFC7C193" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center"/>
 
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                                         <Label Content="Driving time" Width="100" Height="50" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#CCFEDE06" BorderBrush="#FFC7C193" BorderThickness="1,1,1,1"/>
                                         <TextBox x:Name="timeVsComfort" BorderBrush="#FFC7C193" Width="100" Height="50" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" IsEnabled="False" Text="{Binding Configuration.ComparisionMatrix[0][1], Converter={StaticResource matrixConverter}}"/>
                                         <TextBox x:Name="timeVsTime" BorderBrush="#FFC7C193" Width="100" Height="50" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Text="{Binding Configuration.ComparisionMatrix[1][1]}" IsEnabled="False"/>
-                                        <ComboBox x:Name="timeVsProfit" ItemsSource="{Binding PossibleComparisionValues}" SelectedItem="{Binding Configuration.ComparisionMatrix[1][2]}" Width="100" Height="50" BorderBrush="#FFC7C193" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center"/>
-                                        <ComboBox x:Name="timeVsJobs" ItemsSource="{Binding PossibleComparisionValues}" SelectedItem="{Binding Configuration.ComparisionMatrix[1][3]}"  Width="100" Height="50" BorderBrush="#FFC7C193" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center"/>
-                                        <ComboBox x:Name="timeVsCustomer" ItemsSource="{Binding PossibleComparisionValues}" SelectedItem="{Binding Configuration.ComparisionMatrix[1][4]}" Width="100" Height="50" BorderBrush="#FFC7C193" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center"/>
+                                        <ComboBox x:Name="timeVsProfit" ItemsSource="{Binding Configuration.PossibleComparisionValues}" SelectedItem="{Binding Configuration.ComparisionMatrix[1][2]}" Width="100" Height="50" BorderBrush="#FFC7C193" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center"/>
+                                        <ComboBox x:Name="timeVsJobs" ItemsSource="{Binding Configuration.PossibleComparisionValues}" SelectedItem="{Binding Configuration.ComparisionMatrix[1][3]}"  Width="100" Height="50" BorderBrush="#FFC7C193" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center"/>
+                                        <ComboBox x:Name="timeVsCustomer" ItemsSource="{Binding Configuration.PossibleComparisionValues}" SelectedItem="{Binding Configuration.ComparisionMatrix[1][4]}" Width="100" Height="50" BorderBrush="#FFC7C193" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center"/>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                                         <Label Content="Profit" Width="100" Height="50" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#CCFEDE06" BorderBrush="#FFC7C193" BorderThickness="1,1,1,1"/>
                                         <TextBox x:Name="profitVsComfort" BorderBrush="#FFC7C193" Width="100" Height="50" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" IsEnabled="False" Text="{Binding Configuration.ComparisionMatrix[0][2], Converter={StaticResource matrixConverter}}"/>
                                         <TextBox x:Name="profitVsTime" BorderBrush="#FFC7C193" Width="100" Height="50" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" IsEnabled="False" Text="{Binding Configuration.ComparisionMatrix[1][2], Converter={StaticResource matrixConverter}}"/>
                                         <TextBox x:Name="profitVsProfit" BorderBrush="#FFC7C193" Width="100" Height="50" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Text="{Binding Configuration.ComparisionMatrix[2][2]}" IsEnabled="False"/>
-                                        <ComboBox x:Name="profitVsJobs" ItemsSource="{Binding PossibleComparisionValues}" SelectedItem="{Binding Configuration.ComparisionMatrix[2][3]}"  Width="100" Height="50" BorderBrush="#FFC7C193" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center"/>
-                                        <ComboBox x:Name="profitVsCustomer" ItemsSource="{Binding PossibleComparisionValues}" SelectedItem="{Binding Configuration.ComparisionMatrix[2][4]}" Width="100" Height="50" BorderBrush="#FFC7C193" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center"/>
+                                        <ComboBox x:Name="profitVsJobs" ItemsSource="{Binding Configuration.PossibleComparisionValues}" SelectedItem="{Binding Configuration.ComparisionMatrix[2][3]}"  Width="100" Height="50" BorderBrush="#FFC7C193" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center"/>
+                                        <ComboBox x:Name="profitVsCustomer" ItemsSource="{Binding Configuration.PossibleComparisionValues}" SelectedItem="{Binding Configuration.ComparisionMatrix[2][4]}" Width="100" Height="50" BorderBrush="#FFC7C193" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center"/>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                                         <Label Width="100" Height="50" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#CCFEDE06" BorderBrush="#FFC7C193" BorderThickness="1,1,1,1">
@@ -69,7 +70,7 @@
                                         <TextBox x:Name="jobsVsTime" BorderBrush="#FFC7C193" Width="100" Height="50" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" IsEnabled="False" Text="{Binding Configuration.ComparisionMatrix[1][3], Converter={StaticResource matrixConverter}}"/>
                                         <TextBox x:Name="jobsVsProfit" BorderBrush="#FFC7C193" Width="100" Height="50" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" IsEnabled="False" Text="{Binding Configuration.ComparisionMatrix[2][3], Converter={StaticResource matrixConverter}}"/>
                                         <TextBox x:Name="jobsVsJobs" BorderBrush="#FFC7C193" Width="100" Height="50" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Text="{Binding Configuration.ComparisionMatrix[3][3]}" IsEnabled="False"/>
-                                        <ComboBox x:Name="jobsVsCustomer" ItemsSource="{Binding PossibleComparisionValues}" SelectedItem="{Binding Configuration.ComparisionMatrix[3][4]}" Width="100" Height="50" BorderBrush="#FFC7C193" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center"/>
+                                        <ComboBox x:Name="jobsVsCustomer" ItemsSource="{Binding Configuration.PossibleComparisionValues}" SelectedItem="{Binding Configuration.ComparisionMatrix[3][4]}" Width="100" Height="50" BorderBrush="#FFC7C193" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center"/>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                                         <Label Width="100" Height="50" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#CCFEDE06" BorderBrush="#FFC7C193" BorderThickness="1,1,1,1">
@@ -150,23 +151,64 @@
                     </StackPanel>
                 </TabItem>
                 <mah:MetroTabItem Header="Scheduling" mah:HeaderedControlHelper.HeaderFontSize="16" Padding="10,5,10,5">
-                    <StackPanel MinHeight="520">
+                    <StackPanel MinHeight="520" VerticalAlignment="Center">
                         <StackPanel Margin="30,0,0,0" MinHeight="442">
-                            <mah:MetroHeader Header="Data describing track" Height="50" Content="All necessary data to add your track" mah:ControlsHelper.ContentCharacterCasing="Normal" FontStyle="Italic" mah:HeaderedControlHelper.HeaderFontSize="16" Margin="0,30,0,0"/>
-                            <Grid Height="282" Width="582" HorizontalAlignment="Left" Margin="0,30,0,0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="46*"></ColumnDefinition>
-                                    <ColumnDefinition Width="251*"></ColumnDefinition>
-                                    <ColumnDefinition Width="0*"/>
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="11*"/>
-                                    <RowDefinition Height="91*"></RowDefinition>
-                                </Grid.RowDefinitions>
-                                <mah:NumericUpDown Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Height="26" Width="75" Minimum="1" Maximum="10" Margin="148,0,0,0"/>
-                                <Image Grid.Row="1" Source="/Assets/track.png" HorizontalAlignment="Center" VerticalAlignment="Top" Width="500" Margin="0,7,0,0" Height="237" Grid.Column="1"/>
-                                <mah:NumericUpDown Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Top" Height="26" Width="75" Minimum="1" Maximum="10" Margin="0,89,0,0"/>
-                            </Grid>
+                            <mah:MetroHeader Header="Data describing track" Height="50" Content="All necessary data about your track" mah:ControlsHelper.ContentCharacterCasing="Normal" FontStyle="Italic" mah:HeaderedControlHelper.HeaderFontSize="16" Margin="0,30,0,0"/>
+                            <StackPanel Orientation="Horizontal">
+                                <Grid Height="278" Width="579" Margin="0,25,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="102*"></ColumnDefinition>
+                                        <ColumnDefinition Width="464*"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="11*"/>
+                                        <RowDefinition Height="91*"></RowDefinition>
+                                    </Grid.RowDefinitions>
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="0,0,0,248" Grid.RowSpan="2">
+                                        <mah:NumericUpDown HorizontalAlignment="Left" VerticalAlignment="Center" Height="26" Width="80" Minimum="100" Maximum="1000" Margin="148,0,0,0" Value="{Binding Configuration.TrackWidth}"/>
+                                        <Label Content="cm"></Label>
+                                    </StackPanel>
+                                    <Image Grid.Row="1" Source="/Assets/track.png" HorizontalAlignment="Center" VerticalAlignment="Center" Height="237" Grid.Column="1" Width="456"/>
+                                    <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Height="68" Width="100">
+                                        <mah:NumericUpDown Height="26" Width="80" Minimum="100" Maximum="1000" VerticalAlignment="Top" Value="{Binding Configuration.TrackHeight}"/>
+                                        <Label Content="cm" HorizontalAlignment="Center" VerticalAlignment="Top"></Label>
+                                    </StackPanel>
+                                </Grid>
+                                <Grid Height="234" Margin="25,0,0,10" Width="379" VerticalAlignment="Center">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="190*"/>
+                                        <ColumnDefinition Width="120*"/>
+                                        <ColumnDefinition Width="69*"/>
+                                        <ColumnDefinition Width="0*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Label Grid.Column="0" Content="Cargo space depth:" HorizontalAlignment="Left" VerticalAlignment="Center" Height="26" Margin="55,0,0,0" Width="112"/>
+                                    <Label Grid.Row="1" Grid.Column="0" Content="Max load capacity:" HorizontalAlignment="Left" VerticalAlignment="Center" Height="26" Margin="59,0,0,0" Width="108"/>
+                                    <Label Grid.Row="2" Grid.Column="0" Content="Tarpaulin type:" HorizontalAlignment="Left" VerticalAlignment="Center" Height="26" HorizontalContentAlignment="Right" Margin="80,0,0,0" Width="87"/>
+                                    <Label Grid.Row="3" Content="Average fuel consumption:" HorizontalAlignment="Center" VerticalAlignment="Center" Height="26" Width="150"/>
+                                    <Label Grid.Row="4" Grid.Column="0" Content="Fuel cost:" HorizontalAlignment="Left" VerticalAlignment="Center" Height="26" Margin="108,0,0,0" Width="59" />
+                                    <Label Grid.Row="5" Grid.Column="0" Content="Cost of maintaining:" HorizontalAlignment="Left" VerticalAlignment="Center" Height="26" Margin="51,0,0,0" Width="116" />
+                                    <mah:NumericUpDown Grid.Column="1" HorizontalAlignment="Center" MinWidth="78" VerticalAlignment="Center" Height="26" Minimum="100" Maximum="1000" Width="110" Value="{Binding Configuration.TrackDepth}"/>
+                                    <mah:NumericUpDown Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" MinWidth="78" VerticalAlignment="Center" Height="26"  Minimum="1" Maximum="10000" Width="110" Value="{Binding Configuration.MaxLoadCapacity}"/>
+                                    <ComboBox Grid.Row="2" Grid.Column="1" ItemsSource="{Binding Configuration.PossibleTarpaulinTypes}" HorizontalAlignment="Center" MinWidth="78" VerticalAlignment="Center" Height="26" Width="110" HorizontalContentAlignment="Center" SelectedIndex="0"/>
+                                    <TextBox Grid.Row="3" Grid.Column="1" HorizontalAlignment="Center" MinWidth="78" VerticalAlignment="Center" Height="26" Width="110" Text="{Binding Configuration.CriteriaWeights[2]}"/>
+                                    <TextBox Grid.Row="4" Grid.Column="1" HorizontalAlignment="Center" MinWidth="78" VerticalAlignment="Center" Height="26" Width="110" Text="{Binding Configuration.CriteriaWeights[4]}"/>
+                                    <TextBox Grid.Row="5" Grid.Column="1" HorizontalAlignment="Center" MinWidth="78" VerticalAlignment="Center" Height="26" Width="110" Text="{Binding Configuration.CriteriaWeights[4]}"/>
+                                    <Label Grid.Column="2" Content="cm" HorizontalAlignment="Left" VerticalAlignment="Center" Height="26" Width="26"/>
+                                    <Label Grid.Column="2" Grid.Row="1" Content="kg" HorizontalAlignment="Left" VerticalAlignment="Center" Height="26" Width="23"/>
+                                    <Label Grid.Column="2" Grid.Row="2" Content="" HorizontalAlignment="Left" VerticalAlignment="Center" Height="26" Width="20"/>
+                                    <Label Grid.Column="2" Grid.Row="3" Content="l / 100km" HorizontalAlignment="Left" VerticalAlignment="Center" Height="26" Width="60"/>
+                                    <Label Grid.Column="2" Grid.Row="4" Content="zł" HorizontalAlignment="Left" VerticalAlignment="Center" Height="26" Width="20"/>
+                                    <Label Grid.Column="2" Grid.Row="5" Content="zł / km" HorizontalAlignment="Left" VerticalAlignment="Center" Height="26" Width="46"/>
+                                </Grid>
+                            </StackPanel>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,30,30">
                             <Button Padding="10 0 10 0" HorizontalAlignment="Right" Command="{Binding ResetConfigurationCommand}">

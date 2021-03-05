@@ -1,4 +1,5 @@
 ﻿using ResearchPlatform.Helpers;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace ResearchPlatform.Models
@@ -20,6 +21,19 @@ namespace ResearchPlatform.Models
             15, // Criteria.CompletedJobs
             10 // Criteria.CustomerReliability
         };
+        public static List<string> PossibleComparisionValues { get;}  = new List<string>{
+            "1", "2", "3", "4", "5", "6", "7", "8", "9", "1/2", "1/3", "1/4", "1/5", "1/6", "1/7", "1/8", "1/9"
+        };
+
+        public static List<string> PossibleTarpaulinTypes { get; } = new List<string>{
+            TarpaulinTypes.TILT, TarpaulinTypes.CURTAIN, TarpaulinTypes.WAGON, TarpaulinTypes.CHEST, TarpaulinTypes.TROLLEY, TarpaulinTypes.COOLING_BODIES
+        };
+
+        public int TrackHeight { get; set; } = 200;
+        public int TrackWidth { get; set; } = 800;
+        public int TrackDepth { get; set; } = 200;
+        public int MaxLoadCapacity { get; set; } = 2000;
+
 
         public static Configuration Create => new Configuration();
 

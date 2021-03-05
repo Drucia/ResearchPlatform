@@ -22,7 +22,6 @@ namespace ResearchPlatform.ViewModels
             get => _configuration;
             set => SetProperty(ref _configuration, value);
         }
-        public List<string> PossibleComparisionValues {get; set;}
 
         public SettingsDialogViewModel(Configuration configuration, IDialogCoordinator dialogCoordinator)
         {
@@ -32,10 +31,6 @@ namespace ResearchPlatform.ViewModels
             // make deep copy of configuration
             var json = JsonSerializer.Serialize(_originalConfiguration);
             _configuration = JsonSerializer.Deserialize<Configuration>(json);
-
-            PossibleComparisionValues = new List<string>{
-                 "1", "2", "3", "4", "5", "6", "7", "8", "9", "1/2", "1/3", "1/4", "1/5", "1/6", "1/7", "1/8", "1/9"
-            };
 
             SaveConfigurationCommand = new RelayCommand(new Action(SaveConfiguration));
             ResetConfigurationCommand = new RelayCommand(new Action(ResetToDefaultConfiguration));
