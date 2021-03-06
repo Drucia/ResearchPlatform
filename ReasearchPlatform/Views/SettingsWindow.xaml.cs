@@ -3,16 +3,6 @@ using MahApps.Metro.Controls.Dialogs;
 using ResearchPlatform.Models;
 using ResearchPlatform.ViewModels;
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace ResearchPlatform.Views
 {
@@ -26,6 +16,11 @@ namespace ResearchPlatform.Views
             InitializeComponent();
 
             DataContext = new SettingsDialogViewModel(configuration, DialogCoordinator.Instance);
+        }
+
+        private void OnCommitBindingGroup(object sender, EventArgs e)
+        {
+            WeightsGrid.BindingGroup.CommitEdit();
         }
     }
 }

@@ -2,9 +2,9 @@
 using MahApps.Metro.Controls.Dialogs;
 using ResearchPlatform.Models;
 using System;
-using System.Collections.Generic;
 using System.Windows.Input;
 using System.Text.Json;
+using System.Collections.ObjectModel;
 
 namespace ResearchPlatform.ViewModels
 {
@@ -16,6 +16,8 @@ namespace ResearchPlatform.ViewModels
 
         public ICommand SaveConfigurationCommand { get; set; }
         public ICommand ResetConfigurationCommand { get; set; }
+
+        public ObservableCollection<int> Test { get; set; } = new ObservableCollection<int> { 10 };
 
         public Configuration Configuration
         {

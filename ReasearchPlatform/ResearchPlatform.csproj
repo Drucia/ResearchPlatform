@@ -2,9 +2,10 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>hnet.com-image.ico</ApplicationIcon>
+    <StartupObject>ResearchPlatform.App</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>

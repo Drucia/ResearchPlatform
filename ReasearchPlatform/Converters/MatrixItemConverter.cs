@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 using System.Windows.Data;
 
-namespace ResearchPlatform.Helpers
+namespace ResearchPlatform.Converters
 {
     [ValueConversion(typeof(string), typeof(string))]
     public class MatrixItemConverter : IValueConverter
