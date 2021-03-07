@@ -15,6 +15,9 @@
     <mah:MetroWindow.Resources>
         <src:MatrixItemConverter x:Key="MatrixConverter"/>
         <src:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+        <src:BoolToVisibilityConverter
+         x:Key="BoolToHiddenConverter"
+         TrueValue="Hidden" FalseValue="Visible"/>
     </mah:MetroWindow.Resources>
     <StackPanel>
         <ContentControl DataContext="{Binding ElementName=AnimatedTabControl}"/>
@@ -85,13 +88,13 @@
                                         <TextBox x:Name="customerVsCustomer" BorderBrush="#FFC7C193" Width="100" Height="50" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Text="{Binding Configuration.ComparisionMatrix[4][4]}" IsEnabled="False"/>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                                        <Label Width="474"/>
-                                        <Button Padding="10 0 10 0" HorizontalAlignment="Right" Margin="0,10,0,0">
+                                        <Label Width="474" Content="{Binding MatrixError}" Visibility="{Binding IsMatrixConsistent, Converter={StaticResource BoolToHiddenConverter}}" Foreground="Red" FontSize="15" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Padding="5,15,10,5"/>
+                                        <Button Padding="10 0 10 0" HorizontalAlignment="Right" Margin="0,10,0,0" Command="{Binding CheckMatrixConsistencyCommand}">
                                             <StackPanel Orientation="Horizontal" Height="40">
                                                 <Label Content="Check matrix" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="12"/>
-                                                <iconPacks:PackIconFontAwesome Kind="ExclamationTriangleSolid"
-                                            VerticalAlignment="Center"
-                                            HorizontalAlignment="Center" Margin="3 0 0 0" />
+                                                <iconPacks:PackIconFontAwesome Kind="{Binding MatrixCheckIcon}"
+                                                    VerticalAlignment="Center"
+                                                    HorizontalAlignment="Center" Margin="3 0 0 0" Foreground="{Binding MatrixCheckColor}" />
                                             </StackPanel>
                                         </Button>
                                     </StackPanel>

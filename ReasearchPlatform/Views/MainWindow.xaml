@@ -18,6 +18,7 @@
         </mah:WindowCommands>
     </mah:MetroWindow.LeftWindowCommands>
     <Grid>
-
+        <GroupBox Header="Sialalal">
+        </GroupBox>
     </Grid>
 </mah:MetroWindow>

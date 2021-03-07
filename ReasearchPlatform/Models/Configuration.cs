@@ -11,15 +11,15 @@ namespace ResearchPlatform.Models
     {
         private static readonly int SUM_OF_WEIGHTS = 100;
 
-        public List<List<string>> ComparisionMatrix { get; set; } = new List<List<string>> {
-            new List<string>{ "1", "2", "1/4", "3", "1/2"},
-            new List<string>{ "1/2", "1", "1/5", "1/3", "1/2"},
-            new List<string>{ "4", "5", "1", "9", "2"},
-            new List<string>{ "1/3", "3", "1/9", "1", "4" },
-            new List<string>{ "2", "2", "1/2", "1/4", "1" }
+        public ObservableCollection<ObservableCollection<string>> ComparisionMatrix { get; set; } = new ObservableCollection<ObservableCollection<string>> {
+            new ObservableCollection<string>{ "1", "2", "1/6", "1/4", "1/2"},
+            new ObservableCollection<string>{ "1/2", "1", "1/5", "1/3", "1/2"},
+            new ObservableCollection<string>{ "4", "5", "1", "5", "5"},
+            new ObservableCollection<string>{ "1/3", "1", "1/5", "1", "2" },
+            new ObservableCollection<string>{ "2", "2", "1/2", "1/4", "1" }
         };
 
-        public List<int> CriteriaWeights { get; set; } = new List<int> {
+        public ObservableCollection<int> CriteriaWeights { get; set; } = new ObservableCollection<int> {
             5, // Criteria.ComfortOfWork 
             10, // Criteria.DrivingTime
             60, // Criteria.Profit

@@ -1,12 +1,7 @@
 ﻿using GalaSoft.MvvmLight.Command;
-using MahApps.Metro.Controls.Dialogs;
 using ResearchPlatform.Models;
 using ResearchPlatform.Views;
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
 
 namespace ResearchPlatform.ViewModels
