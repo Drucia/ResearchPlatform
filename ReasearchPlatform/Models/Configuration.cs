@@ -14,9 +14,9 @@ namespace ResearchPlatform.Models
         public ObservableCollection<ObservableCollection<string>> ComparisionMatrix { get; set; } = new ObservableCollection<ObservableCollection<string>> {
             new ObservableCollection<string>{ "1", "2", "1/6", "1/4", "1/2"},
             new ObservableCollection<string>{ "1/2", "1", "1/5", "1/3", "1/2"},
-            new ObservableCollection<string>{ "4", "5", "1", "5", "5"},
-            new ObservableCollection<string>{ "1/3", "1", "1/5", "1", "2" },
-            new ObservableCollection<string>{ "2", "2", "1/2", "1/4", "1" }
+            new ObservableCollection<string>{ "6", "5", "1", "5", "5"},
+            new ObservableCollection<string>{ "4", "3", "1/5", "1", "2" },
+            new ObservableCollection<string>{ "2", "2", "1/5", "1/2", "1" }
         };
 
         public ObservableCollection<int> CriteriaWeights { get; set; } = new ObservableCollection<int> {
