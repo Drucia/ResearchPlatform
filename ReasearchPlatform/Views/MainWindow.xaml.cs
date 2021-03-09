@@ -29,5 +29,15 @@ namespace ResearchPlatform.Views
 
             DataContext = new MainWindowViewModel();
         }
+
+        private void OnCommitBindingGroup(object sender, EventArgs e)
+        {
+            WeightsGrid.BindingGroup.CommitEdit();
+        }
+
+        private void OnCommitMatrixBindingGroup(object sender, EventArgs e)
+        {
+            MatrixGrid.BindingGroup.CommitEdit();
+        }
     }
 }

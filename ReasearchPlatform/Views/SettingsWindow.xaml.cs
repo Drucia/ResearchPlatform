@@ -22,5 +22,10 @@ namespace ResearchPlatform.Views
         {
             WeightsGrid.BindingGroup.CommitEdit();
         }
+
+        private void OnCommitMatrixBindingGroup(object sender, EventArgs e)
+        {
+            MatrixPanel.BindingGroup.CommitEdit();
+        }
     }
 }

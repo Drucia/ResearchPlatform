@@ -26,7 +26,27 @@ namespace ResearchPlatform.Models
             15, // Criteria.CompletedJobs
             10 // Criteria.CustomerReliability
         };
-        public static List<string> PossibleComparisionValues { get;}  = new List<string>{
+
+        public ObservableCollection<int> GoalFunctionWeights { get; set; } = new ObservableCollection<int>
+        {
+            15,
+            60,
+            25
+        };
+
+        public ObservableCollection<ObservableCollection<bool>> AlgorithmsMatrix { get; set; } = new ObservableCollection<ObservableCollection<bool>> {
+            new ObservableCollection<bool>{true, false, false, false},
+            new ObservableCollection<bool>{true, false, false, false},
+            new ObservableCollection<bool>{true, false, false, false},
+            new ObservableCollection<bool>{true, false, false, false},
+        };
+
+        public bool IsAlgorithmsMatrixValid()
+        {
+            return AlgorithmsMatrix.Any(row => row.Any(col => col));
+        }
+
+        public static List<string> PossibleComparisionValues { get; } = new List<string>{
             "1", "2", "3", "4", "5", "6", "7", "8", "9", "1/2", "1/3", "1/4", "1/5", "1/6", "1/7", "1/8", "1/9"
         };
 
@@ -60,17 +80,27 @@ namespace ResearchPlatform.Models
 
         public bool IsValid()
         {
+            return AreCriteriaWeightValid() && AreGoalFunctionWeightValid();
+        }
+
+        public bool AreCriteriaWeightValid()
+        {
             return CriteriaWeights.Sum() == SUM_OF_WEIGHTS;
+        }
+
+        public bool AreGoalFunctionWeightValid()
+        {
+            return GoalFunctionWeights.Sum() == SUM_OF_WEIGHTS;
         }
 
         public void fillMatrix()
         {
             var converter = new MatrixItemConverter();
 
-            for (int row=0; row < ComparisionMatrix.Count; row++)
+            for (int row = 0; row < ComparisionMatrix.Count; row++)
             {
                 var rowCol = ComparisionMatrix[row];
-                for (int col=0; col < rowCol.Count; col++)
+                for (int col = 0; col < rowCol.Count; col++)
                 {
                     if (row == col)
                         break;

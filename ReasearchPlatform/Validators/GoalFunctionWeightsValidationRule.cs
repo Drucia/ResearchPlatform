@@ -1,15 +1,12 @@
 ﻿using ResearchPlatform.Models;
 using ResearchPlatform.ViewModels;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 using System.Windows.Controls;
 using System.Windows.Data;
 
 namespace ResearchPlatform.Validators
 {
-    public class WeightsValidationRule : ValidationRule
+    public class GoalFunctionWeightsValidationRule : ValidationRule
     {
         public override ValidationResult Validate(object value, CultureInfo cultureInfo)
         {
@@ -17,10 +14,10 @@ namespace ResearchPlatform.Validators
             if (bindingGroup.Items.Count > 1)
             {
                 object item = bindingGroup.Items[0];
-                SettingsDialogViewModel viewModel =
-                  item as SettingsDialogViewModel;
+                MainWindowViewModel viewModel =
+                  item as MainWindowViewModel;
                 if (viewModel != null && viewModel.Configuration != null &&
-                  !viewModel.Configuration.AreCriteriaWeightValid())
+                  !viewModel.Configuration.AreGoalFunctionWeightValid())
                     return new ValidationResult(false,
                       Messages.WEIGHTS_VALIDATION_MSG);
             }

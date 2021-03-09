@@ -4,10 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ResearchPlatform.Helpers
+namespace ResearchPlatform.Models
 {
-    public static class ConsistencyValidator
+    public enum SearchTreeAlgorithm
     {
-
+        DFS,
+        BFS,
+        Heuristic,
+        Random
     }
 }

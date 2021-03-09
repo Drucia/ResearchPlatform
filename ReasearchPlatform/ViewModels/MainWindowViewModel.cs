@@ -6,9 +6,14 @@ using System.Windows.Input;
 
 namespace ResearchPlatform.ViewModels
 {
-    class MainWindowViewModel
+    class MainWindowViewModel : ViewModelBase
     {
         private Configuration _configuration;
+        public Configuration Configuration
+        {
+            get => _configuration;
+            set => SetProperty(ref _configuration, value);
+        }
 
         public ICommand LaunchSettingsCommand { get; set; }
 
