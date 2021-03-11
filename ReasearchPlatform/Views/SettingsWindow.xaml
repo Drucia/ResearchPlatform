@@ -108,6 +108,25 @@
                                         <TextBox x:Name="customerVsJobs" BorderBrush="#FFC7C193" Width="100" Height="50" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" IsEnabled="False" Text="{Binding Configuration.ComparisionMatrix[3][4], Converter={StaticResource MatrixConverter}}"/>
                                         <TextBox x:Name="customerVsCustomer" BorderBrush="#FFC7C193" Width="100" Height="50" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Text="{Binding Configuration.ComparisionMatrix[4][4]}" IsEnabled="False"/>
                                     </StackPanel>
+                                    <Grid Width="591">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <Label Grid.Column="0" Content="1 - Equal importance"/>
+                                        <Label Grid.Column="1" Content="3 - Moderate importance"/>
+                                        <Label Grid.Column="2" Content="5 - Strong importance"/>
+                                        <Label Grid.Row="1" Grid.Column="0" Content="7 - Very strong importance"/>
+                                        <Label Grid.Row="1" Grid.Column="1" Content="9 - Extreme importance"/>
+                                        <Label Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" Content="2, 4, 6, 8 - Intermediate values"/>
+                                        <Label Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Content="1/3, 1/5, 1/7, 1/9 - Values for inverse comparision"/>
+                                    </Grid>
                                 </StackPanel>
                             </StackPanel>
                             <GridSplitter Margin="35,35,0,0" Width="2"/>
@@ -152,7 +171,7 @@
                                 </Grid>
                             </StackPanel>
                         </StackPanel>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,30,30">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,-70,30,30">
                             <Button Padding="10 0 10 0" HorizontalAlignment="Right" Command="{Binding ResetConfigurationCommand}">
                                 <StackPanel Orientation="Horizontal" Height="25">
                                     <Label Content="Reset to default" FontSize="12"/>

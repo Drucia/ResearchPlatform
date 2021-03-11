@@ -49,7 +49,7 @@
         <GroupBox Grid.Row="0" Grid.Column="0" Header="Test Preferences" Margin="10,10,10,10">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel>
-                    <Label Content="Choose algorithms to run:" Margin="0,0,0,5" FontStyle="Italic"/>
+                    <Label Content="Choose algorithms to run:" Margin="10,0,0,5" FontStyle="Italic"/>
                     <Grid Margin="30,0,30,0" x:Name="MatrixGrid" Validation.ErrorTemplate="{StaticResource MahApps.Templates.ValidationError}">
                         <Grid.BindingGroup>
                             <BindingGroup>
@@ -129,9 +129,9 @@
                             <CheckBox HorizontalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="{Binding Configuration.AlgorithmsMatrix[3][3], UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" Checked="OnCommitMatrixBindingGroup" Unchecked="OnCommitMatrixBindingGroup"/>
                         </Border>
                     </Grid>
-                    <Label Content="Choose weights to goal function:" Margin="0,20,0,5" FontStyle="Italic"/>
+                    <Label Content="Choose weights to goal function:" Margin="10,20,0,5" FontStyle="Italic"/>
                     <DockPanel>
-                        <Grid x:Name="WeightsGrid" Margin="25,0,0,0" HorizontalAlignment="Left" Validation.ErrorTemplate="{StaticResource MahApps.Templates.ValidationError}">
+                        <Grid x:Name="WeightsGrid" Margin="25,0,0,10" HorizontalAlignment="Left" Validation.ErrorTemplate="{StaticResource MahApps.Templates.ValidationError}">
                             <Grid.BindingGroup>
                                 <BindingGroup>
                                     <BindingGroup.ValidationRules>
@@ -157,7 +157,7 @@
                             <mah:NumericUpDown Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" MinWidth="78" Margin="20,5,0,0" VerticalAlignment="Center" Height="26" Minimum="0" Maximum="100" Width="78" Value="{Binding Configuration.GoalFunctionWeights[2], UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" ValueChanged="OnCommitBindingGroup" />
                             <Label Grid.Column="2" Grid.Row="0" Content="%" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,5,0,0" Height="26" Width="20"/>
                             <Label Grid.Column="2" Grid.Row="1" Content="%" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,5,0,0" Height="26" Width="20"/>
-                            <Label Grid.Column="2" Grid.Row="2" Content="%" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,5,0,10" Height="26" Width="20"/>
+                            <Label Grid.Column="2" Grid.Row="2" Content="%" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,5,0,0" Height="26" Width="20"/>
                         </Grid>
                         <Button x:Name="RunButton" HorizontalAlignment="Right" Padding="0 5 0 5" Margin="12,0,40,0" Width="95" VerticalAlignment="Center">
                             <Button.IsEnabled>
@@ -180,6 +180,23 @@
         <GroupBox Grid.Row="0" Grid.Column="1" Header="Algorithms Results" Margin="10,10,10,10">
         </GroupBox>
         <GroupBox Grid.Row="1" Grid.Column="0" Header="Input Data" Margin="10,10,10,10">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                <Grid>
+                    <ListView ItemsSource="{Binding Jobs}">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="ID" Width="50" DisplayMemberBinding="{Binding Path=ID}" />
+                                <GridViewColumn Header="From" Width="50" DisplayMemberBinding="{Binding From}" />
+                                <GridViewColumn Header="To" Width="50" DisplayMemberBinding="{Binding To}" />
+                                <GridViewColumn Header="Price" Width="50" DisplayMemberBinding="{Binding Price}" />
+                                <GridViewColumn Header="Pickup time" Width="50" DisplayMemberBinding="{Binding Pickup}" />
+                                <GridViewColumn Header="Delivery time" Width="60" DisplayMemberBinding="{Binding Delivery}" />
+                                <GridViewColumn Header="ClientId" Width="50" DisplayMemberBinding="{Binding ClientId}" />
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </Grid>
+            </ScrollViewer>
         </GroupBox>
         <GroupBox Grid.Row="1" Grid.Column="1" Header="Output Data" Margin="10,10,10,10">
         </GroupBox>
