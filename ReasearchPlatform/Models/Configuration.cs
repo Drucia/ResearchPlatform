@@ -61,7 +61,7 @@ namespace ResearchPlatform.Models
         public double AvgFuelConsumption { get; set; } = 8.5;
         public double FuelCost { get; set; } = 5.0;
         public double CostOfMaintain { get; set; } = 2.5;
-
+        public string Postcode { get; set; } = "58-400";
 
         public static Configuration Create => new Configuration();
 

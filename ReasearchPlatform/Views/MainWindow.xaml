@@ -129,7 +129,7 @@
                             <CheckBox HorizontalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="{Binding Configuration.AlgorithmsMatrix[3][3], UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" Checked="OnCommitMatrixBindingGroup" Unchecked="OnCommitMatrixBindingGroup"/>
                         </Border>
                     </Grid>
-                    <Label Content="Choose weights to goal function:" Margin="10,20,0,5" FontStyle="Italic"/>
+                    <Label Content="Choose weights for goal function:" Margin="10,20,0,5" FontStyle="Italic"/>
                     <DockPanel>
                         <Grid x:Name="WeightsGrid" Margin="25,0,0,10" HorizontalAlignment="Left" Validation.ErrorTemplate="{StaticResource MahApps.Templates.ValidationError}">
                             <Grid.BindingGroup>
@@ -181,21 +181,27 @@
         </GroupBox>
         <GroupBox Grid.Row="1" Grid.Column="0" Header="Input Data" Margin="10,10,10,10">
             <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-                <Grid>
-                    <ListView ItemsSource="{Binding Jobs}">
-                        <ListView.View>
-                            <GridView>
-                                <GridViewColumn Header="ID" Width="50" DisplayMemberBinding="{Binding Path=ID}" />
-                                <GridViewColumn Header="From" Width="50" DisplayMemberBinding="{Binding From}" />
-                                <GridViewColumn Header="To" Width="50" DisplayMemberBinding="{Binding To}" />
-                                <GridViewColumn Header="Price" Width="50" DisplayMemberBinding="{Binding Price}" />
-                                <GridViewColumn Header="Pickup time" Width="50" DisplayMemberBinding="{Binding Pickup}" />
-                                <GridViewColumn Header="Delivery time" Width="60" DisplayMemberBinding="{Binding Delivery}" />
-                                <GridViewColumn Header="ClientId" Width="50" DisplayMemberBinding="{Binding ClientId}" />
-                            </GridView>
-                        </ListView.View>
-                    </ListView>
-                </Grid>
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBox Text="{Binding Configuration.Postcode}" HorizontalAlignment="Left" MinWidth="100"/>
+                        <Button Content="Generate" Command="{Binding GenerateInputCommand}"/>
+                    </StackPanel>
+                    <Grid>
+                        <ListView ItemsSource="{Binding Jobs}">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Header="ID" Width="50" DisplayMemberBinding="{Binding Path=ID}" />
+                                    <GridViewColumn Header="From" Width="50" DisplayMemberBinding="{Binding From}" />
+                                    <GridViewColumn Header="To" Width="50" DisplayMemberBinding="{Binding To}" />
+                                    <GridViewColumn Header="Price" Width="50" DisplayMemberBinding="{Binding Price}" />
+                                    <GridViewColumn Header="Pickup time" Width="50" DisplayMemberBinding="{Binding Pickup}" />
+                                    <GridViewColumn Header="Delivery time" Width="60" DisplayMemberBinding="{Binding Delivery}" />
+                                    <GridViewColumn Header="ClientId" Width="50" DisplayMemberBinding="{Binding ClientId}" />
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </Grid>
+                </StackPanel>
             </ScrollViewer>
         </GroupBox>
         <GroupBox Grid.Row="1" Grid.Column="1" Header="Output Data" Margin="10,10,10,10">

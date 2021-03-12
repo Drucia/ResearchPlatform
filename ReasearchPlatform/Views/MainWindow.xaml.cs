@@ -27,7 +27,7 @@ namespace ResearchPlatform.Views
         {
             InitializeComponent();
 
-            DataContext = new MainWindowViewModel();
+            DataContext = new MainWindowViewModel(DialogCoordinator.Instance);
         }
 
         private void OnCommitBindingGroup(object sender, EventArgs e)
