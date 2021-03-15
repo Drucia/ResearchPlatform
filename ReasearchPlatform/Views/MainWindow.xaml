@@ -180,23 +180,26 @@
         <GroupBox Grid.Row="0" Grid.Column="1" Header="Algorithms Results" Margin="10,10,10,10">
         </GroupBox>
         <GroupBox Grid.Row="1" Grid.Column="0" Header="Input Data" Margin="10,10,10,10">
-            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+            <ScrollViewer
+                          HorizontalScrollBarVisibility="Auto"
+                          VerticalScrollBarVisibility="Auto">
                 <StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBox Text="{Binding Configuration.Postcode}" HorizontalAlignment="Left" MinWidth="100"/>
-                        <Button Content="Generate" Command="{Binding GenerateInputCommand}"/>
-                    </StackPanel>
+                <DockPanel>
+                        <ComboBox HorizontalAlignment="Left" ItemsSource="{Binding InputFileList}" SelectedValue="{Binding SelectedInputFile}" MinWidth="150" Margin="0,0,0,10"/>
+                    </DockPanel>
                     <Grid>
-                        <ListView ItemsSource="{Binding Jobs}">
+                        <ListView ItemsSource="{Binding Input.Jobs}"
+                              Style="{StaticResource MahApps.Styles.ListView.Virtualized}" ScrollViewer.CanContentScroll="True">
                             <ListView.View>
                                 <GridView>
-                                    <GridViewColumn Header="ID" Width="50" DisplayMemberBinding="{Binding Path=ID}" />
-                                    <GridViewColumn Header="From" Width="50" DisplayMemberBinding="{Binding From}" />
-                                    <GridViewColumn Header="To" Width="50" DisplayMemberBinding="{Binding To}" />
-                                    <GridViewColumn Header="Price" Width="50" DisplayMemberBinding="{Binding Price}" />
-                                    <GridViewColumn Header="Pickup time" Width="50" DisplayMemberBinding="{Binding Pickup}" />
-                                    <GridViewColumn Header="Delivery time" Width="60" DisplayMemberBinding="{Binding Delivery}" />
-                                    <GridViewColumn Header="ClientId" Width="50" DisplayMemberBinding="{Binding ClientId}" />
+                                    <GridViewColumn Header="ID" DisplayMemberBinding="{Binding Path=ID}" />
+                                    <GridViewColumn Header="From" DisplayMemberBinding="{Binding From}" />
+                                    <GridViewColumn Header="To" DisplayMemberBinding="{Binding To}" />
+                                    <GridViewColumn Header="Price" DisplayMemberBinding="{Binding Price, StringFormat=C,  ConverterCulture='pl-PL'}" />
+                                    <GridViewColumn Header="Pickup time" DisplayMemberBinding="{Binding Pickup}" />
+                                    <GridViewColumn Header="Delivery time" DisplayMemberBinding="{Binding Delivery}" />
+                                    <GridViewColumn Header="Loading time" DisplayMemberBinding="{Binding LoadingTime, StringFormat=0 min}"/>
+                                    <GridViewColumn Header="ClientId" DisplayMemberBinding="{Binding ClientId}" />
                                 </GridView>
                             </ListView.View>
                         </ListView>

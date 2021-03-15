@@ -1,14 +1,12 @@
 ﻿using GalaSoft.MvvmLight.Command;
 using MahApps.Metro.Controls.Dialogs;
-using Microsoft.Win32;
 using ResearchPlatform.Helpers;
-using ResearchPlatform.Input;
 using ResearchPlatform.Models;
 using ResearchPlatform.Views;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
@@ -21,12 +19,14 @@ namespace ResearchPlatform.ViewModels
     {
         private static readonly string CENTRAL_NODES_FILE = "CentralNode.json";
         private static readonly string GENERATED_NODES_AROUND_FILE = "NodesAround.json";
-        private static readonly string INPUT_FILE = "Input.json";
+        private static readonly string INPUT_FILE = "Input";
 
         private IDialogCoordinator _dialogCoordinator;
 
         private Configuration _configuration;
         private Models.Input _input;
+        private List<string> _inputFileList;
+        private string _selectedInputFile;
 
         public Configuration Configuration
         {
@@ -39,6 +39,22 @@ namespace ResearchPlatform.ViewModels
             set => SetProperty(ref _input, value);
         }
 
+        public List<string> InputFileList
+        {
+            get => _inputFileList;
+            set => SetProperty(ref _inputFileList, value);
+        }
+
+        public string SelectedInputFile
+        {
+            get => _selectedInputFile;
+            set
+            {
+                if (SetProperty(ref _selectedInputFile, value))
+                    ReadInputFile();
+            }
+        }
+
         public ICommand LaunchSettingsCommand { get; set; }
         public ICommand GenerateInputCommand { get; set; }
 
@@ -49,14 +65,39 @@ namespace ResearchPlatform.ViewModels
 
             LaunchSettingsCommand = new RelayCommand(new Action(LaunchSetting));
             GenerateInputCommand = new RelayCommand(new Action(GenerateInput));
+
+            _inputFileList = GetInputFileList();
+            SelectedInputFile = _inputFileList.First();
+        }
+
+        private List<string> GetInputFileList()
+        {
+            return Directory.GetFiles("./")
+                .Where(filename => filename.Contains(INPUT_FILE))
+                .Select(filename => filename.Split("./")[1])
+                .ToList();
+        }
+
+        private void ReadInputFile()
+        {
+            if (SelectedInputFile != null)
+            {
+                using (StreamReader r = new StreamReader(SelectedInputFile))
+                {
+                    string json = r.ReadToEnd();
+                    Input = JsonSerializer.Deserialize<Models.Input>(json);
+                }
+            }
         }
 
         private async void GenerateInput()
         {
-            //var node = await Fetcher.FetchCityNodeFromPostcodeAsync(Configuration.Postcode);
-            //var nodes = await Fetcher.FetchCitiesNodesAroundNodeAsync(node);
+            var progressBar = await _dialogCoordinator.ShowProgressAsync(this, "Info", Messages.GENERATING_MSG);
+
             var generator = InputGenerator.GetInstance();
             await generator.GenerateAsync(Configuration.Postcode);
+
+            await progressBar.CloseAsync();
 
             if (generator.Input == null)
             {
@@ -68,13 +109,8 @@ namespace ResearchPlatform.ViewModels
                     Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Latin1Supplement, UnicodeRanges.LatinExtendedA)
                 };
 
-                //var serializeNode = JsonSerializer.Serialize<Node>(node, serializerOptions);
-                //var serializeNodes = JsonSerializer.Serialize<List<Node>>(nodes, serializerOptions);
-
-                //File.AppendAllText(CENTRAL_NODES_FILE, serializeNode.ToString(), Encoding.UTF8);
-                //File.AppendAllText(GENERATED_NODES_AROUND_FILE, serializeNodes.ToString(), Encoding.UTF8);
                 var serializeInput = JsonSerializer.Serialize<Models.Input>(generator.Input, serializerOptions);
-                File.AppendAllText(INPUT_FILE, serializeInput.ToString(), Encoding.UTF8);
+                File.WriteAllText($"{INPUT_FILE}_{DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss")}.json", serializeInput.ToString(), Encoding.UTF8);
 
                 await _dialogCoordinator.ShowMessageAsync(this, "Info", Messages.POSTCODE_SAVE_MSG);
             }

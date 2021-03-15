@@ -9,5 +9,6 @@
         public static readonly string ALGORITHMS_MATRIX_VALIDATION_MSG = "At least one algorithm have to be chosen!";
         public static readonly string POSTCODE_ERROR_MSG = "Entered postcode was not connected to any city. Please enter right postcode";
         public static readonly string POSTCODE_SAVE_MSG = "Successfully saved generated nodes";
+        public static readonly string GENERATING_MSG = "Generating data...";
     }
 }

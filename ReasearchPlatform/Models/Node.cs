@@ -1,10 +1,7 @@
-﻿using Newtonsoft.Json;
-using ResearchPlatform.Models.DTO;
+﻿using ResearchPlatform.Models.DTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ResearchPlatform.Models
 {
@@ -42,6 +39,11 @@ namespace ResearchPlatform.Models
         public bool Equals(Node other)
         {
             return ID == other.ID;
+        }
+
+        public override string ToString() 
+        {
+            return Name;
         }
     }
 }

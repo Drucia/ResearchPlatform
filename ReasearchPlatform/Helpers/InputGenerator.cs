@@ -41,12 +41,14 @@ namespace ResearchPlatform.Helpers
             if (nodesAround == null)
                 return null;
 
-            var distances = await GetAllDistancesForAsync(nodesAround);
+            var distances = await GetAllDistancesForAsync(centralNode, nodesAround);
 
             Input = new Models.Input() {
                 Base = centralNode,
                 Nodes = nodesAround,
-                DistanceMatrix = distances
+                DistanceMatrix = distances,
+                Jobs = new List<Job>(),
+                Logs = new List<string>()
             };
 
             return this;
@@ -58,8 +60,15 @@ namespace ResearchPlatform.Helpers
             {
                 var from = GetRandomNode();
                 var to = GetRandomNode(from);
-                var distance = Input.DistanceMatrix.Find(distance => (distance.From == from && distance.To == to) 
-                    || (distance.To == from && distance.From == to));
+
+                var distance = Input.DistanceMatrix.Find(distance => (distance.From.Equals(from) && distance.To.Equals(to)) 
+                    || (distance.To.Equals(from) && distance.From.Equals(to)));
+
+                if (distance == null)
+                {
+                    Input.Logs.Add($"Error with distance from {from.ID} to {to.ID}");
+                    continue;
+                }
 
                 var loadingTime = _random.Next(MIN_LOADING_TIME, MAX_LOADING_TIME);
                 var pickupStart = _random.Next(0, MAX_WORKING_TIME);
@@ -116,7 +125,7 @@ namespace ResearchPlatform.Helpers
                 return Input.Nodes[idx];
         }
 
-        private async Task<List<Distance>> GetAllDistancesForAsync(List<Node> nodesAround)
+        private async Task<List<Distance>> GetAllDistancesForAsync(Node centralNode, List<Node> nodesAround)
         {
             List<Distance> distances = new List<Distance>();
 
@@ -125,15 +134,17 @@ namespace ResearchPlatform.Helpers
                 for (int j=i+1; j < nodesAround.Count; j++)
                 {
                     var distance = await Fetcher.FetchDistanceBetweenNodesAsync(nodesAround[i], nodesAround[j]);
-                    if (distance != null)
-                        distances.Add(distance);
+                    while (distance == null)
+                        distance = await Fetcher.FetchDistanceBetweenNodesAsync(nodesAround[i], nodesAround[j]);
+                    distances.Add(distance);
                 }
             }
 
             nodesAround.ForEach(async node => { 
-                var distance = await Fetcher.FetchDistanceBetweenNodesAsync(Input.Base, node);
-                if (distance != null)
-                    distances.Add(distance);
+                var distance = await Fetcher.FetchDistanceBetweenNodesAsync(centralNode, node);
+                while (distance == null)
+                    distance = await Fetcher.FetchDistanceBetweenNodesAsync(centralNode, node);
+                distances.Add(distance);
             });
 
             return distances;
