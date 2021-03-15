@@ -180,32 +180,30 @@
         <GroupBox Grid.Row="0" Grid.Column="1" Header="Algorithms Results" Margin="10,10,10,10">
         </GroupBox>
         <GroupBox Grid.Row="1" Grid.Column="0" Header="Input Data" Margin="10,10,10,10">
-            <ScrollViewer
-                          HorizontalScrollBarVisibility="Auto"
-                          VerticalScrollBarVisibility="Auto">
-                <StackPanel>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
                 <DockPanel>
-                        <ComboBox HorizontalAlignment="Left" ItemsSource="{Binding InputFileList}" SelectedValue="{Binding SelectedInputFile}" MinWidth="150" Margin="0,0,0,10"/>
-                    </DockPanel>
-                    <Grid>
-                        <ListView ItemsSource="{Binding Input.Jobs}"
-                              Style="{StaticResource MahApps.Styles.ListView.Virtualized}" ScrollViewer.CanContentScroll="True">
-                            <ListView.View>
-                                <GridView>
-                                    <GridViewColumn Header="ID" DisplayMemberBinding="{Binding Path=ID}" />
-                                    <GridViewColumn Header="From" DisplayMemberBinding="{Binding From}" />
-                                    <GridViewColumn Header="To" DisplayMemberBinding="{Binding To}" />
-                                    <GridViewColumn Header="Price" DisplayMemberBinding="{Binding Price, StringFormat=C,  ConverterCulture='pl-PL'}" />
-                                    <GridViewColumn Header="Pickup time" DisplayMemberBinding="{Binding Pickup}" />
-                                    <GridViewColumn Header="Delivery time" DisplayMemberBinding="{Binding Delivery}" />
-                                    <GridViewColumn Header="Loading time" DisplayMemberBinding="{Binding LoadingTime, StringFormat=0 min}"/>
-                                    <GridViewColumn Header="ClientId" DisplayMemberBinding="{Binding ClientId}" />
-                                </GridView>
-                            </ListView.View>
-                        </ListView>
-                    </Grid>
-                </StackPanel>
-            </ScrollViewer>
+                    <ComboBox Grid.Row="0" HorizontalAlignment="Right" ItemsSource="{Binding InputFileList}" SelectedValue="{Binding SelectedInputFile}" MinWidth="150" Margin="0,0,0,10" VerticalAlignment="Center"/>
+                </DockPanel>
+                <ListView ItemsSource="{Binding Input.Jobs}" Grid.Row="1"
+                              Style="{StaticResource MahApps.Styles.ListView.Virtualized}" ScrollViewer.CanContentScroll="True" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="ID" DisplayMemberBinding="{Binding Path=ID}" />
+                            <GridViewColumn Header="From" DisplayMemberBinding="{Binding From}" />
+                            <GridViewColumn Header="To" DisplayMemberBinding="{Binding To}" />
+                            <GridViewColumn Header="Price" DisplayMemberBinding="{Binding Price, StringFormat=C,  ConverterCulture='pl-PL'}" />
+                            <GridViewColumn Header="Pickup time" DisplayMemberBinding="{Binding Pickup}" />
+                            <GridViewColumn Header="Delivery time" DisplayMemberBinding="{Binding Delivery}" />
+                            <GridViewColumn Header="Loading time" DisplayMemberBinding="{Binding LoadingTime, StringFormat=0 min}"/>
+                            <GridViewColumn Header="Client ID" DisplayMemberBinding="{Binding ClientId}" />
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </Grid>
         </GroupBox>
         <GroupBox Grid.Row="1" Grid.Column="1" Header="Output Data" Margin="10,10,10,10">
         </GroupBox>
