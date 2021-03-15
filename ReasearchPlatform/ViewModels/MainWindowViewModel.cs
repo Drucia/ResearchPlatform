@@ -5,28 +5,33 @@ using ResearchPlatform.Models;
 using ResearchPlatform.Views;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Unicode;
+using System.Threading;
 using System.Windows.Input;
 
 namespace ResearchPlatform.ViewModels
 {
     class MainWindowViewModel : ViewModelBase
     {
-        private static readonly string CENTRAL_NODES_FILE = "CentralNode.json";
-        private static readonly string GENERATED_NODES_AROUND_FILE = "NodesAround.json";
         private static readonly string INPUT_FILE = "Input";
 
         private IDialogCoordinator _dialogCoordinator;
 
         private Configuration _configuration;
         private Models.Input _input;
+
         private List<string> _inputFileList;
         private string _selectedInputFile;
+        private bool _inProgress = false;
+        private List<Job> _results;
+
+        private AlgorithmsManager _algManager;
 
         public Configuration Configuration
         {
@@ -55,8 +60,21 @@ namespace ResearchPlatform.ViewModels
             }
         }
 
+        public bool InProgress
+        {
+            get => _inProgress;
+            set => SetProperty(ref _inProgress, value);
+        }
+
+        public List<Job> Results
+        {
+            get => _results;
+            set => SetProperty(ref _results, value);
+        }
+
         public ICommand LaunchSettingsCommand { get; set; }
         public ICommand GenerateInputCommand { get; set; }
+        public ICommand RunAlgorithmsCommand { get; set; }
 
         public MainWindowViewModel(IDialogCoordinator dialogCoordinator)
         {
@@ -65,9 +83,19 @@ namespace ResearchPlatform.ViewModels
 
             LaunchSettingsCommand = new RelayCommand(new Action(LaunchSetting));
             GenerateInputCommand = new RelayCommand(new Action(GenerateInput));
+            RunAlgorithmsCommand = new RelayCommand(new Action(RunAlgorithms));
 
             _inputFileList = GetInputFileList();
             SelectedInputFile = _inputFileList.First();
+
+            _algManager = AlgorithmsManager.GetInstance();
+        }
+
+        private async void RunAlgorithms()
+        {
+            InProgress = true;
+            Results = await _algManager.RunWith(Configuration, Input);
+            InProgress = false;
         }
 
         private List<string> GetInputFileList()

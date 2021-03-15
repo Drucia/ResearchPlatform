@@ -1,5 +1,9 @@
 ﻿using ResearchPlatform.Algorithms;
+using ResearchPlatform.Models;
+using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ResearchPlatform
 {
@@ -38,6 +42,11 @@ namespace ResearchPlatform
                 .NormalizeMatrix()
                 .CalculateCriteriaWeights()
                 .CalculateMatrixConsistency();
+        }
+
+        public async Task<List<Job>> RunWith(Configuration configuration, Models.Input input)
+        {
+            return new List<Job>();
         }
     }
 }

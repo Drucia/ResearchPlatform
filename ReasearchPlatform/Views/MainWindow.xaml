@@ -12,7 +12,6 @@
         mc:Ignorable="d"
         Title="Research Platform" Height="450" Width="800" WindowState="Maximized"
         FocusManager.FocusedElement="{Binding ElementName=RunButton}">
-
     <mah:MetroWindow.LeftWindowCommands>
         <mah:WindowCommands>
             <Button Command="{Binding LaunchSettingsCommand}" ToolTip="Open settings window">
@@ -21,6 +20,13 @@
         </mah:WindowCommands>
     </mah:MetroWindow.LeftWindowCommands>
     <mah:MetroWindow.Resources>
+        <src:InverseSingleBooleanConverter x:Key="InverseSingleBooleanConverter"/>
+        <src:BoolToVisibilityConverter
+         x:Key="BoolToHiddenConverter"
+         TrueValue="Visible" FalseValue="Collapsed"/>
+        <src:BoolToVisibilityConverter
+         x:Key="FalseToVisibleConverter"
+         TrueValue="Collapsed" FalseValue="Visible"/>
         <src:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
         <Style TargetType="{x:Type mah:NumericUpDown}">
             <Setter Property="Validation.ErrorTemplate">
@@ -37,6 +43,9 @@
             </Style.Triggers>
         </Style>
     </mah:MetroWindow.Resources>
+    <mah:MetroWindow.IsEnabled>
+        <Binding Mode="TwoWay" Path="InProgress" Converter="{StaticResource InverseSingleBooleanConverter}"/>
+    </mah:MetroWindow.IsEnabled>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
@@ -159,7 +168,7 @@
                             <Label Grid.Column="2" Grid.Row="1" Content="%" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,5,0,0" Height="26" Width="20"/>
                             <Label Grid.Column="2" Grid.Row="2" Content="%" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,5,0,0" Height="26" Width="20"/>
                         </Grid>
-                        <Button x:Name="RunButton" HorizontalAlignment="Right" Padding="0 5 0 5" Margin="12,0,40,0" Width="95" VerticalAlignment="Center">
+                        <Button x:Name="RunButton" HorizontalAlignment="Right" Padding="0 5 0 5" Margin="12,0,40,0" Width="95" VerticalAlignment="Center" Command="{Binding RunAlgorithmsCommand}">
                             <Button.IsEnabled>
                                 <MultiBinding Converter="{StaticResource InverseBooleanConverter}" Mode="TwoWay">
                                     <Binding ElementName="MatrixGrid" Path="(Validation.HasError)" />
@@ -178,6 +187,7 @@
             </ScrollViewer>
         </GroupBox>
         <GroupBox Grid.Row="0" Grid.Column="1" Header="Algorithms Results" Margin="10,10,10,10">
+            <ProgressBar Visibility="{Binding InProgress, Converter={StaticResource BoolToHiddenConverter}}" HorizontalAlignment="Center" VerticalAlignment="Center" IsIndeterminate="True" MinWidth="100"/>
         </GroupBox>
         <GroupBox Grid.Row="1" Grid.Column="0" Header="Input Data" Margin="10,10,10,10">
             <Grid>
@@ -206,6 +216,24 @@
             </Grid>
         </GroupBox>
         <GroupBox Grid.Row="1" Grid.Column="1" Header="Output Data" Margin="10,10,10,10">
+            <Grid>
+                <ListView ItemsSource="{Binding Results}" Grid.Row="1" Visibility="{Binding InProgress, Converter={StaticResource FalseToVisibleConverter}, Mode=TwoWay}"
+                                  Style="{StaticResource MahApps.Styles.ListView.Virtualized}" ScrollViewer.CanContentScroll="True" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="ID" DisplayMemberBinding="{Binding Path=ID}" />
+                            <GridViewColumn Header="From" DisplayMemberBinding="{Binding From}" />
+                            <GridViewColumn Header="To" DisplayMemberBinding="{Binding To}" />
+                            <GridViewColumn Header="Price" DisplayMemberBinding="{Binding Price, StringFormat=C,  ConverterCulture='pl-PL'}" />
+                            <GridViewColumn Header="Pickup time" DisplayMemberBinding="{Binding Pickup}" />
+                            <GridViewColumn Header="Delivery time" DisplayMemberBinding="{Binding Delivery}" />
+                            <GridViewColumn Header="Loading time" DisplayMemberBinding="{Binding LoadingTime, StringFormat=0 min}"/>
+                            <GridViewColumn Header="Client ID" DisplayMemberBinding="{Binding ClientId}" />
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+                <ProgressBar Visibility="{Binding InProgress, Converter={StaticResource BoolToHiddenConverter}, Mode=TwoWay}" HorizontalAlignment="Center" VerticalAlignment="Center" IsIndeterminate="True" MinWidth="100"/>
+            </Grid>
         </GroupBox>
     </Grid>
 </mah:MetroWindow>
