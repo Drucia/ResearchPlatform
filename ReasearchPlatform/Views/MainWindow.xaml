@@ -209,7 +209,9 @@
                             <GridViewColumn Header="Pickup time" DisplayMemberBinding="{Binding Pickup}" />
                             <GridViewColumn Header="Delivery time" DisplayMemberBinding="{Binding Delivery}" />
                             <GridViewColumn Header="Loading time" DisplayMemberBinding="{Binding LoadingTime, StringFormat=0 min}"/>
-                            <GridViewColumn Header="Client ID" DisplayMemberBinding="{Binding ClientId}" />
+                            <GridViewColumn Header="Client opinion" DisplayMemberBinding="{Binding ClientOpinion, StringFormat=N2}"/>
+                            <GridViewColumn Header="Type of loading" DisplayMemberBinding="{Binding TypeOfLoading}"/>
+                            <GridViewColumn Header="Seizure risk" DisplayMemberBinding="{Binding SeizureRisk}"/>
                         </GridView>
                     </ListView.View>
                 </ListView>

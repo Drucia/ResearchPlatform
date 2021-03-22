@@ -2,6 +2,7 @@
 using ResearchPlatform.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ResearchPlatform.Helpers
@@ -48,7 +49,8 @@ namespace ResearchPlatform.Helpers
                 Nodes = nodesAround,
                 DistanceMatrix = distances,
                 Jobs = new List<Job>(),
-                Logs = new List<string>()
+                Logs = new List<string>(),
+                Clients = new List<Client>()
             };
 
             return this;
@@ -75,6 +77,9 @@ namespace ResearchPlatform.Helpers
                 var pickupEnd = pickupStart + loadingTime + MARGIN_FOR_LOADING_TIME;
                 var deliveryStart = (int) (pickupStart + distance.DurationInSeconds / 60);
 
+                var _randomRisk = _random.NextDouble();
+                var _randomTypeOfLoading = _random.NextDouble();
+
                 Input.Jobs.Add(new Job()
                 {
                     ID = i,
@@ -84,7 +89,9 @@ namespace ResearchPlatform.Helpers
                     LoadingTime = loadingTime,
                     Pickup = Tuple.Create(pickupStart, pickupEnd),
                     Delivery = Tuple.Create(deliveryStart, (int)(pickupEnd + distance.DurationInSeconds / 60)),
-                    ClientId = _random.Next(1, AMOUNT_OF_CLIENTS)
+                    ClientId = _random.Next(1, AMOUNT_OF_CLIENTS),
+                    TypeOfLoading = _randomTypeOfLoading < 0.25 ? 1 : _randomTypeOfLoading < 0.52 ? 2 : 3,
+                    SeizureRisk = _randomRisk < 0.05 ? 1 : _randomRisk < 0.32 ? 2 : 3 // a'la Gausse
                 });
             }
 
@@ -95,6 +102,7 @@ namespace ResearchPlatform.Helpers
         {
             await GenerateInputDataAsync(postcode);
             GenerateJobs();
+            GenerateClientsWithOpinions();
         }
 
         private Node GetRandomNode(Node node = null)
@@ -148,6 +156,65 @@ namespace ResearchPlatform.Helpers
             });
 
             return distances;
+        }
+
+        private void GenerateClientsWithOpinions()
+        {
+            var _random = new Random();
+
+            // end of risk and type of loading
+
+            var allClientsId = Input.Jobs
+                                        .Select(job => job.ClientId)
+                                        .Distinct()
+                                        .ToList();
+            var amountOfAllOpinions = allClientsId.Count * 1.5;
+
+            var opinions = new Dictionary<int /* client id */, double /* CSAT */>();
+            var sumOfAllOpinions = 0;
+
+            for (int i = 0; i < amountOfAllOpinions; i++)
+            {
+                var clientIdx = _random.Next(0, allClientsId.Count);
+                var actualSumOfOpinions = 0.0;
+                opinions.TryGetValue(allClientsId[clientIdx], out actualSumOfOpinions);
+                var opinionToAdd = _random.Next(1, 6);
+                if (actualSumOfOpinions == 0.0)
+                    opinions.Add(allClientsId[clientIdx], actualSumOfOpinions + opinionToAdd);
+                else
+                    opinions[allClientsId[clientIdx]] = actualSumOfOpinions + opinionToAdd;
+                sumOfAllOpinions += opinionToAdd;
+            }
+
+            var keys = new List<int>(opinions.Keys);
+
+            foreach (var key in keys)
+            {
+                opinions[key] = (opinions[key] / sumOfAllOpinions) * 100;
+            }
+
+            foreach (var entry in opinions)
+            {
+                var jobsWithThisClient = Input.Jobs.Where(job => job.ClientId == entry.Key).ToList();
+                jobsWithThisClient.ForEach(job => job.ClientOpinion = entry.Value);
+            }
+
+            // end of generating opinions
+
+            // only 10% are own clients
+            var ownClientsAmount = allClientsId.Count * 0.1;
+
+            while (ownClientsAmount > 0)
+            {
+                var randomClientId = allClientsId[_random.Next(0, allClientsId.Count)];
+                if (Input.Clients.Where(c => c.ClientID == randomClientId).Count() == 0)
+                {
+                    Input.Clients.Add(new Client() { ClientID = randomClientId, AmountOfDoneJobs = _random.Next(1, 36) });
+                    ownClientsAmount--;
+                }
+            }
+
+            // end of generating own clients
         }
     }
 }
