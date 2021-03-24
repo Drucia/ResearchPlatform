@@ -41,4 +41,20 @@ namespace ResearchPlatform.Models
             return summedRows.Average();
         }
     }
+
+    public class DistancesManager
+    {
+        private List<Distance> _distances;
+
+        public DistancesManager(List<Distance> distances)
+        {
+            _distances = distances;
+        }
+
+        public Distance GetDistanceBetween(Node from, Node to)
+        {
+            return _distances.Find(distance => distance.From.Equals(from) && distance.To.Equals(to) ||
+                distance.From.Equals(to) && distance.To.Equals(from));
+        }
+    }
 }

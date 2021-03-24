@@ -20,19 +20,31 @@ namespace ResearchPlatform
         {
             var algorithmsMatrix = configuration.AlgorithmsMatrix;
             var branchAndBoundHelper = new BranchAndBoundHelper();
+            var distanceManager = new DistancesManager(input.DistanceMatrix);
+            var jobsToProceed = input.Jobs.Select(j => new JobToProceed(j)).ToList();
+
+            CriteriaCalculator.CalculateCriteria(
+                jobsToProceed, 
+                configuration, 
+                distanceManager, 
+                input.Base,
+                input.Clients);
+
             var algorithmsToRun = new List<Models.Task>
             {
                 new Models.Task(
-                new AHPBuilder(configuration.ComparisionMatrix),
-                branchAndBoundHelper,
-                input,
-                new List<bool>(algorithmsMatrix[(int)MultiCriteriaAlgorithm.AHP])),
+                    new AHPBuilder(configuration.ComparisionMatrix),
+                    branchAndBoundHelper,
+                    input,
+                    new List<bool>(algorithmsMatrix[(int)MultiCriteriaAlgorithm.AHP]),
+                    jobsToProceed),
 
                 new Models.Task(
-                new OwnWeightsBuilder(configuration.CriteriaWeights.Select(w => w / 100.0).ToList()),
-                branchAndBoundHelper,
-                input,
-                new List<bool>(algorithmsMatrix[(int)MultiCriteriaAlgorithm.OwnWeights]))
+                    new OwnWeightsBuilder(configuration.CriteriaWeights.Select(w => w / 100.0).ToList()),
+                    branchAndBoundHelper,
+                    input,
+                    new List<bool>(algorithmsMatrix[(int)MultiCriteriaAlgorithm.OwnWeights]),
+                    jobsToProceed)
             };
 
             algorithmsToRun.ForEach(alg => alg.Run());

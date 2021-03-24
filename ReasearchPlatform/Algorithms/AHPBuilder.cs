@@ -69,7 +69,6 @@ namespace ResearchPlatform.Algorithms
 
         public AHPBuilder CalculateMatrixConsistency()
         {
-
             MultiplyMatrixByWeights();
             CalculateWeightedSumValue();
             CalculateRatioOfWeightedSumAnWeights();

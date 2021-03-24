@@ -4,6 +4,6 @@ namespace ResearchPlatform.Models
 {
     public class Result
     {
-        public List<JobWithChoose> Jobs { get; set; };
+        public List<JobToProceed> Jobs { get; set; };
     }
 }

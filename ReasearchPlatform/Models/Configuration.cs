@@ -63,6 +63,8 @@ namespace ResearchPlatform.Models
         public double CostOfMaintain { get; set; } = 2.5;
         public string Postcode { get; set; } = "58-400";
 
+        public double TypeOfLoadingMultipler { get; set; } = 0.4;
+        public double RiskMultipler { get; set; } = 0.6;
         public static Configuration Create => new Configuration();
 
         public void CopyTo(Configuration originalConfiguration)

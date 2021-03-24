@@ -12,15 +12,18 @@ namespace ResearchPlatform.Models
         private readonly IBranchAndBoundHelper _branchAndBoundHelper;
         private readonly Models.Input _input;
         private readonly List<bool> _searchTreeAlgorithms;
+        private readonly List<JobToProceed> _jobsToProceed;
         private readonly Dictionary<SearchTreeAlgorithm, Result> _results;
 
         public Task(ICriteriaAlgorithmBuilder builder, IBranchAndBoundHelper helper, 
-            Models.Input input, List<bool> searchTreeAlgorithms)
+            Models.Input input, List<bool> searchTreeAlgorithms,
+            List<JobToProceed> jobsToProceed)
         {
             _criteriaBuilder = builder;
             _branchAndBoundHelper = helper;
             _input = input;
             _searchTreeAlgorithms = searchTreeAlgorithms;
+            _jobsToProceed = jobsToProceed;
             _results = new Dictionary<SearchTreeAlgorithm, Result>();
         }
 
@@ -29,17 +32,9 @@ namespace ResearchPlatform.Models
             _criteriaBuilder.Run();
             var weights = _criteriaBuilder.GetWeights();
 
-            var jobsToChoose = _input.Jobs
-                                    .Select(job => {
-                                        var newJob = new JobWithChoose(job);
-                                        CriteriaCalculator.CalculateUtility(newJob, weights);
-                                        return newJob;
-                                     })
-                                    .ToList();
+            _jobsToProceed.Sort((left, right) => (int)((left.Utility - right.Utility) * 100));
 
-            jobsToChoose.Sort((left, right) => (int)((left.Utility - right.Utility) * 100));
-
-            var bAb = new BranchAndBound(_input.Base, _input.Nodes, _input.DistanceMatrix, jobsToChoose, _branchAndBoundHelper);
+            var bAb = new BranchAndBound(_input.Base, _input.Nodes, _input.DistanceMatrix, _jobsToProceed, _branchAndBoundHelper);
 
             foreach (SearchTreeAlgorithm alg in Enum.GetValues(typeof(SearchTreeAlgorithm)))
             {

@@ -13,12 +13,12 @@ namespace ResearchPlatform.Algorithms
         // input
         private List<Node> _allNodes;
         private Node _base;
-        private List<Distance> _distances;
+        private DistancesManager _distancesManager;
         private IBranchAndBoundHelper _helper;
 
         // processing
         private Node _currentNode;
-        private List<JobWithChoose> _jobs;
+        private List<JobToProceed> _jobs;
         private List<byte> _chosenEdges;
         private List<byte> _chosenBreaks;
         private double _workTime = 0;
@@ -27,27 +27,27 @@ namespace ResearchPlatform.Algorithms
         private Tuple<Double, List<Job>> _currentBest;
 
         public BranchAndBound(Node startNode, List<Node> allNodes, List<Distance> distances,
-            List<JobWithChoose> jobs, IBranchAndBoundHelper helper)
+            List<JobToProceed> jobs, IBranchAndBoundHelper helper)
         {
             _helper = helper;
             _allNodes = allNodes;
             _base = startNode;
-            _distances = distances;
+            _distancesManager = new DistancesManager(distances);
             _jobs = jobs;
             _currentNode = _base;
         }
 
-        public List<JobWithChoose> Run(SearchTreeAlgorithm searchTreeAlgorithm)
+        public List<JobToProceed> Run(SearchTreeAlgorithm searchTreeAlgorithm)
         {
             switch(searchTreeAlgorithm)
             {
                 case SearchTreeAlgorithm.DFS: return RunWithDFS();
             }
 
-            return new List<JobWithChoose>();
+            return new List<JobToProceed>();
         }
 
-        public List<JobWithChoose> RunWithDFS()
+        public List<JobToProceed> RunWithDFS()
         {
             
             // sorting Job on basis of utility
@@ -56,21 +56,20 @@ namespace ResearchPlatform.Algorithms
             return _jobs.Where(j => j.IsChosen).ToList();
         }
 
-        private List<JobWithChoose> GetRestOfJobs(List<JobWithChoose> jobs)
+        private List<JobToProceed> GetRestOfJobs(List<JobToProceed> jobs)
         {
             return jobs
                 .Where(j => !j.IsChosen && IsPossibleToGoToJob(j)).ToList();
         }
 
-        private bool IsPossibleToGoToJob(JobWithChoose job)
+        private bool IsPossibleToGoToJob(JobToProceed job)
         {
             return job.Pickup.Item2 > (_workTime + GetTimeToGo(_currentNode, job.From)); 
         }
 
         private double GetTimeToGo(Node currentNode, Node nextNode)
         {
-            return _distances.Find(distance => distance.From.Equals(currentNode) && distance.To.Equals(nextNode) ||
-                distance.From.Equals(nextNode) && distance.To.Equals(currentNode)).DurationInSeconds / 60;
+            return _distancesManager.GetDistanceBetween(currentNode, nextNode).DurationInSeconds / 60;
         }
     }
 }
