@@ -87,14 +87,13 @@ namespace ResearchPlatform.ViewModels
 
             _inputFileList = GetInputFileList();
             SelectedInputFile = _inputFileList.First();
-
-            _algManager = AlgorithmsManager.GetInstance();
         }
 
-        private async void RunAlgorithms()
+        private void RunAlgorithms()
         {
             InProgress = true;
-            Results = await _algManager.RunWith(Configuration, Input);
+            var allRes = AlgorithmsManager.RunWith(Configuration, Input);
+            Results = allRes[(int)MultiCriteriaAlgorithm.AHP][SearchTreeAlgorithm.DFS].Jobs.Cast<Job>().ToList();
             InProgress = false;
         }
 

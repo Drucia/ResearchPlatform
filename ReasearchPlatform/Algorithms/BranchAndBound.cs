@@ -14,7 +14,6 @@ namespace ResearchPlatform.Algorithms
         private List<Node> _allNodes;
         private Node _base;
         private List<Distance> _distances;
-        private List<Job> _jobsToChoose;
         private IBranchAndBoundHelper _helper;
 
         // processing
@@ -27,22 +26,34 @@ namespace ResearchPlatform.Algorithms
 
         private Tuple<Double, List<Job>> _currentBest;
 
-        public BranchAndBound(Node startNode, List<Node> allNodes, List<Distance> distances, List<Job> jobs, IBranchAndBoundHelper helper)
+        public BranchAndBound(Node startNode, List<Node> allNodes, List<Distance> distances,
+            List<JobWithChoose> jobs, IBranchAndBoundHelper helper)
         {
             _helper = helper;
             _allNodes = allNodes;
             _base = startNode;
             _distances = distances;
-            _jobsToChoose = jobs;
+            _jobs = jobs;
             _currentNode = _base;
-
-            _jobs = _jobsToChoose.Cast<JobWithChoose>().ToList();
         }
 
-        public List<Job> runWithDFS()
+        public List<JobWithChoose> Run(SearchTreeAlgorithm searchTreeAlgorithm)
         {
+            switch(searchTreeAlgorithm)
+            {
+                case SearchTreeAlgorithm.DFS: return RunWithDFS();
+            }
+
+            return new List<JobWithChoose>();
+        }
+
+        public List<JobWithChoose> RunWithDFS()
+        {
+            
+            // sorting Job on basis of utility
+            
             var jobToCurrentlyGet = GetRestOfJobs(_jobs);
-            return _currentBest.Item2;
+            return _jobs.Where(j => j.IsChosen).ToList();
         }
 
         private List<JobWithChoose> GetRestOfJobs(List<JobWithChoose> jobs)

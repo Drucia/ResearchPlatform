@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace ResearchPlatform.Algorithms
 {
-    public class AHPBuilder
+    public class AHPBuilder : ICriteriaAlgorithmBuilder
     {
         private static readonly double RANDOM_JUDGEMENT_FOR_4_CRITERIA = 0.9;
         private static readonly double CONSISTENCY_LIMES = 0.1;
@@ -13,8 +13,7 @@ namespace ResearchPlatform.Algorithms
         private List<List<double>> _matrix;
         private List<List<double>> _normalizedMatrix;
         private List<double> _tmp;
-
-        public List<double> Weights { get; private set;  }
+        private List<double> _weights;
         public bool IsConsistent { get; private set;  }
 
         public AHPBuilder(IEnumerable<IEnumerable<string>> matrix)
@@ -28,15 +27,15 @@ namespace ResearchPlatform.Algorithms
                 .Select(row => row.Select(elem => Convert.ToDouble(dataTable.Compute(elem, "")))
                 .ToList())
                 .ToList();
-            _tmp = Enumerable.Repeat(0.0, _matrix.Count()).ToList();
-            Weights = Enumerable.Repeat(0.0, _matrix.Count()).ToList();
+            _tmp = Enumerable.Repeat(0.0, _matrix.Count).ToList();
+            _weights = Enumerable.Repeat(0.0, _matrix.Count).ToList();
         }
 
         public AHPBuilder CalculateSumOfComparisons()
         {
-            for (int row = 0; row < _matrix.Count(); row++)
+            for (int row = 0; row < _matrix.Count; row++)
             {
-                for (int col = 0; col < _matrix.Count(); col++)
+                for (int col = 0; col < _matrix.Count; col++)
                 {
                     _tmp[col] += _matrix[row][col];
                 }
@@ -47,9 +46,9 @@ namespace ResearchPlatform.Algorithms
 
         public AHPBuilder NormalizeMatrix()
         {
-            for (int row = 0; row < _matrix.Count(); row++)
+            for (int row = 0; row < _matrix.Count; row++)
             {
-                for (int col = 0; col < _matrix.Count(); col++)
+                for (int col = 0; col < _matrix.Count; col++)
                 {
                     _normalizedMatrix[row][col] = _matrix[row][col] / _tmp[col];
                 }
@@ -60,9 +59,9 @@ namespace ResearchPlatform.Algorithms
 
         public AHPBuilder CalculateCriteriaWeights()
         {
-            for (int row = 0; row < _matrix.Count(); row++)
+            for (int row = 0; row < _matrix.Count; row++)
             {
-                Weights[row] = _matrix[row].Sum() / _matrix.Count();
+                _weights[row] = _matrix[row].Sum() / _matrix.Count();
             }
 
             return this;
@@ -81,18 +80,18 @@ namespace ResearchPlatform.Algorithms
 
         private void MultiplyMatrixByWeights()
         {
-            for (int row = 0; row < _matrix.Count(); row++)
+            for (int row = 0; row < _matrix.Count; row++)
             {
-                for (int col = 0; col < _matrix.Count(); col++)
+                for (int col = 0; col < _matrix.Count; col++)
                 {
-                    _matrix[row][col] = _matrix[row][col] * Weights[col];
+                    _matrix[row][col] = _matrix[row][col] * _weights[col];
                 }
             }
         }
 
         private void CalculateWeightedSumValue()
         {
-            for (int row = 0; row < _matrix.Count(); row++)
+            for (int row = 0; row < _matrix.Count; row++)
             {
                 _tmp[row] = _matrix[row].Sum();
             }
@@ -100,9 +99,9 @@ namespace ResearchPlatform.Algorithms
 
         private void CalculateRatioOfWeightedSumAnWeights()
         {
-            for (int row = 0; row < _matrix.Count(); row++)
+            for (int row = 0; row < _matrix.Count; row++)
             {
-                _tmp[row] = _tmp[row] / Weights[row];
+                _tmp[row] = _tmp[row] / _weights[row];
             }
         }
 
@@ -113,6 +112,19 @@ namespace ResearchPlatform.Algorithms
             var consistencyIdx = (lambdaMax - n) / (n - 1);
             var consistencyRatio = consistencyIdx / RANDOM_JUDGEMENT_FOR_4_CRITERIA;
             IsConsistent = consistencyRatio < CONSISTENCY_LIMES;
+        }
+
+        public void Run()
+        {
+            this.CalculateSumOfComparisons()
+                .NormalizeMatrix()
+                .CalculateCriteriaWeights()
+                .CalculateMatrixConsistency();
+        }
+
+        public List<double> GetWeights()
+        {
+            return _weights;
         }
     }
 }

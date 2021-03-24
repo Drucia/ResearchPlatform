@@ -9,10 +9,12 @@ namespace ResearchPlatform.Models
     public class JobWithChoose : Job
     {
         public bool IsChosen { get; set; }
+        public double Utility { get; set; }
 
         public JobWithChoose(Job job) : base(job)
         {
             IsChosen = false;
+            Utility = 0.0;
         }
     }
 }

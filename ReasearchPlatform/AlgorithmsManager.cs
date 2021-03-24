@@ -1,52 +1,43 @@
 ﻿using ResearchPlatform.Algorithms;
+using ResearchPlatform.Helpers;
 using ResearchPlatform.Models;
-using System;
 using System.Collections.Generic;
-using System.Threading;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ResearchPlatform
 {
-    public class AlgorithmsManager
+    public static class AlgorithmsManager
     {
-        private static AlgorithmsManager _instance;
-
-        private AHPBuilder _AHPBuilder;
-
-        private AlgorithmsManager()
+        public static bool CheckMatrixConsistency(IEnumerable<IEnumerable<string>> matrix)
         {
+            var ahp = new AHPBuilder(matrix);
+            ahp.Run();
+            return ahp.IsConsistent;
         }
 
-        public static AlgorithmsManager GetInstance()
+        public static List<Dictionary<SearchTreeAlgorithm, Result>> RunWith(Configuration configuration, Models.Input input)
         {
-            if (_instance == null)
+            var algorithmsMatrix = configuration.AlgorithmsMatrix;
+            var branchAndBoundHelper = new BranchAndBoundHelper();
+            var algorithmsToRun = new List<Models.Task>
             {
-                _instance = new AlgorithmsManager();
-            }
+                new Models.Task(
+                new AHPBuilder(configuration.ComparisionMatrix),
+                branchAndBoundHelper,
+                input,
+                new List<bool>(algorithmsMatrix[(int)MultiCriteriaAlgorithm.AHP])),
 
-            return _instance;
-        }
+                new Models.Task(
+                new OwnWeightsBuilder(configuration.CriteriaWeights.Select(w => w / 100.0).ToList()),
+                branchAndBoundHelper,
+                input,
+                new List<bool>(algorithmsMatrix[(int)MultiCriteriaAlgorithm.OwnWeights]))
+            };
 
-        public bool CheckMatrixConsistency(IEnumerable<IEnumerable<string>> matrix)
-        {
-            _AHPBuilder = new AHPBuilder(matrix);
-            RunAHP();
+            algorithmsToRun.ForEach(alg => alg.Run());
 
-            return _AHPBuilder.IsConsistent;
-        }
-
-        private void RunAHP()
-        {
-            _AHPBuilder
-                .CalculateSumOfComparisons()
-                .NormalizeMatrix()
-                .CalculateCriteriaWeights()
-                .CalculateMatrixConsistency();
-        }
-
-        public async Task<List<Job>> RunWith(Configuration configuration, Models.Input input)
-        {
-            return new List<Job>();
+            return algorithmsToRun.Select(alg => alg.GetResults()).ToList();
         }
     }
 }
