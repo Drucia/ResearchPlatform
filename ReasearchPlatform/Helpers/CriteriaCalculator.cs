@@ -1,4 +1,5 @@
 ﻿using ResearchPlatform.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -26,6 +27,18 @@ namespace ResearchPlatform
 
                 job.Reliability = job.ClientOpinion;
                 job.PossibilityOfNextJobs = clients.Find(c => c.ClientID == job.ClientId).AmountOfDoneJobs;
+            });
+        }
+
+        public static void CalculateUtility(List<JobToProceed> jobsToProceed, List<double> weights)
+        {
+            jobsToProceed.ForEach(job => {
+                job.Utility =
+                    weights[(int)Criteria.Profit] * job.Profit +
+                    weights[(int)Criteria.DrivingTime] * job.TimeOfExecution +
+                    weights[(int)Criteria.CustomerReliability] * job.ClientOpinion +
+                    weights[(int)Criteria.CompletedJobs] * job.PossibilityOfNextJobs +
+                    weights[(int)Criteria.ComfortOfWork] * job.ComfortOfWork;
             });
         }
     }

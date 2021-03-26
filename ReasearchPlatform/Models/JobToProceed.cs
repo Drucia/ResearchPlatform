@@ -16,6 +16,8 @@ namespace ResearchPlatform.Models
         public double Reliability { get; internal set; }
         public int PossibilityOfNextJobs { get; internal set; }
 
+        public JobToProceed()
+        {}
         public JobToProceed(Job job) : base(job)
         {
             IsChosen = false;

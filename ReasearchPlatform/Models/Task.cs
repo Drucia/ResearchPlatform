@@ -32,7 +32,7 @@ namespace ResearchPlatform.Models
             _criteriaBuilder.Run();
             var weights = _criteriaBuilder.GetWeights();
 
-            _jobsToProceed.Sort((left, right) => (int)((left.Utility - right.Utility) * 100));
+            CriteriaCalculator.CalculateUtility(_jobsToProceed, weights);
 
             var bAb = new BranchAndBound(_input.Base, _input.Nodes, _input.DistanceMatrix, _jobsToProceed, _branchAndBoundHelper);
 
