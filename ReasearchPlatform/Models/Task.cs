@@ -10,7 +10,7 @@ namespace ResearchPlatform.Models
     {
         private readonly ICriteriaAlgorithmBuilder _criteriaBuilder;
         private readonly IBranchAndBoundHelper _branchAndBoundHelper;
-        private readonly Models.Input _input;
+        private readonly Input _input;
         private readonly List<bool> _searchTreeAlgorithms;
         private readonly List<JobToProceed> _jobsToProceed;
         private readonly Dictionary<SearchTreeAlgorithm, Result> _results;
@@ -34,7 +34,7 @@ namespace ResearchPlatform.Models
 
             CriteriaCalculator.CalculateUtility(_jobsToProceed, weights);
 
-            var bAb = new BranchAndBound(_input.Base, _input.Nodes, _input.DistanceMatrix, _jobsToProceed, _branchAndBoundHelper);
+            var bAb = new BranchAndBound(_input.Base, _input.DistanceMatrix, _jobsToProceed, _branchAndBoundHelper);
 
             foreach (SearchTreeAlgorithm alg in Enum.GetValues(typeof(SearchTreeAlgorithm)))
             {

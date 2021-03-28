@@ -10,5 +10,6 @@
         public static readonly string POSTCODE_ERROR_MSG = "Entered postcode was not connected to any city. Please enter right postcode";
         public static readonly string POSTCODE_SAVE_MSG = "Successfully saved generated nodes";
         public static readonly string GENERATING_MSG = "Generating data...";
+        public static readonly string CALCULATIONS_IN_PROGRESS = "Calculations are in progress... Please wait a minute :)";
     }
 }

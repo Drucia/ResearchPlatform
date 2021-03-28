@@ -17,16 +17,23 @@ namespace ResearchPlatform
                 var distanceFromBase = distancesManager.GetDistanceBetween(baze, job.To);
                 var distanceToBase = distancesManager.GetDistanceBetween(job.From, baze);
 
-                job.Profit = job.Price - (distanceToDoJob.Costs * 0.01 + distanceFromBase.Costs * 0.01 + distanceToBase.Costs * 0.01 +
-                    ((distanceToDoJob.DistanceInMeters + distanceFromBase.DistanceInMeters + distanceToBase.DistanceInMeters) / 1000) *
-                    (configuration.AvgFuelConsumption * configuration.FuelCost + configuration.CostOfMaintain));
+                if (distanceToDoJob != null && distanceFromBase != null && distanceToBase != null)
+                {
+                    job.Profit = job.Price - (distanceToDoJob.Costs * 0.01 + distanceFromBase.Costs * 0.01 + distanceToBase.Costs * 0.01 +
+                        ((distanceToDoJob.DistanceInMeters + distanceFromBase.DistanceInMeters + distanceToBase.DistanceInMeters) / 1000) *
+                        (configuration.AvgFuelConsumption * configuration.FuelCost + configuration.CostOfMaintain));
 
-                job.ComfortOfWork = configuration.TypeOfLoadingMultipler * job.TypeOfLoading + configuration.RiskMultipler * job.SeizureRisk;
-                job.TimeOfExecution = 2 * job.LoadingTime + (distanceToDoJob.DurationInSeconds + distanceFromBase.DurationInSeconds
-                    + distanceToBase.DurationInSeconds) / 60;
+                    job.ComfortOfWork = configuration.TypeOfLoadingMultipler * job.TypeOfLoading + configuration.RiskMultipler * job.SeizureRisk;
+                    job.TimeOfExecution = 2 * job.LoadingTime + (distanceToDoJob.DurationInSeconds + distanceFromBase.DurationInSeconds
+                        + distanceToBase.DurationInSeconds) / 60;
 
-                job.Reliability = job.ClientOpinion;
-                job.PossibilityOfNextJobs = clients.Find(c => c.ClientID == job.ClientId).AmountOfDoneJobs;
+                    job.Reliability = job.ClientOpinion;
+                    var clientIdx = clients.FindIndex(c => c.ClientID == job.ClientId);
+                    job.PossibilityOfNextJobs = clientIdx == -1 ? 0 : clients[clientIdx].AmountOfDoneJobs;
+                } else
+                {
+                    job.ID = -1;
+                }
             });
         }
 

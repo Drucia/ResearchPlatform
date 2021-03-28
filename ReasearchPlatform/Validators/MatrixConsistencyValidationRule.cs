@@ -25,7 +25,7 @@ namespace ResearchPlatform.Validators
                 {
                     var conf = viewModel.Configuration;
                     conf.fillMatrix();
-                    var isConsistent = AlgorithmsManager.GetInstance().CheckMatrixConsistency(conf.ComparisionMatrix);
+                    var isConsistent = AlgorithmsManager.CheckMatrixConsistency(conf.ComparisionMatrix);
                     if (!isConsistent)
                         return new ValidationResult(false,
                           Messages.MATRIX_ERROR_MSG);

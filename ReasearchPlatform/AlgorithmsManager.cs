@@ -29,6 +29,9 @@ namespace ResearchPlatform
                 input.Base,
                 input.Clients);
 
+            // removes jobs with -1 id - no distances to do this job
+            jobsToProceed = jobsToProceed.Where(job => job.ID != -1).ToList();
+
             var algorithmsToRun = new List<Models.Task>
             {
                 new Models.Task(

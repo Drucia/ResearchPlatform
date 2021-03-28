@@ -8,8 +8,8 @@ namespace ResearchPlatform.Models
     {
         public Node From { get; set; }
         public Node To { get; set; }
-        public int DistanceInMeters { get; set; }
-        public int DurationInSeconds { get; set; }
+        public double DistanceInMeters { get; set; }
+        public double DurationInSeconds { get; set; }
         public double Costs { get; set; }
 
         public static Distance CreateFromDTO(DistanceDTO distance, Node from, Node to)
@@ -52,6 +52,9 @@ namespace ResearchPlatform.Models
 
         public Distance GetDistanceBetween(Node from, Node to)
         {
+            if (from.Equals(to))
+                return new Distance() { DistanceInMeters = 0, DurationInSeconds = 0, Costs = 0 };
+
             return _distances.Find(distance => distance.From.Equals(from) && distance.To.Equals(to) ||
                 distance.From.Equals(to) && distance.To.Equals(from));
         }

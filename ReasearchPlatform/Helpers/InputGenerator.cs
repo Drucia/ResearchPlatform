@@ -98,7 +98,7 @@ namespace ResearchPlatform.Helpers
             return this;
         }
 
-        public async Task GenerateAsync(string postcode)
+        public async System.Threading.Tasks.Task GenerateAsync(string postcode)
         {
             await GenerateInputDataAsync(postcode);
             GenerateJobs();

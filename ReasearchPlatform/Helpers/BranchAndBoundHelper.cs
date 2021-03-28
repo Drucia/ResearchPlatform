@@ -1,9 +1,6 @@
 ﻿using ResearchPlatform.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ResearchPlatform.Helpers
 {
@@ -30,8 +27,8 @@ namespace ResearchPlatform.Helpers
             int workTime, int drivenTime, int wholeDrivenTime)
         {
             // simulate execute of job
-            var timeToStart = _manager.GetDistanceBetween(currNode, currentJob.From).DurationInSeconds / 60;
-            var timeFromStartToEnd = _manager.GetDistanceBetween(currentJob.From, currentJob.To).DurationInSeconds / 60;
+            var timeToStart = (int) _manager.GetDistanceBetween(currNode, currentJob.From).DurationInSeconds / 60;
+            var timeFromStartToEnd = (int) _manager.GetDistanceBetween(currentJob.From, currentJob.To).DurationInSeconds / 60;
 
             var breakTime = drivenTime + timeToStart >= IBranchAndBoundHelper.MAX_TIME_WITH_DRIVING
                 ? IBranchAndBoundHelper.BREAK_TIME : 0;

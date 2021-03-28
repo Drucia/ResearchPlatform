@@ -15,6 +15,7 @@
     <mah:MetroWindow.Resources>
         <src:MatrixItemConverter x:Key="MatrixConverter"/>
         <src:InverseSingleBooleanConverter x:Key="InverseSingleBooleanConverter"/>
+        <src:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
         <src:BoolToVisibilityConverter
          x:Key="BoolToHiddenConverter"
          TrueValue="Hidden" FalseValue="Visible"/>

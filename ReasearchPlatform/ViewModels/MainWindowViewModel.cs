@@ -31,8 +31,6 @@ namespace ResearchPlatform.ViewModels
         private bool _inProgress = false;
         private List<Job> _results;
 
-        private AlgorithmsManager _algManager;
-
         public Configuration Configuration
         {
             get => _configuration;
@@ -89,11 +87,13 @@ namespace ResearchPlatform.ViewModels
             SelectedInputFile = _inputFileList.First();
         }
 
-        private void RunAlgorithms()
+        private async void RunAlgorithms()
         {
             InProgress = true;
+            var progress = await _dialogCoordinator.ShowProgressAsync(this, "Info", Messages.CALCULATIONS_IN_PROGRESS);
             var allRes = AlgorithmsManager.RunWith(Configuration, Input);
             Results = allRes[(int)MultiCriteriaAlgorithm.AHP][SearchTreeAlgorithm.DFS].Jobs.Cast<Job>().ToList();
+            await progress.CloseAsync();
             InProgress = false;
         }
 
