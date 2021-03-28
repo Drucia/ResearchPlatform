@@ -11,6 +11,7 @@ namespace ResearchPlatform.Algorithms
     public class BranchAndBound
     {
         private static readonly int MAX_TIME_WITH_DRIVING = 270;
+        private static readonly int BREAK_TIME = 45;
 
         // input
         private List<Node> _allNodes;
@@ -79,6 +80,7 @@ namespace ResearchPlatform.Algorithms
             }
             else 
             {
+                // cut tree
                 allCheckedJobsPath.Add(new List<JobToProceed>(done));
             }
 
@@ -87,10 +89,49 @@ namespace ResearchPlatform.Algorithms
 
         private Node ExecuteJob(List<JobToProceed> done, out int wT, out int dT)
         {
-            KeyValuePair<Tuple<int /*work time */, int /* driven time */>, Node /* last node */> times = done.Aggregate(KeyValuePair.Create(Pair.Create(0, 0), done.First().To), (acc, job) => {
-                acc.Item1.Item1 += GetTimeToGo(acc.Item2, job.From);
+            Tuple<Tuple<int /*work time */, int /* driven time */>, Node /* last node */> times =
+                done.Aggregate(Tuple.Create(Tuple.Create(0, 0), done.First().To), (acc, job) => {
 
-            });
+                    var curWorkTime = acc.Item1.Item1;
+                    var curDrivenTime = acc.Item1.Item2;
+                    var lastNode = acc.Item2;
+
+                    var timeToStart = GetTimeToGo(lastNode, job.From);
+                    var timeFromStartToEnd = GetTimeToGo(job.From, job.To);
+
+                    var breakTime = curDrivenTime + timeToStart >= MAX_TIME_WITH_DRIVING ? BREAK_TIME : 0;
+
+                    // add break time if necessary in commuting node
+                    curDrivenTime += breakTime;
+                    curWorkTime += breakTime;
+
+                    // add travel time from last node to start node
+                    curDrivenTime += timeToStart;
+                    curWorkTime = Math.Max(curWorkTime + timeToStart, job.Pickup.Item1);
+
+                    // add loading time
+                    curWorkTime += job.LoadingTime;
+
+                    breakTime = curDrivenTime + timeFromStartToEnd >= MAX_TIME_WITH_DRIVING ? BREAK_TIME : 0;
+
+                    // add break time if necessary in start node
+                    curDrivenTime += breakTime;
+                    curWorkTime += breakTime;
+
+                    // add travel time from start to end node
+                    curDrivenTime += timeFromStartToEnd;
+                    curWorkTime = Math.Max(curWorkTime + timeFromStartToEnd, job.Delivery.Item1);
+
+                    // add loading time
+                    curWorkTime += job.LoadingTime;
+
+                    return Tuple.Create(Tuple.Create(curWorkTime, curDrivenTime), job.To);
+                });
+
+            wT = times.Item1.Item1;
+            dT = times.Item1.Item2;
+
+            return times.Item2;
         }
 
         private List<JobToProceed> GetPossibleJobsToDo(List<JobToProceed> jobs, Node currentNode)
