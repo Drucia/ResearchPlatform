@@ -5,8 +5,12 @@ namespace ResearchPlatform.Helpers
 {
     public interface IBranchAndBoundHelper
     {
-        public bool AreAllConstrintsSatisfied(JobToProceed currentJob, List<byte> x, List<byte> d, List<byte> z);
+        public static readonly int MAX_TIME_WITH_DRIVING = 270;
+        public static readonly int MAX_TIME_WITH_WORKING = 780;
+        public static readonly int MAX_TIME_WITH_WHOLE_DRIVING = 540;
+        public static readonly int BREAK_TIME = 45;
         public double CalculateValueOfGoalFunction(List<byte> x, List<byte> d, List<byte> z);
-        bool AreAllConstraintsSatisfied(JobToProceed currentJob, List<JobToProceed> done, double workTime, double drivenTime);
+        public bool AreAllConstraintsSatisfied(Node currNode, JobToProceed currentJob, List<JobToProceed> done, 
+            int workTime, int drivenTime, int wholeDrivenTime);
     }
 }

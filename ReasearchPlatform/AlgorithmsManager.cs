@@ -3,7 +3,6 @@ using ResearchPlatform.Helpers;
 using ResearchPlatform.Models;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace ResearchPlatform
 {
@@ -19,8 +18,8 @@ namespace ResearchPlatform
         public static List<Dictionary<SearchTreeAlgorithm, Result>> RunWith(Configuration configuration, Models.Input input)
         {
             var algorithmsMatrix = configuration.AlgorithmsMatrix;
-            var branchAndBoundHelper = new BranchAndBoundHelper();
             var distanceManager = new DistancesManager(input.DistanceMatrix);
+            var branchAndBoundHelper = new BranchAndBoundHelper(distanceManager);
             var jobsToProceed = input.Jobs.Select(j => new JobToProceed(j)).ToList();
 
             CriteriaCalculator.CalculateCriteria(
