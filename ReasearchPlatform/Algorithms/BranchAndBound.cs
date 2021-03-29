@@ -3,8 +3,6 @@ using ResearchPlatform.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ResearchPlatform.Algorithms
 {
@@ -12,19 +10,19 @@ namespace ResearchPlatform.Algorithms
     {
         // input
         private readonly Node _base;
-        private readonly DistancesManager _distancesManager;
+        private readonly IDistancesManager _distancesManager;
         private readonly IBranchAndBoundHelper _helper;
         private readonly List<JobToProceed> _jobs;
 
         // processing
         private readonly List<JobToProceed> _jobsToProceed;
 
-        public BranchAndBound(Node startNode, List<Distance> distances,
+        public BranchAndBound(Node startNode, IDistancesManager distances,
             List<JobToProceed> jobs, IBranchAndBoundHelper helper)
         {
             _helper = helper;
             _base = startNode;
-            _distancesManager = new DistancesManager(distances);
+            _distancesManager = distances;
             _jobs = jobs;
             _jobsToProceed = new List<JobToProceed>(jobs);
         }
@@ -39,27 +37,27 @@ namespace ResearchPlatform.Algorithms
             return new List<JobToProceed>();
         }
 
-        public List<JobToProceed> RunWithDFS()
+        private List<JobToProceed> RunWithDFS()
         {
             // sort jobs
             _jobsToProceed.Sort((left, right) => (int)((left.Utility - right.Utility) * 100));
 
             var currentNode = _base;
             var results = new List<List<JobToProceed>>();
-            var dumyJob = new JobToProceed() { 
+            var dummyJob = new JobToProceed() { 
                 From = _base, 
                 To = _base,
                 Pickup = Tuple.Create(0, IBranchAndBoundHelper.MAX_TIME_WITH_WORKING),
                 Delivery = Tuple.Create(0, IBranchAndBoundHelper.MAX_TIME_WITH_WORKING)
             };
 
-            DFSRec(currentNode, dumyJob, new List<JobToProceed>(), 
+            DFSRec(currentNode, dummyJob, new List<JobToProceed>(), 
                 _jobsToProceed, results, 0, 0, 0);
             
             return results.First().Where(j => j.IsChosen).ToList();
         }
 
-        public void DFSRec(Node currNode, JobToProceed currentJob, List<JobToProceed> done, 
+        private void DFSRec(Node currNode, JobToProceed currentJob, List<JobToProceed> done, 
             List<JobToProceed> all, List<List<JobToProceed>> allCheckedJobsPath, int workTime, int drivenTime, int wholeDrivenTime)
         {
             if (_helper.AreAllConstraintsSatisfied(currNode, currentJob, done, workTime, drivenTime, wholeDrivenTime))

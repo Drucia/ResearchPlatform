@@ -23,5 +23,28 @@ namespace ResearchPlatform.Models
             IsChosen = false;
             Utility = 0.0;
         }
+
+        public override bool Equals(object obj)
+        {
+            return obj is JobToProceed proceed &&
+                   ID == proceed.ID &&
+                   EqualityComparer<Node>.Default.Equals(From, proceed.From) &&
+                   EqualityComparer<Node>.Default.Equals(To, proceed.To) &&
+                   Price == proceed.Price &&
+                   EqualityComparer<Tuple<int, int>>.Default.Equals(Pickup, proceed.Pickup) &&
+                   EqualityComparer<Tuple<int, int>>.Default.Equals(Delivery, proceed.Delivery) &&
+                   LoadingTime == proceed.LoadingTime &&
+                   ClientId == proceed.ClientId &&
+                   TypeOfLoading == proceed.TypeOfLoading &&
+                   SeizureRisk == proceed.SeizureRisk &&
+                   ClientOpinion == proceed.ClientOpinion &&
+                   IsChosen == proceed.IsChosen &&
+                   Utility == proceed.Utility &&
+                   Profit == proceed.Profit &&
+                   ComfortOfWork == proceed.ComfortOfWork &&
+                   TimeOfExecution == proceed.TimeOfExecution &&
+                   Reliability == proceed.Reliability &&
+                   PossibilityOfNextJobs == proceed.PossibilityOfNextJobs;
+        }
     }
 }

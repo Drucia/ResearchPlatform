@@ -36,9 +36,9 @@ namespace ResearchPlatform.Models
 
         public ObservableCollection<ObservableCollection<bool>> AlgorithmsMatrix { get; set; } = new ObservableCollection<ObservableCollection<bool>> {
             new ObservableCollection<bool>{true, false, false, false},
-            new ObservableCollection<bool>{true, false, false, false},
-            new ObservableCollection<bool>{true, false, false, false},
-            new ObservableCollection<bool>{true, false, false, false},
+            new ObservableCollection<bool>{false, false, false, false},
+            new ObservableCollection<bool>{false, false, false, false},
+            new ObservableCollection<bool>{false, false, false, false},
         };
 
         public bool IsAlgorithmsMatrixValid()

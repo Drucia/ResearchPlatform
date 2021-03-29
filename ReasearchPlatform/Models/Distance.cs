@@ -41,7 +41,7 @@ namespace ResearchPlatform.Models
         }
     }
 
-    public class DistancesManager
+    public class DistancesManager : IDistancesManager
     {
         private List<Distance> _distances;
 
@@ -58,5 +58,10 @@ namespace ResearchPlatform.Models
             return _distances.Find(distance => distance.From.Equals(from) && distance.To.Equals(to) ||
                 distance.From.Equals(to) && distance.To.Equals(from));
         }
+    }
+
+    public interface IDistancesManager
+    {
+        public Distance GetDistanceBetween(Node from, Node to);
     }
 }

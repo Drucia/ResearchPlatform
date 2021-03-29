@@ -39,14 +39,16 @@ namespace ResearchPlatform
                     branchAndBoundHelper,
                     input,
                     new List<bool>(algorithmsMatrix[(int)MultiCriteriaAlgorithm.AHP]),
-                    jobsToProceed),
+                    jobsToProceed,
+                    distanceManager),
 
                 new Models.Task(
                     new OwnWeightsBuilder(configuration.CriteriaWeights.Select(w => w / 100.0).ToList()),
                     branchAndBoundHelper,
                     input,
                     new List<bool>(algorithmsMatrix[(int)MultiCriteriaAlgorithm.OwnWeights]),
-                    jobsToProceed)
+                    jobsToProceed,
+                    distanceManager)
             };
 
             algorithmsToRun.ForEach(alg => alg.Run());

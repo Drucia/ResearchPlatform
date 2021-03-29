@@ -14,10 +14,11 @@ namespace ResearchPlatform.Models
         private readonly List<bool> _searchTreeAlgorithms;
         private readonly List<JobToProceed> _jobsToProceed;
         private readonly Dictionary<SearchTreeAlgorithm, Result> _results;
+        private readonly IDistancesManager _distanceManager;
 
         public Task(ICriteriaAlgorithmBuilder builder, IBranchAndBoundHelper helper, 
             Models.Input input, List<bool> searchTreeAlgorithms,
-            List<JobToProceed> jobsToProceed)
+            List<JobToProceed> jobsToProceed, IDistancesManager distanceManager)
         {
             _criteriaBuilder = builder;
             _branchAndBoundHelper = helper;
@@ -25,6 +26,7 @@ namespace ResearchPlatform.Models
             _searchTreeAlgorithms = searchTreeAlgorithms;
             _jobsToProceed = jobsToProceed;
             _results = new Dictionary<SearchTreeAlgorithm, Result>();
+            _distanceManager = distanceManager;
         }
 
         public void Run()
@@ -34,7 +36,7 @@ namespace ResearchPlatform.Models
 
             CriteriaCalculator.CalculateUtility(_jobsToProceed, weights);
 
-            var bAb = new BranchAndBound(_input.Base, _input.DistanceMatrix, _jobsToProceed, _branchAndBoundHelper);
+            var bAb = new BranchAndBound(_input.Base, _distanceManager, _jobsToProceed, _branchAndBoundHelper);
 
             foreach (SearchTreeAlgorithm alg in Enum.GetValues(typeof(SearchTreeAlgorithm)))
             {
