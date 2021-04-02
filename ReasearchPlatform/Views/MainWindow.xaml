@@ -224,9 +224,9 @@
                     <ListView.View>
                         <GridView>
                             <GridViewColumn Header="ID" DisplayMemberBinding="{Binding Path=ID}" />
-                            <GridViewColumn Header="From" DisplayMemberBinding="{Binding From}" />
-                            <GridViewColumn Header="To" DisplayMemberBinding="{Binding To}" />
-                            <GridViewColumn Header="Price" DisplayMemberBinding="{Binding Price, StringFormat=C,  ConverterCulture='pl-PL'}" />
+                            <GridViewColumn Header="From" Width="100" DisplayMemberBinding="{Binding From}" />
+                            <GridViewColumn Header="To" Width="100" DisplayMemberBinding="{Binding To}" />
+                            <GridViewColumn Header="Price" Width="70" DisplayMemberBinding="{Binding Price, StringFormat=C,  ConverterCulture='pl-PL'}" />
                             <GridViewColumn Header="Pickup time" DisplayMemberBinding="{Binding Pickup}" />
                             <GridViewColumn Header="Delivery time" DisplayMemberBinding="{Binding Delivery}" />
                             <GridViewColumn Header="Loading time" DisplayMemberBinding="{Binding LoadingTime, StringFormat=0 min}"/>

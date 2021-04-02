@@ -29,9 +29,9 @@ namespace ResearchPlatform.Models
 
         public ObservableCollection<int> GoalFunctionWeights { get; set; } = new ObservableCollection<int>
         {
-            15,
+            35,
             60,
-            25
+            5
         };
 
         public ObservableCollection<ObservableCollection<bool>> AlgorithmsMatrix { get; set; } = new ObservableCollection<ObservableCollection<bool>> {
@@ -58,9 +58,9 @@ namespace ResearchPlatform.Models
         public int TrackWidth { get; set; } = 800;
         public int TrackDepth { get; set; } = 200;
         public int MaxLoadCapacity { get; set; } = 2000;
-        public double AvgFuelConsumption { get; set; } = 8.5;
-        public double FuelCost { get; set; } = 5.0;
-        public double CostOfMaintain { get; set; } = 2.5;
+        public double AvgFuelConsumption { get; set; } = 6.5;
+        public double FuelCost { get; set; } = 4.0;
+        public double CostOfMaintain { get; set; } = 1.5;
         public string Postcode { get; set; } = "58-400";
 
         public double TypeOfLoadingMultipler { get; set; } = 0.4;

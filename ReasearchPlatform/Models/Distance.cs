@@ -39,6 +39,13 @@ namespace ResearchPlatform.Models
                     .ToList();
             return (int) summedRows.Average();
         }
+
+        public override bool Equals(object obj)
+        {
+            return obj is Distance distance &&
+                   EqualityComparer<Node>.Default.Equals(From, distance.From) &&
+                   EqualityComparer<Node>.Default.Equals(To, distance.To);
+        }
     }
 
     public class DistancesManager : IDistancesManager

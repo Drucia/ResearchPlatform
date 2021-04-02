@@ -9,7 +9,7 @@ namespace ResearchPlatform.Helpers
         public static readonly int MAX_TIME_WITH_WORKING = 780;
         public static readonly int MAX_TIME_WITH_WHOLE_DRIVING = 540;
         public static readonly int BREAK_TIME = 45;
-        public double CalculateValueOfGoalFunction(List<byte> x, List<byte> d, List<byte> z);
+        public double CalculateValueOfGoalFunction(Node baze, List<JobToProceed> done, int workTime);
         public bool AreAllConstraintsSatisfied(Node currNode, JobToProceed currentJob, List<JobToProceed> done, 
             int workTime, int drivenTime, int wholeDrivenTime);
     }

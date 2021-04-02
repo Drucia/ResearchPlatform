@@ -7,6 +7,7 @@ namespace ResearchPlatform
 {
     public static class CriteriaCalculator
     {
+        private static readonly int SHIFT_FOR_UTILITY = 100000;
         public static void CalculateCriteria(List<JobToProceed> jobs, 
             Configuration configuration, DistancesManager distancesManager, 
             Node baze, List<Client> clients)
@@ -19,7 +20,7 @@ namespace ResearchPlatform
 
                 if (distanceToDoJob != null && distanceFromBase != null && distanceToBase != null)
                 {
-                    job.Profit = job.Price - (distanceToDoJob.Costs * 0.01 + distanceFromBase.Costs * 0.01 + distanceToBase.Costs * 0.01 +
+                    job.Profit = job.Price - (distanceToDoJob.Costs * 0.001 + distanceFromBase.Costs * 0.001 + distanceToBase.Costs * 0.001 +
                         ((distanceToDoJob.DistanceInMeters + distanceFromBase.DistanceInMeters + distanceToBase.DistanceInMeters) / 1000) *
                         (configuration.AvgFuelConsumption * configuration.FuelCost + configuration.CostOfMaintain));
 
@@ -45,7 +46,7 @@ namespace ResearchPlatform
                     weights[(int)Criteria.DrivingTime] * job.TimeOfExecution +
                     weights[(int)Criteria.CustomerReliability] * job.ClientOpinion +
                     weights[(int)Criteria.CompletedJobs] * job.PossibilityOfNextJobs +
-                    weights[(int)Criteria.ComfortOfWork] * job.ComfortOfWork;
+                    weights[(int)Criteria.ComfortOfWork] * job.ComfortOfWork + SHIFT_FOR_UTILITY;
             });
         }
     }

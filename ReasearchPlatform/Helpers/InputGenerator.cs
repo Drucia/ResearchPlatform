@@ -3,6 +3,7 @@ using ResearchPlatform.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ResearchPlatform.Helpers
@@ -66,6 +67,8 @@ namespace ResearchPlatform.Helpers
                 var distance = Input.DistanceMatrix.Find(distance => (distance.From.Equals(from) && distance.To.Equals(to)) 
                     || (distance.To.Equals(from) && distance.From.Equals(to)));
 
+                var maxPossibleDistance = Input.DistanceMatrix.Select(d => d.DistanceInMeters).Max();
+
                 if (distance == null)
                 {
                     Input.Logs.Add($"Error with distance from {from.ID} to {to.ID}");
@@ -85,7 +88,7 @@ namespace ResearchPlatform.Helpers
                     ID = i,
                     From = from,
                     To = to,
-                    Price = (distance.DistanceInMeters / 1000) * (MIN_PRISE_FOR_KM_FOR_JOB + _random.NextDouble() * MAX_PRISE_FOR_KM_FOR_JOB),
+                    Price = ((distance.DistanceInMeters + maxPossibleDistance) / 1000) * (MIN_PRISE_FOR_KM_FOR_JOB + _random.NextDouble() * MAX_PRISE_FOR_KM_FOR_JOB),
                     LoadingTime = loadingTime,
                     Pickup = Tuple.Create(pickupStart, pickupEnd),
                     Delivery = Tuple.Create(deliveryStart, (int)(pickupEnd + distance.DurationInSeconds / 60)),
@@ -133,7 +136,7 @@ namespace ResearchPlatform.Helpers
                 return Input.Nodes[idx];
         }
 
-        private async Task<List<Distance>> GetAllDistancesForAsync(Node centralNode, List<Node> nodesAround)
+        public async Task<List<Distance>> GetAllDistancesForAsync(Node centralNode, List<Node> nodesAround)
         {
             List<Distance> distances = new List<Distance>();
 
@@ -156,6 +159,39 @@ namespace ResearchPlatform.Helpers
             });
 
             return distances;
+        }
+
+        public async Task<List<Distance>> GetAllDistancesForAsync(Node centralNode, List<Job> jobs, List<Distance> fetchedDistances)
+        {
+            List<Distance> distances = new List<Distance>();
+            var distancesToCalc = GetAllDistancesToFetch(centralNode, fetchedDistances, jobs);
+
+            foreach (var distance in distancesToCalc)
+            {
+                var calculatedDistance = await Fetcher.FetchDistanceBetweenNodesAsync(distance.From, distance.To);
+                while (calculatedDistance == null)
+                {
+                    Thread.Sleep(5000);
+                    calculatedDistance = await Fetcher.FetchDistanceBetweenNodesAsync(distance.From, distance.To);
+                }
+                distances.Add(calculatedDistance);
+            }
+
+            return distances;
+        }
+
+        private List<Distance> GetAllDistancesToFetch(Node centralNode, List<Distance> distances, List<Job> jobs)
+        {
+            // from jobs
+            var distancesToMake = jobs.Select(job => new Distance() { From = job.From, To = job.To }).Distinct().ToList();
+
+            // from base to jobs
+            var distancesToMakeFromBase = jobs.Select(job => new Distance() { From = centralNode, To = job.From } ).ToList();
+            var distancesToMakeToBase = jobs.Select(job => new Distance() { From = centralNode, To = job.To }).ToList();
+
+            var distWithBase = distancesToMakeFromBase.Concat(distancesToMakeToBase).Distinct().ToList();
+            distancesToMake = distancesToMake.Concat(distWithBase).ToList();
+            return distancesToMake.Where(dist => !distances.Contains(dist)).ToList();
         }
 
         private void GenerateClientsWithOpinions()

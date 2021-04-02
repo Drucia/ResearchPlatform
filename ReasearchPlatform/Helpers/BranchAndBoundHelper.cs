@@ -1,16 +1,21 @@
 ﻿using ResearchPlatform.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ResearchPlatform.Helpers
 {
     public class BranchAndBoundHelper : IBranchAndBoundHelper
     {
-        private DistancesManager _manager;
+        private readonly DistancesManager _manager;
+        private readonly List<double> _weights;
+        private readonly Configuration _configuration;
 
-        public BranchAndBoundHelper(DistancesManager distancesManager)
+        public BranchAndBoundHelper(DistancesManager distancesManager, IEnumerable<int> weights, Configuration configuration)
         {
             _manager = distancesManager;
+            _weights = weights.Select(w => w / 100.0).ToList();
+            _configuration = configuration;
         }
 
         public bool AreAllConstraintsSatisfied(Node currNode, JobToProceed currentJob, List<JobToProceed> done, 
@@ -72,14 +77,36 @@ namespace ResearchPlatform.Helpers
             return true;
         }
 
-        public bool AreAllConstrintsSatisfied(List<byte> x, List<byte> d, List<byte> z)
+        public double CalculateValueOfGoalFunction(Node baze, List<JobToProceed> done, int workTime)
         {
-            throw new NotImplementedException();
+            if (done.Count < 2)
+                return double.NegativeInfinity;
+
+            var utilityAvg = done.Average(job => job.Utility);
+            var price = CalculateRealProfit(baze, done) / done.Sum(job => job.Price);
+            var time = workTime / IBranchAndBoundHelper.MAX_TIME_WITH_WORKING;
+            var re = _weights[0] * utilityAvg + _weights[1] * price - _weights[2] * time;
+
+            return _weights[0] * utilityAvg + _weights[1] * price - _weights[2] * time;
         }
 
-        public double CalculateValueOfGoalFunction(List<byte> x, List<byte> d, List<byte> z)
+        private double CalculateRealProfit(Node baze, List<JobToProceed> done)
         {
-            throw new NotImplementedException();
+            Tuple<double /* profit */, Node /* last node */> profit =
+                          done.Aggregate(Tuple.Create(0.0, done.First().To), (acc, job) => {
+
+                              var currProfit = acc.Item1;
+                              var distanceToStart = _manager.GetDistanceBetween(acc.Item2, job.From);
+                              var distanceFromStartToEnd = _manager.GetDistanceBetween(job.From, job.To);
+
+                              currProfit += job.Price - (distanceToStart.Costs * 0.001 + distanceFromStartToEnd.Costs * 0.001 + 
+                              ((distanceToStart.DistanceInMeters + distanceFromStartToEnd.DistanceInMeters) / 1000) *
+                              (_configuration.AvgFuelConsumption * _configuration.FuelCost + _configuration.CostOfMaintain));
+
+                              return Tuple.Create(currProfit, job.To);
+                          });
+
+            return profit.Item1;
         }
     }
 }

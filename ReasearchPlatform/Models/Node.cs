@@ -19,8 +19,8 @@ namespace ResearchPlatform.Models
         {
             return new Node() { 
                 ID = nodeDTO.place_id, 
-                Latitude = Double.Parse(nodeDTO.lat), 
-                Longitude = Double.Parse(nodeDTO.lon), 
+                Latitude = double.Parse(nodeDTO.lat), 
+                Longitude = double.Parse(nodeDTO.lon), 
                 Name = nodeDTO.display_name.Split(",")[0]
             };
         }

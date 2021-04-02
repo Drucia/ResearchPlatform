@@ -8,7 +8,6 @@ namespace ResearchPlatform.Models
 {
     public class JobToProceed : Job
     {
-        public bool IsChosen { get; set; }
         public double Utility { get; set; }
         public double Profit { get; internal set; }
         public double ComfortOfWork { get; internal set; }
@@ -20,7 +19,6 @@ namespace ResearchPlatform.Models
         {}
         public JobToProceed(Job job) : base(job)
         {
-            IsChosen = false;
             Utility = 0.0;
         }
 
@@ -38,7 +36,6 @@ namespace ResearchPlatform.Models
                    TypeOfLoading == proceed.TypeOfLoading &&
                    SeizureRisk == proceed.SeizureRisk &&
                    ClientOpinion == proceed.ClientOpinion &&
-                   IsChosen == proceed.IsChosen &&
                    Utility == proceed.Utility &&
                    Profit == proceed.Profit &&
                    ComfortOfWork == proceed.ComfortOfWork &&

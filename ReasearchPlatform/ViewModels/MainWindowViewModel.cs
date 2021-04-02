@@ -1,5 +1,6 @@
 ﻿using GalaSoft.MvvmLight.Command;
 using MahApps.Metro.Controls.Dialogs;
+using Newtonsoft.Json;
 using ResearchPlatform.Helpers;
 using ResearchPlatform.Models;
 using ResearchPlatform.Views;
@@ -109,11 +110,9 @@ namespace ResearchPlatform.ViewModels
         {
             if (SelectedInputFile != null)
             {
-                using (StreamReader r = new StreamReader(SelectedInputFile))
-                {
-                    string json = r.ReadToEnd();
-                    Input = JsonSerializer.Deserialize<Models.Input>(json);
-                }
+                using StreamReader r = new StreamReader(SelectedInputFile);
+                string json = r.ReadToEnd();
+                Input = JsonConvert.DeserializeObject<Models.Input>(json);
             }
         }
 
@@ -136,7 +135,7 @@ namespace ResearchPlatform.ViewModels
                     Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Latin1Supplement, UnicodeRanges.LatinExtendedA)
                 };
 
-                var serializeInput = JsonSerializer.Serialize<Models.Input>(generator.Input, serializerOptions);
+                var serializeInput = System.Text.Json.JsonSerializer.Serialize(generator.Input, serializerOptions);
                 File.WriteAllText($"{INPUT_FILE}_{DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss")}.json", serializeInput.ToString(), Encoding.UTF8);
 
                 await _dialogCoordinator.ShowMessageAsync(this, "Info", Messages.POSTCODE_SAVE_MSG);
@@ -145,7 +144,7 @@ namespace ResearchPlatform.ViewModels
 
         private void LaunchSetting()
         {
-            new SettingsWindow(_configuration).ShowDialog();
+            new SettingsWindow(_configuration, SelectedInputFile).ShowDialog();
         }
     }
 }

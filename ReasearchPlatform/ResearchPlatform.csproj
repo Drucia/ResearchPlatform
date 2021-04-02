@@ -4,7 +4,7 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
-    <ApplicationIcon></ApplicationIcon>
+    <ApplicationIcon>hnet.com-image.ico</ApplicationIcon>
     <StartupObject>ResearchPlatform.App</StartupObject>
   </PropertyGroup>
 

@@ -11,11 +11,11 @@ namespace ResearchPlatform.Views
     /// </summary>
     public partial class SettingsWindow : MetroWindow
     {
-        public SettingsWindow(Configuration configuration)
+        public SettingsWindow(Configuration configuration, string inputFile)
         {
             InitializeComponent();
 
-            DataContext = new SettingsDialogViewModel(configuration, DialogCoordinator.Instance);
+            DataContext = new SettingsDialogViewModel(configuration, DialogCoordinator.Instance, inputFile);
         }
 
         private void OnCommitBindingGroup(object sender, EventArgs e)
