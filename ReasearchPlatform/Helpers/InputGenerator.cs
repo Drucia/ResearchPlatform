@@ -87,7 +87,7 @@ namespace ResearchPlatform.Helpers
                 {
                     ID = i,
                     From = from,
-                    To = to,
+                    To = to, // TODO price
                     Price = ((distance.DistanceInMeters + maxPossibleDistance) / 1000) * (MIN_PRISE_FOR_KM_FOR_JOB + _random.NextDouble() * MAX_PRISE_FOR_KM_FOR_JOB),
                     LoadingTime = loadingTime,
                     Pickup = Tuple.Create(pickupStart, pickupEnd),

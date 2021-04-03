@@ -47,7 +47,7 @@ namespace ResearchPlatform.Algorithms
         private List<JobToProceed> RunWithDFS()
         {
             // sort jobs
-            _jobsToProceed.Sort((left, right) => (int)((left.Utility - right.Utility) * 100));
+            _jobsToProceed.Sort((left, right) => (int)((right.Utility - left.Utility) * 100));
 
             var currentNode = _base;
             _best = new BestResult(){ Value = double.NegativeInfinity, ChosenJobs = new List<JobToProceed>()};

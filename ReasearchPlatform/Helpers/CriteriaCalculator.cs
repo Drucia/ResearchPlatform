@@ -40,6 +40,7 @@ namespace ResearchPlatform
 
         public static void CalculateUtility(List<JobToProceed> jobsToProceed, List<double> weights)
         {
+            // todo
             jobsToProceed.ForEach(job => {
                 job.Utility =
                     weights[(int)Criteria.Profit] * job.Profit +
