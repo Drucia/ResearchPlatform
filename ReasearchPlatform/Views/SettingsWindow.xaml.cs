@@ -3,6 +3,7 @@ using MahApps.Metro.Controls.Dialogs;
 using ResearchPlatform.Models;
 using ResearchPlatform.ViewModels;
 using System;
+using System.Collections.Generic;
 
 namespace ResearchPlatform.Views
 {
@@ -11,11 +12,11 @@ namespace ResearchPlatform.Views
     /// </summary>
     public partial class SettingsWindow : MetroWindow
     {
-        public SettingsWindow(Configuration configuration, string inputFile)
+        public SettingsWindow(Configuration configuration, List<string> inputFilesList)
         {
             InitializeComponent();
 
-            DataContext = new SettingsDialogViewModel(configuration, DialogCoordinator.Instance, inputFile);
+            DataContext = new SettingsDialogViewModel(configuration, DialogCoordinator.Instance, inputFilesList);
         }
 
         private void OnCommitBindingGroup(object sender, EventArgs e)

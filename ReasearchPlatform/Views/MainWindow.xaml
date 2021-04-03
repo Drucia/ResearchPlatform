@@ -195,8 +195,15 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
-                <DockPanel>
-                    <ComboBox Grid.Row="0" HorizontalAlignment="Right" ItemsSource="{Binding InputFileList}" SelectedValue="{Binding SelectedInputFile}" MinWidth="150" Margin="0,0,0,10" VerticalAlignment="Center"/>
+                <DockPanel Grid.Row="0" HorizontalAlignment="Right">
+                    <StackPanel Orientation="Horizontal">
+                        <Button Margin="0,0,10,10" Command="{Binding RefreshFileListCommand}" Background="{x:Null}" BorderBrush="{x:Null}">
+                            <iconPacks:PackIconFontAwesome Kind="SyncAltSolid"
+                                                        VerticalAlignment="Center"
+                                                        HorizontalAlignment="Center"/>
+                        </Button>
+                        <ComboBox ItemsSource="{Binding InputFileList}" SelectedValue="{Binding SelectedInputFile}" MinWidth="150" Margin="0,0,0,10" VerticalAlignment="Center"/>
+                    </StackPanel>
                 </DockPanel>
                 <ListView ItemsSource="{Binding Input.Jobs}" Grid.Row="1"
                               Style="{StaticResource MahApps.Styles.ListView.Virtualized}" ScrollViewer.CanContentScroll="True" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">

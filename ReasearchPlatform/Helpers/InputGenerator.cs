@@ -58,9 +58,11 @@ namespace ResearchPlatform.Helpers
             return this;
         }
 
-        private InputGenerator GenerateJobs()
+        public InputGenerator GenerateJobs(Models.Input input, int numberOfJobs)
         {
-            for (int i = 1; i <= AMOUNT_OF_JOBS_TO_GENERATE; i++)
+            Input = input;
+            var currentJobs = input.Jobs.Count == 0 ? 1 : input.Jobs.Count + 1;
+            for (int i = currentJobs; i <= currentJobs + numberOfJobs; i++)
             {
                 var from = GetRandomNode();
                 var to = GetRandomNode(from);
@@ -84,7 +86,7 @@ namespace ResearchPlatform.Helpers
                 var _randomRisk = _random.NextDouble();
                 var _randomTypeOfLoading = _random.NextDouble();
 
-                Input.Jobs.Add(new Job()
+                input.Jobs.Add(new Job()
                 {
                     ID = i,
                     From = from,
@@ -105,7 +107,7 @@ namespace ResearchPlatform.Helpers
         public async System.Threading.Tasks.Task GenerateAsync(string postcode)
         {
             await GenerateInputDataAsync(postcode);
-            GenerateJobs();
+            GenerateJobs(Input, AMOUNT_OF_JOBS_TO_GENERATE);
             GenerateClientsWithOpinions();
         }
 
@@ -205,7 +207,7 @@ namespace ResearchPlatform.Helpers
             return distancesToMake.Where(dist => !distances.Contains(dist)).ToList();
         }
 
-        private void GenerateClientsWithOpinions()
+        public void GenerateClientsWithOpinions()
         {
             var _random = new Random();
 

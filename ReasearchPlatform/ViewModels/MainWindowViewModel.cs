@@ -13,7 +13,6 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Unicode;
-using System.Threading;
 using System.Windows.Input;
 
 namespace ResearchPlatform.ViewModels
@@ -74,6 +73,7 @@ namespace ResearchPlatform.ViewModels
         public ICommand LaunchSettingsCommand { get; set; }
         public ICommand GenerateInputCommand { get; set; }
         public ICommand RunAlgorithmsCommand { get; set; }
+        public ICommand RefreshFileListCommand { get; set; }
 
         public MainWindowViewModel(IDialogCoordinator dialogCoordinator)
         {
@@ -83,6 +83,10 @@ namespace ResearchPlatform.ViewModels
             LaunchSettingsCommand = new RelayCommand(new Action(LaunchSetting));
             GenerateInputCommand = new RelayCommand(new Action(GenerateInput));
             RunAlgorithmsCommand = new RelayCommand(new Action(RunAlgorithms));
+            RefreshFileListCommand = new RelayCommand(new Action(() => { 
+                InputFileList = GetInputFileList();
+                SelectedInputFile = _inputFileList.First();
+            }));
 
             _inputFileList = GetInputFileList();
             SelectedInputFile = _inputFileList.First();
@@ -136,7 +140,7 @@ namespace ResearchPlatform.ViewModels
                 };
 
                 var serializeInput = System.Text.Json.JsonSerializer.Serialize(generator.Input, serializerOptions);
-                File.WriteAllText($"{INPUT_FILE}_{DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss")}.json", serializeInput.ToString(), Encoding.UTF8);
+                File.WriteAllText($"{INPUT_FILE}_{DateTime.Now:yyyy-MM-dd hhmmss}.json", serializeInput.ToString(), Encoding.UTF8);
 
                 await _dialogCoordinator.ShowMessageAsync(this, "Info", Messages.POSTCODE_SAVE_MSG);
             }
@@ -144,7 +148,7 @@ namespace ResearchPlatform.ViewModels
 
         private void LaunchSetting()
         {
-            new SettingsWindow(_configuration, SelectedInputFile).ShowDialog();
+            new SettingsWindow(_configuration, InputFileList).ShowDialog();
         }
     }
 }

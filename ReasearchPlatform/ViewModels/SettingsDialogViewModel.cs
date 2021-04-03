@@ -12,23 +12,29 @@ using System.Text;
 using System.IO;
 using Newtonsoft.Json;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace ResearchPlatform.ViewModels
 {
     class SettingsDialogViewModel : ViewModelBase
     {
         private readonly string DISTANCES_FILE = "Distances";
+        private readonly string INPUT_FILE = "Input";
 
         private Configuration _originalConfiguration;
         private Configuration _configuration;
-        private readonly string _inputFile;
+        private List<string> _inputFilesList;
+        private string _selectedInputFile;
         private Models.Input _input;
+        private int _numberOfJobsToGenerate;
 
         private IDialogCoordinator _dialogCoordinator;
 
         public ICommand SaveConfigurationCommand { get; set; }
         public ICommand ResetConfigurationCommand { get; set; }
         public ICommand GenerateDistancesCommand { get; set; }
+        public ICommand GenerateInputCommand { get; set; }
+        public ICommand GenerateMoreJobsCommand { get; set; }
 
         public ObservableCollection<int> Test { get; set; } = new ObservableCollection<int> { 10 };
 
@@ -38,11 +44,31 @@ namespace ResearchPlatform.ViewModels
             set => SetProperty(ref _configuration, value);
         }
 
-        public SettingsDialogViewModel(Configuration configuration, IDialogCoordinator dialogCoordinator, string inputFile)
+        public int NumberOfJobsToGenerate
+        {
+            get => _numberOfJobsToGenerate;
+            set => SetProperty(ref _numberOfJobsToGenerate, value);
+        }
+
+        public List<string> InputFilesList
+        {
+            get => _inputFilesList;
+            set => SetProperty(ref _inputFilesList, value);
+        }
+
+        public string SelectedInputFile
+        {
+            get => _selectedInputFile;
+            set => SetProperty(ref _selectedInputFile, value);
+        }
+
+        public SettingsDialogViewModel(Configuration configuration, IDialogCoordinator dialogCoordinator, 
+            List<string> inputFilesList)
         {
             _originalConfiguration = configuration;
             _dialogCoordinator = dialogCoordinator;
-            _inputFile = inputFile;
+            _inputFilesList = inputFilesList;
+            _selectedInputFile = inputFilesList.Count > 0 ? inputFilesList[0] : "";
 
             // make deep copy of configuration
             var json = System.Text.Json.JsonSerializer.Serialize(_originalConfiguration);
@@ -50,7 +76,9 @@ namespace ResearchPlatform.ViewModels
 
             SaveConfigurationCommand = new RelayCommand(new Action(SaveConfiguration));
             ResetConfigurationCommand = new RelayCommand(new Action(ResetToDefaultConfiguration));
-            GenerateDistancesCommand = new RelayCommand(new Action(GenerateDistances));
+            //GenerateDistancesCommand = new RelayCommand(new Action(GenerateDistances));
+            GenerateInputCommand = new RelayCommand(new Action(GenerateWholeInput));
+            GenerateMoreJobsCommand = new RelayCommand(new Action(GenerateMoreJobs));
         }
 
         private void SaveConfiguration()
@@ -66,40 +94,90 @@ namespace ResearchPlatform.ViewModels
             _dialogCoordinator.ShowMessageAsync(this, "Info", Messages.RESET_CONFIGURATION_MSG);
         }
 
-        private async void GenerateDistances()
+        //private async void GenerateDistances() // TODO
+        //{
+        //    //var progressBar = await _dialogCoordinator.ShowProgressAsync(this, "Info", Messages.GENERATING_MSG);
+        //    ReadInputFile();
+        //    //var generator = InputGenerator.GetInstance();
+        //    //var distances = await generator.GetAllDistancesForAsync(_input.Base, _input.Jobs, _input.DistanceMatrix);
+
+        //    //await progressBar.CloseAsync();
+
+        //    //if (distances.Count == 0)
+        //    //{
+        //    //    await _dialogCoordinator.ShowMessageAsync(this, "Error", Messages.POSTCODE_ERROR_MSG);
+        //    //}
+        //    //else
+        //    //{
+        //    var serializerOptions = new JsonSerializerOptions()
+        //        {
+        //            WriteIndented = true,
+        //            Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Latin1Supplement, UnicodeRanges.LatinExtendedA)
+        //        };
+        //        var maxPossibleDistance = _input.DistanceMatrix.Select(d => d.DistanceInMeters).Max();
+        //        _input.Jobs.ForEach(job => job.Price += ((maxPossibleDistance) / 1000) * (3.15 + new Random().NextDouble() * 6.75));
+        //        var serializeInput = System.Text.Json.JsonSerializer.Serialize(_input, serializerOptions);
+        //        File.WriteAllText($"{DISTANCES_FILE}_{DateTime.Now:yyyy-MM-dd hhmmss}.json", serializeInput.ToString(), Encoding.UTF8);
+
+        //        await _dialogCoordinator.ShowMessageAsync(this, "Info", Messages.POSTCODE_SAVE_MSG);
+        //    //}
+        //}
+
+        private async void GenerateWholeInput()
         {
-            //var progressBar = await _dialogCoordinator.ShowProgressAsync(this, "Info", Messages.GENERATING_MSG);
-            ReadInputFile();
-            //var generator = InputGenerator.GetInstance();
-            //var distances = await generator.GetAllDistancesForAsync(_input.Base, _input.Jobs, _input.DistanceMatrix);
+            var progressBar = await _dialogCoordinator.ShowProgressAsync(this, "Info", Messages.GENERATING_MSG);
+            var generator = InputGenerator.GetInstance();
+            await generator.GenerateAsync(Configuration.Postcode);
+            await progressBar.CloseAsync();
 
-            //await progressBar.CloseAsync();
-
-            //if (distances.Count == 0)
-            //{
-            //    await _dialogCoordinator.ShowMessageAsync(this, "Error", Messages.POSTCODE_ERROR_MSG);
-            //}
-            //else
-            //{
-            var serializerOptions = new JsonSerializerOptions()
-                {
-                    WriteIndented = true,
-                    Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Latin1Supplement, UnicodeRanges.LatinExtendedA)
-                };
-                var maxPossibleDistance = _input.DistanceMatrix.Select(d => d.DistanceInMeters).Max();
-                _input.Jobs.ForEach(job => job.Price += ((maxPossibleDistance) / 1000) * (3.15 + new Random().NextDouble() * 6.75));
-                var serializeInput = System.Text.Json.JsonSerializer.Serialize(_input, serializerOptions);
-                File.WriteAllText($"{"Input-bigger-prices"}_{DateTime.Now:yyyy-MM-dd hhmmss}.json", serializeInput.ToString(), Encoding.UTF8);
-
-                await _dialogCoordinator.ShowMessageAsync(this, "Info", Messages.POSTCODE_SAVE_MSG);
-            //}
+            if (generator.Input == null)
+            {
+                await _dialogCoordinator.ShowMessageAsync(this, "Error", Messages.POSTCODE_ERROR_MSG);
+            }
+            else
+            {
+                SaveInput(generator.Input);
+            }
         }
 
-        private void ReadInputFile()
+        private async void GenerateMoreJobs()
         {
-            using StreamReader r = new StreamReader(_inputFile);
+            var progressBar = await _dialogCoordinator.ShowProgressAsync(this, "Info", Messages.GENERATING_MSG);
+            ReadInputFile(_selectedInputFile);
+            var generator = InputGenerator.GetInstance();
+            generator.GenerateJobs(_input, _numberOfJobsToGenerate);
+            generator.GenerateClientsWithOpinions();
+            await progressBar.CloseAsync();
+            SaveInput(generator.Input);
+            InputFilesList = GetInputFileList();
+        }
+
+        private async void SaveInput(Models.Input input)
+        {
+            var serializerOptions = new JsonSerializerOptions()
+            {
+                WriteIndented = true,
+                Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Latin1Supplement, UnicodeRanges.LatinExtendedA)
+            };
+            var serializeInput = System.Text.Json.JsonSerializer.Serialize(input, serializerOptions);
+            File.WriteAllText($"{INPUT_FILE}_{DateTime.Now:yyyy-MM-dd hhmmss}.json", serializeInput.ToString(), Encoding.UTF8);
+
+            await _dialogCoordinator.ShowMessageAsync(this, "Info", Messages.POSTCODE_SAVE_MSG);
+        }
+
+        private void ReadInputFile(string inputFile)
+        {
+            using StreamReader r = new StreamReader(inputFile);
             string json = r.ReadToEnd();
             _input = JsonConvert.DeserializeObject<Models.Input>(json);
+        }
+
+        private List<string> GetInputFileList()
+        {
+            return Directory.GetFiles("./")
+                .Where(filename => filename.Contains(INPUT_FILE))
+                .Select(filename => filename.Split("./")[1])
+                .ToList();
         }
     }
 }
