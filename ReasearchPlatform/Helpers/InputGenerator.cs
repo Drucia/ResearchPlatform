@@ -11,13 +11,14 @@ namespace ResearchPlatform.Helpers
     public class InputGenerator
     {
         private static readonly int AMOUNT_OF_JOBS_TO_GENERATE = 100;
-        private static readonly double MIN_PRISE_FOR_KM_FOR_JOB = 3.15;
-        private static readonly double MAX_PRISE_FOR_KM_FOR_JOB = 6.75;
+        private static readonly double MIN_PRISE_FOR_KM_FOR_JOB = 5.15;
+        private static readonly double MAX_PRISE_FOR_KM_FOR_JOB = 9.75;
         private static readonly int MIN_LOADING_TIME = 30;
         private static readonly int MAX_LOADING_TIME = 91;
         private static readonly int MAX_WORKING_TIME = 780;
         private static readonly int MARGIN_FOR_LOADING_TIME = 45;
         private static readonly int AMOUNT_OF_CLIENTS = 150;
+        private static readonly int MAX_NUMBER_OF_REPEAT_CALLS = 10;
 
         private static InputGenerator _instance;
         private static Random _random;
@@ -87,8 +88,8 @@ namespace ResearchPlatform.Helpers
                 {
                     ID = i,
                     From = from,
-                    To = to, // TODO price
-                    Price = ((distance.DistanceInMeters + maxPossibleDistance) / 1000) * (MIN_PRISE_FOR_KM_FOR_JOB + _random.NextDouble() * MAX_PRISE_FOR_KM_FOR_JOB),
+                    To = to,
+                    Price = (distance.DistanceInMeters / 1000) * (MIN_PRISE_FOR_KM_FOR_JOB + _random.NextDouble() * MAX_PRISE_FOR_KM_FOR_JOB),
                     LoadingTime = loadingTime,
                     Pickup = Tuple.Create(pickupStart, pickupEnd),
                     Delivery = Tuple.Create(deliveryStart, (int)(pickupEnd + distance.DurationInSeconds / 60)),
@@ -145,16 +146,24 @@ namespace ResearchPlatform.Helpers
                 for (int j=i+1; j < nodesAround.Count; j++)
                 {
                     var distance = await Fetcher.FetchDistanceBetweenNodesAsync(nodesAround[i], nodesAround[j]);
-                    while (distance == null)
+                    var counter = 0;
+                    while (distance == null && counter < MAX_NUMBER_OF_REPEAT_CALLS)
+                    {
                         distance = await Fetcher.FetchDistanceBetweenNodesAsync(nodesAround[i], nodesAround[j]);
+                        counter++;
+                    }
                     distances.Add(distance);
                 }
             }
 
             nodesAround.ForEach(async node => { 
                 var distance = await Fetcher.FetchDistanceBetweenNodesAsync(centralNode, node);
-                while (distance == null)
+                var counter = 0;
+                while (distance == null && counter < MAX_NUMBER_OF_REPEAT_CALLS)
+                {
                     distance = await Fetcher.FetchDistanceBetweenNodesAsync(centralNode, node);
+                    counter++;
+                }
                 distances.Add(distance);
             });
 
@@ -169,10 +178,12 @@ namespace ResearchPlatform.Helpers
             foreach (var distance in distancesToCalc)
             {
                 var calculatedDistance = await Fetcher.FetchDistanceBetweenNodesAsync(distance.From, distance.To);
-                while (calculatedDistance == null)
+                var counter = 0;
+                while (calculatedDistance == null && counter < MAX_NUMBER_OF_REPEAT_CALLS)
                 {
                     Thread.Sleep(5000);
                     calculatedDistance = await Fetcher.FetchDistanceBetweenNodesAsync(distance.From, distance.To);
+                    counter++;
                 }
                 distances.Add(calculatedDistance);
             }

@@ -18,7 +18,6 @@ namespace ResearchPlatform.Algorithms
         private readonly Node _base;
         private readonly IDistancesManager _distancesManager;
         private readonly IBranchAndBoundHelper _helper;
-        private readonly List<JobToProceed> _jobs;
         private BestResult _best;
 
         // processing
@@ -30,7 +29,6 @@ namespace ResearchPlatform.Algorithms
             _helper = helper;
             _base = startNode;
             _distancesManager = distances;
-            _jobs = jobs;
             _jobsToProceed = new List<JobToProceed>(jobs);
         }
 
