@@ -6,5 +6,7 @@ namespace ResearchPlatform.Models
     {
         public List<JobToProceed> Jobs { get; set; }
         public List<Break> Breaks { get; set; }
+        public long Duration { get; set; }
+        public int VisitedNodes { get; set; }
     }
 }

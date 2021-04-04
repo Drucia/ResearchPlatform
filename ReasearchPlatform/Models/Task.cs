@@ -42,8 +42,15 @@ namespace ResearchPlatform.Models
             {
                 if (_searchTreeAlgorithms[(int)alg])
                 {
+                    var watch = System.Diagnostics.Stopwatch.StartNew();
                     var res = bAb.Run(alg);
-                    _results.Add(alg, new Result() { Jobs = res.ChosenJobs, Breaks = res.Breaks });
+                    watch.Stop();
+                    _results.Add(alg, new Result() { 
+                        Jobs = res.ChosenJobs, 
+                        Breaks = res.Breaks, 
+                        Duration = watch.ElapsedMilliseconds,
+                        VisitedNodes = res.VisitedNodes
+                    });
                 }
             }
         }

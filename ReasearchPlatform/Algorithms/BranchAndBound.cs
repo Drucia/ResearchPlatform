@@ -13,12 +13,14 @@ namespace ResearchPlatform.Algorithms
             public double Value { get; set; }
             public List<JobToProceed> ChosenJobs { get; set; }
             public List<Break> Breaks { get; set; }
+            public int VisitedNodes { get; set; }
         }
 
         // input
         private readonly Node _base;
         private readonly IDistancesManager _distancesManager;
         private readonly IBranchAndBoundHelper _helper;
+        private int _visitedNodes;
         private BestResult _best;
 
         // processing
@@ -30,14 +32,21 @@ namespace ResearchPlatform.Algorithms
             _helper = helper;
             _base = startNode;
             _distancesManager = distances;
+            _visitedNodes = 0;
             _jobsToProceed = new List<JobToProceed>(jobs);
         }
 
         public BestResult Run(SearchTreeAlgorithm searchTreeAlgorithm)
         {
-            switch(searchTreeAlgorithm)
+            switch (searchTreeAlgorithm)
             {
                 case SearchTreeAlgorithm.DFS: return RunWithDFS();
+                case SearchTreeAlgorithm.BFS:
+                    break;
+                case SearchTreeAlgorithm.Heuristic:
+                    break;
+                case SearchTreeAlgorithm.Random:
+                    break;
             }
 
             return new BestResult();
@@ -62,12 +71,16 @@ namespace ResearchPlatform.Algorithms
             DFSRec(currentNode, dummyJob, new List<JobToProceed>(), new List<Break>(),
                 _jobsToProceed, 0, 0, 0, results);
 
+            _best.VisitedNodes = _visitedNodes;
+
             return _best;
         }
 
         private void DFSRec(Node currNode, JobToProceed currentJob, List<JobToProceed> done, List<Break> breaks,
             List<JobToProceed> all, int workTime, int drivenTime, int wholeDrivenTime, List<List<JobToProceed>> allCheckedJobsPath)
         {
+            _visitedNodes++;
+
             var currentValue = _helper.CalculateValueOfGoalFunction(_base, done, workTime);
 
             if (_helper.AreAllConstraintsSatisfied(currNode, currentJob, done, workTime, drivenTime, wholeDrivenTime))
