@@ -41,7 +41,10 @@ namespace ResearchPlatform.Models
             foreach (SearchTreeAlgorithm alg in Enum.GetValues(typeof(SearchTreeAlgorithm)))
             {
                 if (_searchTreeAlgorithms[(int)alg])
-                    _results.Add(alg, new Result() { Jobs = bAb.Run(alg) });
+                {
+                    var res = bAb.Run(alg);
+                    _results.Add(alg, new Result() { Jobs = res.ChosenJobs, Breaks = res.Breaks });
+                }
             }
         }
 

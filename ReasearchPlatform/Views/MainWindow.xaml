@@ -226,22 +226,38 @@
         </GroupBox>
         <GroupBox Grid.Row="1" Grid.Column="1" Header="Output Data" Margin="10,10,10,10">
             <Grid>
-                <ListView ItemsSource="{Binding Results}" Grid.Row="1" Visibility="{Binding InProgress, Converter={StaticResource FalseToVisibleConverter}, Mode=TwoWay}"
+                <Grid.RowDefinitions>
+                    <RowDefinition MaxHeight="30"/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <DockPanel Grid.Row="0" HorizontalAlignment="Right">
+                    <ComboBox ItemsSource="{Binding InputFileList}" SelectedValue="{Binding SelectedInputFile}" MinWidth="150" Margin="0,0,0,5" VerticalAlignment="Center"/>
+                </DockPanel>
+                <ListView ItemsSource="{Binding JobResults}" Grid.Row="1" Visibility="{Binding InProgress, Converter={StaticResource FalseToVisibleConverter}, Mode=TwoWay}"
                                   Style="{StaticResource MahApps.Styles.ListView.Virtualized}" ScrollViewer.CanContentScroll="True" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <ListView.View>
                         <GridView>
-                            <GridViewColumn Header="ID" DisplayMemberBinding="{Binding Path=ID}" />
+                            <GridViewColumn Header="ID" Width="30" DisplayMemberBinding="{Binding Path=ID}" />
                             <GridViewColumn Header="From" Width="100" DisplayMemberBinding="{Binding From}" />
                             <GridViewColumn Header="To" Width="100" DisplayMemberBinding="{Binding To}" />
                             <GridViewColumn Header="Price" Width="70" DisplayMemberBinding="{Binding Price, StringFormat=C,  ConverterCulture='pl-PL'}" />
                             <GridViewColumn Header="Pickup time" DisplayMemberBinding="{Binding Pickup}" />
                             <GridViewColumn Header="Delivery time" DisplayMemberBinding="{Binding Delivery}" />
                             <GridViewColumn Header="Loading time" DisplayMemberBinding="{Binding LoadingTime, StringFormat=0 min}"/>
-                            <GridViewColumn Header="Client ID" DisplayMemberBinding="{Binding ClientId}" />
                         </GridView>
                     </ListView.View>
                 </ListView>
-                <ProgressBar Visibility="{Binding InProgress, Converter={StaticResource BoolToHiddenConverter}, Mode=TwoWay}" HorizontalAlignment="Center" VerticalAlignment="Center" IsIndeterminate="True" MinWidth="100"/>
+                <ProgressBar Grid.Row="1" Visibility="{Binding InProgress, Converter={StaticResource BoolToHiddenConverter}, Mode=TwoWay}" HorizontalAlignment="Center" VerticalAlignment="Center" IsIndeterminate="True" MinWidth="100"/>
+                <ListView ItemsSource="{Binding BreaksResults}" Grid.Row="2" Visibility="{Binding InProgress, Converter={StaticResource FalseToVisibleConverter}, Mode=TwoWay}"
+                                  Style="{StaticResource MahApps.Styles.ListView.Virtualized}" ScrollViewer.CanContentScroll="True" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="Break place" Width="100" DisplayMemberBinding="{Binding Place}" />
+                            <GridViewColumn Header="After driven" Width="100" DisplayMemberBinding="{Binding DrivenTime}" />
+                        </GridView>
+                    </ListView.View>
+                </ListView>
             </Grid>
         </GroupBox>
     </Grid>

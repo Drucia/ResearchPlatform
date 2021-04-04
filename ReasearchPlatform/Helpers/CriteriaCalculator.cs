@@ -40,14 +40,21 @@ namespace ResearchPlatform
 
         public static void CalculateUtility(List<JobToProceed> jobsToProceed, List<double> weights)
         {
-            // todo
+            var minProfit = jobsToProceed.Min(job => job.Profit);
+            var maxProfit = jobsToProceed.Max(job => job.Profit) + Math.Abs(minProfit < 0 ? minProfit : 0);
+
+            var maxTimeOfExec = jobsToProceed.Max(job => job.TimeOfExecution);
+            var maxClientOpinion = jobsToProceed.Max(job => job.ClientOpinion);
+            var maxPossOfNextJobs = jobsToProceed.Max(job => job.PossibilityOfNextJobs);
+            var maxComfortOfWork = jobsToProceed.Max(job => job.ComfortOfWork);
+
             jobsToProceed.ForEach(job => {
                 job.Utility =
-                    weights[(int)Criteria.Profit] * job.Profit +
-                    weights[(int)Criteria.DrivingTime] * job.TimeOfExecution +
-                    weights[(int)Criteria.CustomerReliability] * job.ClientOpinion +
-                    weights[(int)Criteria.CompletedJobs] * job.PossibilityOfNextJobs +
-                    weights[(int)Criteria.ComfortOfWork] * job.ComfortOfWork + SHIFT_FOR_UTILITY;
+                    weights[(int)Criteria.Profit] * ((job.Profit + Math.Abs(minProfit < 0 ? minProfit : 0)) / maxProfit) +
+                    weights[(int)Criteria.DrivingTime] * 1 / (job.TimeOfExecution / maxTimeOfExec) +
+                    weights[(int)Criteria.CustomerReliability] * (job.ClientOpinion / maxClientOpinion) +
+                    weights[(int)Criteria.CompletedJobs] * (job.PossibilityOfNextJobs / maxPossOfNextJobs) +
+                    weights[(int)Criteria.ComfortOfWork] * (job.ComfortOfWork / maxComfortOfWork);
             });
         }
     }

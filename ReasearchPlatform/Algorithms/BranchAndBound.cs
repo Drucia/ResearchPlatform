@@ -12,6 +12,7 @@ namespace ResearchPlatform.Algorithms
         {
             public double Value { get; set; }
             public List<JobToProceed> ChosenJobs { get; set; }
+            public List<Break> Breaks { get; set; }
         }
 
         // input
@@ -32,17 +33,17 @@ namespace ResearchPlatform.Algorithms
             _jobsToProceed = new List<JobToProceed>(jobs);
         }
 
-        public List<JobToProceed> Run(SearchTreeAlgorithm searchTreeAlgorithm)
+        public BestResult Run(SearchTreeAlgorithm searchTreeAlgorithm)
         {
             switch(searchTreeAlgorithm)
             {
                 case SearchTreeAlgorithm.DFS: return RunWithDFS();
             }
 
-            return new List<JobToProceed>();
+            return new BestResult();
         }
 
-        private List<JobToProceed> RunWithDFS()
+        private BestResult RunWithDFS()
         {
             // sort jobs
             _jobsToProceed.Sort((left, right) => (int)((right.Utility - left.Utility) * 100));
@@ -58,13 +59,13 @@ namespace ResearchPlatform.Algorithms
 
             var results = new List<List<JobToProceed>>();
 
-            DFSRec(currentNode, dummyJob, new List<JobToProceed>(), 
+            DFSRec(currentNode, dummyJob, new List<JobToProceed>(), new List<Break>(),
                 _jobsToProceed, 0, 0, 0, results);
 
-            return _best.ChosenJobs;
+            return _best;
         }
 
-        private void DFSRec(Node currNode, JobToProceed currentJob, List<JobToProceed> done, 
+        private void DFSRec(Node currNode, JobToProceed currentJob, List<JobToProceed> done, List<Break> breaks,
             List<JobToProceed> all, int workTime, int drivenTime, int wholeDrivenTime, List<List<JobToProceed>> allCheckedJobsPath)
         {
             var currentValue = _helper.CalculateValueOfGoalFunction(_base, done, workTime);
@@ -72,12 +73,12 @@ namespace ResearchPlatform.Algorithms
             if (_helper.AreAllConstraintsSatisfied(currNode, currentJob, done, workTime, drivenTime, wholeDrivenTime))
             {
                 done.Add(currentJob);
-                currNode = ExecuteJob(done, out int wT, out int dT, out int wholeDT);
+                currNode = ExecuteJob(done, out int wT, out int dT, out int wholeDT, breaks);
 
                 var allPossible = GetPossibleJobsToDo(all, done, currNode, wT);
                 foreach (var job in allPossible)
                 {
-                    DFSRec(currNode, job, done, all, wT, dT, wholeDT, allCheckedJobsPath);
+                    DFSRec(currNode, job, done, breaks, all, wT, dT, wholeDT, allCheckedJobsPath);
                 }
 
                 currentValue = _helper.CalculateValueOfGoalFunction(_base, done, workTime);
@@ -85,7 +86,7 @@ namespace ResearchPlatform.Algorithms
                 // leaf
                 if (allPossible.Count == 0 && _best.Value <= currentValue)
                 {
-                    ChangeBestResult(currentValue, new List<JobToProceed>(done));
+                    ChangeBestResult(currentValue, new List<JobToProceed>(done), breaks);
                     allCheckedJobsPath.Add(new List<JobToProceed>(done));
                 }
             }
@@ -93,7 +94,7 @@ namespace ResearchPlatform.Algorithms
             {
                 // cut tree
                 if (_best.Value <= currentValue)                
-                    ChangeBestResult(currentValue, new List<JobToProceed>(done));
+                    ChangeBestResult(currentValue, new List<JobToProceed>(done), breaks);
 
                 allCheckedJobsPath.Add(new List<JobToProceed>(done));
             }
@@ -102,14 +103,16 @@ namespace ResearchPlatform.Algorithms
                 done.RemoveAt(done.Count - 1);
         }
 
-        private void ChangeBestResult(double currentValue, List<JobToProceed> done)
+        private void ChangeBestResult(double currentValue, List<JobToProceed> done, List<Break> breaks)
         {
             _best.Value = currentValue;
             _best.ChosenJobs = done;
+            _best.Breaks = breaks;
         }
 
-        private Node ExecuteJob(List<JobToProceed> done, out int wT, out int dT, out int wholeDT)
+        private Node ExecuteJob(List<JobToProceed> done, out int wT, out int dT, out int wholeDT, List<Break> breaks)
         {
+            breaks.Clear();
             Tuple<List<int>, Node /* last node */> times =
                 done.Aggregate(Tuple.Create(new List<int>(Enumerable.Repeat(0, 3)), done.First().To), (acc, job) => {
 
@@ -126,7 +129,11 @@ namespace ResearchPlatform.Algorithms
                         ? IBranchAndBoundHelper.BREAK_TIME : 0;
 
                     // if break then zero driven time
-                    curDrivenTime = breakTime > 0 ? 0 : curDrivenTime;
+                    if (breakTime > 0)
+                    {
+                        breaks.Add(new Break() { Place = lastNode, DrivenTime = curDrivenTime });
+                        curDrivenTime = 0;
+                    }
 
                     // add break time if necessary in commuting node
                     // add travel time from last node to start node
@@ -141,7 +148,11 @@ namespace ResearchPlatform.Algorithms
                         ? IBranchAndBoundHelper.BREAK_TIME : 0;
 
                     // if break then zero driven time
-                    curDrivenTime = breakTime > 0 ? 0 : curDrivenTime;
+                    if (breakTime > 0)
+                    {
+                        breaks.Add(new Break() { Place = job.From, DrivenTime = curDrivenTime });
+                        curDrivenTime = 0;
+                    }
 
                     // add break time if necessary in start node
                     // add travel time from start to end node

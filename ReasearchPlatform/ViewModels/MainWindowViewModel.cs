@@ -29,7 +29,8 @@ namespace ResearchPlatform.ViewModels
         private List<string> _inputFileList;
         private string _selectedInputFile;
         private bool _inProgress = false;
-        private List<Job> _results;
+        private List<Job> _jobResults;
+        private List<Break> _breaksResults;
 
         public Configuration Configuration
         {
@@ -64,10 +65,16 @@ namespace ResearchPlatform.ViewModels
             set => SetProperty(ref _inProgress, value);
         }
 
-        public List<Job> Results
+        public List<Job> JobResults
         {
-            get => _results;
-            set => SetProperty(ref _results, value);
+            get => _jobResults;
+            set => SetProperty(ref _jobResults, value);
+        }
+
+        public List<Break> BreaksResults
+        {
+            get => _breaksResults;
+            set => SetProperty(ref _breaksResults, value);
         }
 
         public ICommand LaunchSettingsCommand { get; set; }
@@ -97,7 +104,7 @@ namespace ResearchPlatform.ViewModels
             InProgress = true;
             var progress = await _dialogCoordinator.ShowProgressAsync(this, "Info", Messages.CALCULATIONS_IN_PROGRESS);
             var allRes = AlgorithmsManager.RunWith(Configuration, Input);
-            Results = allRes[(int)MultiCriteriaAlgorithm.AHP][SearchTreeAlgorithm.DFS].Jobs.Cast<Job>().ToList();
+            JobResults = allRes[(int)MultiCriteriaAlgorithm.AHP][SearchTreeAlgorithm.DFS].Jobs.Cast<Job>().ToList();
             await progress.CloseAsync();
             InProgress = false;
         }

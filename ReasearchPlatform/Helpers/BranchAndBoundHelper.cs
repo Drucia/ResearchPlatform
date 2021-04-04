@@ -84,7 +84,7 @@ namespace ResearchPlatform.Helpers
 
             var utilityAvg = done.Average(job => job.Utility);
             var price = CalculateRealProfit(baze, done) / done.Sum(job => job.Price);
-            var time = workTime / IBranchAndBoundHelper.MAX_TIME_WITH_WORKING;
+            var time = (double) workTime / IBranchAndBoundHelper.MAX_TIME_WITH_WORKING;
             var re = _weights[0] * utilityAvg + _weights[1] * price - _weights[2] * time;
 
             return _weights[0] * utilityAvg + _weights[1] * price - _weights[2] * time;
