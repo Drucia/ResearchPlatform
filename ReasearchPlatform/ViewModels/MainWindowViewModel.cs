@@ -8,6 +8,7 @@ using ResearchPlatform.Models;
 using ResearchPlatform.Views;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -22,16 +23,22 @@ namespace ResearchPlatform.ViewModels
     {
         private static readonly string INPUT_FILE = "Input";
 
-        private IDialogCoordinator _dialogCoordinator;
+        private readonly IDialogCoordinator _dialogCoordinator;
 
         private Configuration _configuration;
         private Models.Input _input;
 
         private List<string> _inputFileList;
         private string _selectedInputFile;
+
+        private ObservableCollection<string> _algorithmsResults;
+        private string _selectedAlgorithmResult;
+
         private bool _inProgress = false;
         private List<Job> _jobResults;
         private List<Break> _breaksResults;
+
+        private readonly Dictionary<string, Result> _allResDict;
 
         public Configuration Configuration
         {
@@ -57,6 +64,30 @@ namespace ResearchPlatform.ViewModels
             {
                 if (SetProperty(ref _selectedInputFile, value))
                     ReadInputFile();
+            }
+        }
+        public ObservableCollection<string> AlgorithmsResults
+        {
+            get => _algorithmsResults;
+            set => SetProperty(ref _algorithmsResults, value);
+        }
+
+        public string SelectedAlgorithmResult
+        {
+            get => _selectedAlgorithmResult;
+            set
+            {
+                if (SetProperty(ref _selectedAlgorithmResult, value))
+                    SetProperResult(_selectedAlgorithmResult);
+            }
+        }
+
+        private void SetProperResult(string selectedAlgorithmResult)
+        {
+            if (selectedAlgorithmResult != null)
+            {
+                JobResults = _allResDict[selectedAlgorithmResult].Jobs.Cast<Job>().ToList();
+                BreaksResults = _allResDict[selectedAlgorithmResult].Breaks;
             }
         }
 
@@ -101,6 +132,11 @@ namespace ResearchPlatform.ViewModels
             _inputFileList = GetInputFileList();
             SelectedInputFile = _inputFileList.First();
 
+            _algorithmsResults = new ObservableCollection<string>();
+            _allResDict = new Dictionary<string, Result>();
+            _breaksResults = new List<Break>();
+            _selectedAlgorithmResult = null;
+
             PreparePlot();
         }
 
@@ -137,12 +173,58 @@ namespace ResearchPlatform.ViewModels
 
         private async void RunAlgorithms()
         {
-            InProgress = true;
             var progress = await _dialogCoordinator.ShowProgressAsync(this, "Info", Messages.CALCULATIONS_IN_PROGRESS);
-            var allRes = AlgorithmsManager.RunWith(Configuration, Input);
-            JobResults = allRes[(int)MultiCriteriaAlgorithm.AHP][SearchTreeAlgorithm.DFS].Jobs.Cast<Job>().ToList();
+            progress.SetIndeterminate();
+            await Run();
             await progress.CloseAsync();
-            InProgress = false;
+        }
+
+        private async System.Threading.Tasks.Task Run()
+        {
+            await System.Threading.Tasks.Task.Run(() =>
+            {
+                SetupListOfResults(AlgorithmsManager.RunWith(Configuration, Input));
+            });
+        }
+
+        private void SetupListOfResults(List<Dictionary<SearchTreeAlgorithm, Result>> allRes)
+        {
+            App.Current.Dispatcher.Invoke((Action)delegate
+            {
+                _algorithmsResults.Clear();
+            });
+
+            _allResDict.Clear();
+            BreaksResults.Clear();
+            SelectedAlgorithmResult = null;
+
+            var ahp = allRes[(int)MultiCriteriaAlgorithm.AHP];
+            var pro = allRes[(int)MultiCriteriaAlgorithm.PROMETHEE];
+            var ele = allRes[(int)MultiCriteriaAlgorithm.ELECTRE];
+            var own = allRes[(int)MultiCriteriaAlgorithm.OwnWeights];
+
+            AddResultsToList(ahp, "AHP");
+            AddResultsToList(own, "Own Weights");
+            AddResultsToList(pro, "PROMETHEE");
+            AddResultsToList(ele, "ELECTRE");
+
+            SelectedAlgorithmResult = _allResDict.First().Key;
+        }
+
+        private void AddResultsToList(Dictionary<SearchTreeAlgorithm, Result> results, string nameOfCriteriaAlg)
+        {
+            if (results.Count != 0)
+            {
+                foreach(var res in results)
+                {
+                    var name = $"{res.Key} + {nameOfCriteriaAlg}";
+                    App.Current.Dispatcher.Invoke((Action)delegate
+                    {
+                        _algorithmsResults.Add(name);
+                    });
+                    _allResDict.Add(name, res.Value);
+                }
+            }
         }
 
         private List<string> GetInputFileList()

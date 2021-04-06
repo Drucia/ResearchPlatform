@@ -43,12 +43,28 @@ namespace ResearchPlatform
                     distanceManager),
 
                 new Task(
+                    new AHPBuilder(configuration.ComparisionMatrix),
+                    branchAndBoundHelper,
+                    input,
+                    new List<bool>(algorithmsMatrix[(int)MultiCriteriaAlgorithm.PROMETHEE]),
+                    jobsToProceed,
+                    distanceManager),
+
+                new Task(
+                    new OwnWeightsBuilder(configuration.CriteriaWeights.Select(w => w / 100.0).ToList()),
+                    branchAndBoundHelper,
+                    input,
+                    new List<bool>(algorithmsMatrix[(int)MultiCriteriaAlgorithm.ELECTRE]),
+                    jobsToProceed,
+                    distanceManager),
+
+                new Task(
                     new OwnWeightsBuilder(configuration.CriteriaWeights.Select(w => w / 100.0).ToList()),
                     branchAndBoundHelper,
                     input,
                     new List<bool>(algorithmsMatrix[(int)MultiCriteriaAlgorithm.OwnWeights]),
                     jobsToProceed,
-                    distanceManager)
+                    distanceManager),
             };
 
             algorithmsToRun.ForEach(alg => alg.Run());

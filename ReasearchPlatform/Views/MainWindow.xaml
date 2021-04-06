@@ -44,9 +44,6 @@
             </Style.Triggers>
         </Style>
     </mah:MetroWindow.Resources>
-    <mah:MetroWindow.IsEnabled>
-        <Binding Mode="TwoWay" Path="InProgress" Converter="{StaticResource InverseSingleBooleanConverter}"/>
-    </mah:MetroWindow.IsEnabled>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
@@ -236,7 +233,7 @@
                     <RowDefinition/>
                 </Grid.RowDefinitions>
                 <DockPanel Grid.Row="0" HorizontalAlignment="Right">
-                    <ComboBox ItemsSource="{Binding InputFileList}" SelectedValue="{Binding SelectedInputFile}" MinWidth="150" Margin="0,0,0,5" VerticalAlignment="Center"/>
+                    <ComboBox ItemsSource="{Binding AlgorithmsResults, Mode=TwoWay}" SelectedValue="{Binding SelectedAlgorithmResult, Mode=TwoWay}" MinWidth="150" Margin="0,0,0,5" VerticalAlignment="Center"/>
                 </DockPanel>
                 <ListView ItemsSource="{Binding JobResults}" Grid.Row="1" Visibility="{Binding InProgress, Converter={StaticResource FalseToVisibleConverter}, Mode=TwoWay}"
                                   Style="{StaticResource MahApps.Styles.ListView.Virtualized}" ScrollViewer.CanContentScroll="True" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
