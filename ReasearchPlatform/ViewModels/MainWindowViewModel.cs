@@ -1,4 +1,7 @@
 ﻿using GalaSoft.MvvmLight.Command;
+using LiveCharts;
+using LiveCharts.Configurations;
+using LiveCharts.Wpf;
 using MahApps.Metro.Controls.Dialogs;
 using Newtonsoft.Json;
 using OxyPlot;
@@ -39,6 +42,9 @@ namespace ResearchPlatform.ViewModels
         private List<Break> _breaksResults;
 
         private readonly Dictionary<string, Result> _allResDict;
+        private string _axisYName;
+        private int _stepSize;
+        private double _minYValue;
 
         public Configuration Configuration
         {
@@ -109,12 +115,31 @@ namespace ResearchPlatform.ViewModels
             set => SetProperty(ref _breaksResults, value);
         }
 
-        public PlotModel Model { get; private set; }
+        public string AxisYName
+        {
+            get => _axisYName;
+            set => SetProperty(ref _axisYName, value);
+        }
+
+        public int StepSize
+        {
+            get => _stepSize;
+            set => SetProperty(ref _stepSize, value);
+        }
+
+        public double MinYValue
+        {
+            get => _minYValue;
+            set => SetProperty(ref _minYValue, value);
+        }
 
         public ICommand LaunchSettingsCommand { get; set; }
         public ICommand GenerateInputCommand { get; set; }
         public ICommand RunAlgorithmsCommand { get; set; }
         public ICommand RefreshFileListCommand { get; set; }
+        public ICommand DrawDurationPlotCommand { get; set; }
+        public ICommand DrawNodesPlotCommand { get; set; }
+        public ICommand DrawBreaksPlotCommand { get; set; }
 
         public MainWindowViewModel(IDialogCoordinator dialogCoordinator)
         {
@@ -128,6 +153,9 @@ namespace ResearchPlatform.ViewModels
                 InputFileList = GetInputFileList();
                 SelectedInputFile = _inputFileList.First();
             }));
+            DrawDurationPlotCommand = new RelayCommand(new Action(() => PreparePlot("Duration")));
+            DrawNodesPlotCommand = new RelayCommand(new Action(() => PreparePlot("Nodes")));
+            DrawBreaksPlotCommand = new RelayCommand(new Action(() => PreparePlot("Breaks")));
 
             _inputFileList = GetInputFileList();
             SelectedInputFile = _inputFileList.First();
@@ -137,38 +165,60 @@ namespace ResearchPlatform.ViewModels
             _breaksResults = new List<Break>();
             _selectedAlgorithmResult = null;
 
-            PreparePlot();
+            Series = new SeriesCollection();
         }
+        public Func<double, string> Formatter { get; set; }
+        public SeriesCollection Series { get; set; }
 
-        private void PreparePlot()
+        private void PreparePlot(string name)
         {
-            // Create the plot model
-            var tmp = new PlotModel { Title = "Simple example", Subtitle = "using OxyPlot" };
+            App.Current.Dispatcher.Invoke((Action)delegate
+            {
+                Series.Clear();
+                switch (name)
+                {
+                    case "Duration":
+                        Series.Configuration = Mappers.Xy<Result>()
+                                                    .X(resConfig => resConfig.AmountOfJobs)
+                                                    .Y(resConfig => resConfig.Duration);
+                        AxisYName = "Duration [ms]";
+                        StepSize = 100;
+                        MinYValue = double.NaN;
+                        break;
+                    case "Nodes":
+                        Series.Configuration = Mappers.Xy<Result>()
+                                                    .X(resConfig => resConfig.AmountOfJobs)
+                                                    .Y(resConfig => resConfig.VisitedNodes);
+                        AxisYName = "Visited nodes";
+                        StepSize = 100;
+                        MinYValue = double.NaN;
+                        break;
+                    case "Breaks":
+                        Series.Configuration = Mappers.Xy<Result>()
+                                                    .X(resConfig => resConfig.AmountOfJobs)
+                                                    .Y(resConfig => resConfig.Breaks.Count);
+                        AxisYName = "Breaks count";
+                        StepSize = 10;
+                        MinYValue = 0;
+                        break;
+                }
+            });
 
-            // Create two line series (markers are hidden by default)
-            var series1 = new LineSeries { Title = "Series 1", MarkerType = MarkerType.Circle };
-            series1.Points.Add(new DataPoint(0, 0));
-            series1.Points.Add(new DataPoint(10, 18));
-            series1.Points.Add(new DataPoint(20, 12));
-            series1.Points.Add(new DataPoint(30, 8));
-            series1.Points.Add(new DataPoint(40, 15));
+            foreach (var result in _allResDict)
+            {
+                App.Current.Dispatcher.Invoke((Action)delegate
+                {
+                    Series.Add(new LiveCharts.Wpf.ColumnSeries
+                    {
+                        Title = result.Key,
 
-            var series2 = new LineSeries { Title = "Series 2", MarkerType = MarkerType.Square };
-            series2.Points.Add(new DataPoint(0, 4));
-            series2.Points.Add(new DataPoint(10, 12));
-            series2.Points.Add(new DataPoint(20, 16));
-            series2.Points.Add(new DataPoint(30, 25));
-            series2.Points.Add(new DataPoint(40, 5));
-
-
-            // Add the series to the plot model
-            tmp.Series.Add(series1);
-            tmp.Series.Add(series2);
-
-            // Axes are created automatically if they are not defined
-
-            // Set the Model property, the INotifyPropertyChanged event will make the WPF Plot control update its content
-            this.Model = tmp;
+                        Values = new ChartValues<Result>
+                        {
+                            result.Value
+                        }
+                    });
+                });
+            }
         }
 
         private async void RunAlgorithms()
@@ -184,6 +234,7 @@ namespace ResearchPlatform.ViewModels
             await System.Threading.Tasks.Task.Run(() =>
             {
                 SetupListOfResults(AlgorithmsManager.RunWith(Configuration, Input));
+                PreparePlot("Duration");
             });
         }
 

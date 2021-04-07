@@ -4,13 +4,13 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-        xmlns:local="clr-namespace:ResearchPlatform.Validators"
+        xmlns:validators="clr-namespace:ResearchPlatform.Validators" 
         xmlns:src="clr-namespace:ResearchPlatform.Converters"
         xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
         xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
         Dialog:DialogParticipation.Register="{Binding}"
         mc:Ignorable="d"
-        xmlns:oxy="clr-namespace:OxyPlot.Wpf;assembly=OxyPlot.Wpf" 
+        xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
         Title="Research Platform" Height="450" Width="800" WindowState="Maximized"
         FocusManager.FocusedElement="{Binding ElementName=RunButton}">
     <mah:MetroWindow.LeftWindowCommands>
@@ -61,7 +61,7 @@
                         <Grid.BindingGroup>
                             <BindingGroup>
                                 <BindingGroup.ValidationRules>
-                                    <local:AlgorithmsChosenMatrixValidationRule/>
+                                    <validators:AlgorithmsChosenMatrixValidationRule/>
                                 </BindingGroup.ValidationRules>
                             </BindingGroup>
                         </Grid.BindingGroup>
@@ -142,7 +142,7 @@
                             <Grid.BindingGroup>
                                 <BindingGroup>
                                     <BindingGroup.ValidationRules>
-                                        <local:GoalFunctionWeightsValidationRule/>
+                                        <validators:GoalFunctionWeightsValidationRule/>
                                     </BindingGroup.ValidationRules>
                                 </BindingGroup>
                             </Grid.BindingGroup>
@@ -186,24 +186,55 @@
         </GroupBox>
         <GroupBox Grid.Row="0" Grid.Column="1" Header="Algorithms Results" Margin="10,10,10,10">
             <Grid>
-                <oxy:PlotView Model="{Binding Model}" />
+                <lvc:CartesianChart x:Name="RankGraph" Series="{Binding Series}" LegendLocation="Right">
+                    <lvc:CartesianChart.AxisX>
+                        <lvc:Axis Title="Amount of input"></lvc:Axis>
+                    </lvc:CartesianChart.AxisX>
+                    <lvc:CartesianChart.AxisY>
+                        <lvc:Axis Title="{Binding AxisYName}" MinValue="{Binding MinYValue}">
+                            <lvc:Axis.Separator>
+                                <lvc:Separator Step="{Binding StepSize}"/>
+                            </lvc:Axis.Separator>
+                        </lvc:Axis>
+                    </lvc:CartesianChart.AxisY>
+                    <lvc:CartesianChart.DataTooltip>
+                        <lvc:DefaultTooltip BulletSize="20" Background="Gray" ShowTitle="False"/>
+                    </lvc:CartesianChart.DataTooltip>
+                </lvc:CartesianChart>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5,0,5,0">
+                    <Button Content="Duration" Padding="5,2,5,2" FontSize="8" Margin="0,0,5,0" FontWeight="Normal" Height="20" Command="{Binding DrawDurationPlotCommand}">
+                        <Button.Background>
+                            <SolidColorBrush Color="{DynamicResource MahApps.Colors.Gray}"/>
+                        </Button.Background>
+                    </Button>
+                    <Button Content="Nodes" Padding="5,2,5,2" FontSize="8" Margin="0,0,5,0" FontWeight="Normal" Height="20" Command="{Binding DrawNodesPlotCommand}">
+                        <Button.Background>
+                            <SolidColorBrush Color="{DynamicResource MahApps.Colors.Gray}"/>
+                        </Button.Background>
+                    </Button>
+                    <Button Content="Breaks" Padding="5,2,5,2" FontSize="8" FontWeight="Normal" Height="20" Command="{Binding DrawBreaksPlotCommand}">
+                        <Button.Background>
+                            <SolidColorBrush Color="{DynamicResource MahApps.Colors.Gray}"/>
+                        </Button.Background>
+                    </Button>
+                </StackPanel>
                 <ProgressBar Visibility="{Binding InProgress, Converter={StaticResource BoolToHiddenConverter}}" HorizontalAlignment="Center" VerticalAlignment="Center" IsIndeterminate="True" MinWidth="100"/>
             </Grid>
         </GroupBox>
         <GroupBox Grid.Row="1" Grid.Column="0" Header="Input Data" Margin="10,10,10,10">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition MaxHeight="30"/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
                 <DockPanel Grid.Row="0" HorizontalAlignment="Right">
                     <StackPanel Orientation="Horizontal">
-                        <Button Margin="0,0,10,10" Command="{Binding RefreshFileListCommand}" Background="{x:Null}" BorderBrush="{x:Null}">
+                        <Button Margin="0,0,10,5" Command="{Binding RefreshFileListCommand}" Background="{x:Null}" BorderBrush="{x:Null}">
                             <iconPacks:PackIconFontAwesome Kind="SyncAltSolid"
                                                         VerticalAlignment="Center"
                                                         HorizontalAlignment="Center"/>
                         </Button>
-                        <ComboBox ItemsSource="{Binding InputFileList}" SelectedValue="{Binding SelectedInputFile}" MinWidth="150" Margin="0,0,0,10" VerticalAlignment="Center"/>
+                        <ComboBox ItemsSource="{Binding InputFileList}" SelectedValue="{Binding SelectedInputFile}" MinWidth="150" Margin="0,0,0,5" VerticalAlignment="Center"/>
                     </StackPanel>
                 </DockPanel>
                 <ListView ItemsSource="{Binding Input.Jobs}" Grid.Row="1"

@@ -8,5 +8,6 @@ namespace ResearchPlatform.Models
         public List<Break> Breaks { get; set; }
         public long Duration { get; set; }
         public int VisitedNodes { get; set; }
+        public int AmountOfJobs { get; set; }
     }
 }

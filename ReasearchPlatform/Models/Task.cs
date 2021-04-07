@@ -49,7 +49,8 @@ namespace ResearchPlatform.Models
                         Jobs = res.ChosenJobs, 
                         Breaks = res.Breaks, 
                         Duration = watch.ElapsedMilliseconds,
-                        VisitedNodes = res.VisitedNodes
+                        VisitedNodes = res.VisitedNodes,
+                        AmountOfJobs = _jobsToProceed.Count
                     });
                 }
             }
