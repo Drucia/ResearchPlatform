@@ -37,7 +37,7 @@ namespace ResearchPlatform.ViewModels
         private ObservableCollection<string> _algorithmsResults;
         private string _selectedAlgorithmResult;
 
-        private bool _inProgress = false;
+        private bool _showResults = false;
         private List<Job> _jobResults;
         private List<Break> _breaksResults;
 
@@ -97,10 +97,10 @@ namespace ResearchPlatform.ViewModels
             }
         }
 
-        public bool InProgress
+        public bool ShowResults
         {
-            get => _inProgress;
-            set => SetProperty(ref _inProgress, value);
+            get => _showResults;
+            set => SetProperty(ref _showResults, value);
         }
 
         public List<Job> JobResults
@@ -166,6 +166,7 @@ namespace ResearchPlatform.ViewModels
             _selectedAlgorithmResult = null;
 
             Series = new SeriesCollection();
+            ShowResults = false;
         }
         public Func<double, string> Formatter { get; set; }
         public SeriesCollection Series { get; set; }
@@ -227,6 +228,7 @@ namespace ResearchPlatform.ViewModels
             progress.SetIndeterminate();
             await Run();
             await progress.CloseAsync();
+            ShowResults = true;
         }
 
         private async System.Threading.Tasks.Task Run()

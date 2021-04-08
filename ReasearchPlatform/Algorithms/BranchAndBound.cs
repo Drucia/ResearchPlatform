@@ -114,6 +114,9 @@ namespace ResearchPlatform.Algorithms
 
             if (done.Count > 1)
                 done.RemoveAt(done.Count - 1);
+
+            if (breaks.Count > 0)
+                breaks.RemoveAt(breaks.Count - 1);
         }
 
         private void ChangeBestResult(double currentValue, List<JobToProceed> done, List<Break> breaks)

@@ -186,7 +186,10 @@
         </GroupBox>
         <GroupBox Grid.Row="0" Grid.Column="1" Header="Algorithms Results" Margin="10,10,10,10">
             <Grid>
-                <lvc:CartesianChart x:Name="RankGraph" Series="{Binding Series}" LegendLocation="Right">
+                <iconPacks:PackIconFontAwesome Visibility="{Binding ShowResults, Converter={StaticResource FalseToVisibleConverter}}" Kind="ChartBarSolid"
+                                                        VerticalAlignment="Stretch"
+                                                        HorizontalAlignment="Stretch" Width="100" Height="100"/>
+                <lvc:CartesianChart x:Name="RankGraph" Series="{Binding Series}" LegendLocation="Right" Visibility="{Binding ShowResults, Converter={StaticResource BoolToHiddenConverter}}">
                     <lvc:CartesianChart.AxisX>
                         <lvc:Axis Title="Amount of input"></lvc:Axis>
                     </lvc:CartesianChart.AxisX>
@@ -201,7 +204,7 @@
                         <lvc:DefaultTooltip BulletSize="20" Background="Gray" ShowTitle="False"/>
                     </lvc:CartesianChart.DataTooltip>
                 </lvc:CartesianChart>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5,0,5,0">
+                <StackPanel Visibility="{Binding ShowResults, Converter={StaticResource BoolToHiddenConverter}}" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5,0,5,0">
                     <Button Content="Duration" Padding="5,2,5,2" FontSize="8" Margin="0,0,5,0" FontWeight="Normal" Height="20" Command="{Binding DrawDurationPlotCommand}">
                         <Button.Background>
                             <SolidColorBrush Color="{DynamicResource MahApps.Colors.Gray}"/>
@@ -218,13 +221,12 @@
                         </Button.Background>
                     </Button>
                 </StackPanel>
-                <ProgressBar Visibility="{Binding InProgress, Converter={StaticResource BoolToHiddenConverter}}" HorizontalAlignment="Center" VerticalAlignment="Center" IsIndeterminate="True" MinWidth="100"/>
             </Grid>
         </GroupBox>
         <GroupBox Grid.Row="1" Grid.Column="0" Header="Input Data" Margin="10,10,10,10">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition MaxHeight="30"/>
+                    <RowDefinition MaxHeight="35"/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
                 <DockPanel Grid.Row="0" HorizontalAlignment="Right">
@@ -263,10 +265,13 @@
                     <RowDefinition/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
+                <iconPacks:PackIconFontAwesome Visibility="{Binding ShowResults, Converter={StaticResource FalseToVisibleConverter}}" Grid.RowSpan="3" Kind="TableSolid"
+                                                        VerticalAlignment="Stretch"
+                                                        HorizontalAlignment="Stretch" Width="100" Height="100"/>
                 <DockPanel Grid.Row="0" HorizontalAlignment="Right">
-                    <ComboBox ItemsSource="{Binding AlgorithmsResults, Mode=TwoWay}" SelectedValue="{Binding SelectedAlgorithmResult, Mode=TwoWay}" MinWidth="150" Margin="0,0,0,5" VerticalAlignment="Center"/>
+                    <ComboBox ItemsSource="{Binding AlgorithmsResults, Mode=TwoWay}" Visibility="{Binding ShowResults, Converter={StaticResource BoolToHiddenConverter}}" SelectedValue="{Binding SelectedAlgorithmResult, Mode=TwoWay}" MinWidth="150" Margin="0,0,0,5" VerticalAlignment="Center"/>
                 </DockPanel>
-                <ListView ItemsSource="{Binding JobResults}" Grid.Row="1" Visibility="{Binding InProgress, Converter={StaticResource FalseToVisibleConverter}, Mode=TwoWay}"
+                <ListView ItemsSource="{Binding JobResults}" Grid.Row="1" Visibility="{Binding ShowResults, Converter={StaticResource BoolToHiddenConverter}}"
                                   Style="{StaticResource MahApps.Styles.ListView.Virtualized}" ScrollViewer.CanContentScroll="True" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <ListView.View>
                         <GridView>
@@ -280,8 +285,7 @@
                         </GridView>
                     </ListView.View>
                 </ListView>
-                <ProgressBar Grid.Row="1" Visibility="{Binding InProgress, Converter={StaticResource BoolToHiddenConverter}, Mode=TwoWay}" HorizontalAlignment="Center" VerticalAlignment="Bottom" IsIndeterminate="True" MinWidth="100"/>
-                <ListView ItemsSource="{Binding BreaksResults}" Grid.Row="2" Visibility="{Binding InProgress, Converter={StaticResource FalseToVisibleConverter}, Mode=TwoWay}"
+                <ListView ItemsSource="{Binding BreaksResults}" Grid.Row="2" Visibility="{Binding ShowResults, Converter={StaticResource BoolToHiddenConverter}}"
                                   Style="{StaticResource MahApps.Styles.ListView.Virtualized}" ScrollViewer.CanContentScroll="True" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <ListView.View>
                         <GridView>
