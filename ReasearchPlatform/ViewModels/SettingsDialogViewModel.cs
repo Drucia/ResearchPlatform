@@ -25,8 +25,10 @@ namespace ResearchPlatform.ViewModels
         private Configuration _configuration;
         private List<string> _inputFilesList;
         private string _selectedInputFile;
+        private string _selectedInputFileForDistances;
         private Models.Input _input;
         private int _numberOfJobsToGenerate;
+        private int _maxNumberOfJobsToGenerate;
 
         private IDialogCoordinator _dialogCoordinator;
 
@@ -50,6 +52,12 @@ namespace ResearchPlatform.ViewModels
             set => SetProperty(ref _numberOfJobsToGenerate, value);
         }
 
+        public int MaxNumberOfJobsToGenerate
+        {
+            get => _maxNumberOfJobsToGenerate;
+            set => SetProperty(ref _maxNumberOfJobsToGenerate, value);
+        }
+
         public List<string> InputFilesList
         {
             get => _inputFilesList;
@@ -62,6 +70,12 @@ namespace ResearchPlatform.ViewModels
             set => SetProperty(ref _selectedInputFile, value);
         }
 
+        public string SelectedInputFileForDistances
+        {
+            get => _selectedInputFileForDistances;
+            set => SetProperty(ref _selectedInputFileForDistances, value);
+        }
+
         public SettingsDialogViewModel(Configuration configuration, IDialogCoordinator dialogCoordinator, 
             List<string> inputFilesList)
         {
@@ -69,6 +83,7 @@ namespace ResearchPlatform.ViewModels
             _dialogCoordinator = dialogCoordinator;
             _inputFilesList = inputFilesList;
             _selectedInputFile = inputFilesList.Count > 0 ? inputFilesList[0] : "";
+            _selectedInputFileForDistances = inputFilesList.Count > 0 ? inputFilesList[0] : "";
 
             // make deep copy of configuration
             var json = System.Text.Json.JsonSerializer.Serialize(_originalConfiguration);
@@ -76,7 +91,7 @@ namespace ResearchPlatform.ViewModels
 
             SaveConfigurationCommand = new RelayCommand(new Action(SaveConfiguration));
             ResetConfigurationCommand = new RelayCommand(new Action(ResetToDefaultConfiguration));
-            //GenerateDistancesCommand = new RelayCommand(new Action(GenerateDistances));
+            GenerateDistancesCommand = new RelayCommand(new Action(GenerateDistances));
             GenerateInputCommand = new RelayCommand(new Action(GenerateWholeInput));
             GenerateMoreJobsCommand = new RelayCommand(new Action(GenerateMoreJobs));
         }
@@ -94,40 +109,42 @@ namespace ResearchPlatform.ViewModels
             _dialogCoordinator.ShowMessageAsync(this, "Info", Messages.RESET_CONFIGURATION_MSG);
         }
 
-        //private async void GenerateDistances() // TODO
-        //{
-        //    //var progressBar = await _dialogCoordinator.ShowProgressAsync(this, "Info", Messages.GENERATING_MSG);
-        //    ReadInputFile();
-        //    //var generator = InputGenerator.GetInstance();
-        //    //var distances = await generator.GetAllDistancesForAsync(_input.Base, _input.Jobs, _input.DistanceMatrix);
+        private async void GenerateDistances()
+        {
+            var progressBar = await _dialogCoordinator.ShowProgressAsync(this, "Info", Messages.GENERATING_MSG);
+            ReadInputFile(_selectedInputFileForDistances);
+            var generator = InputGenerator.GetInstance();
+            _input.Logs.Clear();
+            var distances = await generator.GetAllDistancesForAsync(_input.Base, _input.Nodes, _input.DistanceMatrix, _input.Logs);
 
-        //    //await progressBar.CloseAsync();
+            await progressBar.CloseAsync();
 
-        //    //if (distances.Count == 0)
-        //    //{
-        //    //    await _dialogCoordinator.ShowMessageAsync(this, "Error", Messages.POSTCODE_ERROR_MSG);
-        //    //}
-        //    //else
-        //    //{
-        //    var serializerOptions = new JsonSerializerOptions()
-        //        {
-        //            WriteIndented = true,
-        //            Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Latin1Supplement, UnicodeRanges.LatinExtendedA)
-        //        };
-        //        var maxPossibleDistance = _input.DistanceMatrix.Select(d => d.DistanceInMeters).Max();
-        //        _input.Jobs.ForEach(job => job.Price += ((maxPossibleDistance) / 1000) * (3.15 + new Random().NextDouble() * 6.75));
-        //        var serializeInput = System.Text.Json.JsonSerializer.Serialize(_input, serializerOptions);
-        //        File.WriteAllText($"{DISTANCES_FILE}_{DateTime.Now:yyyy-MM-dd hhmmss}.json", serializeInput.ToString(), Encoding.UTF8);
+            if (distances.Count == 0)
+            {
+                await _dialogCoordinator.ShowMessageAsync(this, "Error", Messages.POSTCODE_ERROR_MSG);
+            }
+            else
+            {
+                var serializerOptions = new JsonSerializerOptions()
+                {
+                    WriteIndented = true,
+                    Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Latin1Supplement, UnicodeRanges.LatinExtendedA)
+                };
 
-        //        await _dialogCoordinator.ShowMessageAsync(this, "Info", Messages.POSTCODE_SAVE_MSG);
-        //    //}
-        //}
+                _input.DistanceMatrix = _input.DistanceMatrix.Concat(distances).ToList();
+
+                var serializeInput = System.Text.Json.JsonSerializer.Serialize(_input, serializerOptions);
+                File.WriteAllText($"{DISTANCES_FILE}_{DateTime.Now:yyyy-MM-dd hhmmss}.json", serializeInput.ToString(), Encoding.UTF8);
+
+                await _dialogCoordinator.ShowMessageAsync(this, "Info", Messages.POSTCODE_SAVE_MSG);
+            }
+        }
 
         private async void GenerateWholeInput()
         {
             var progressBar = await _dialogCoordinator.ShowProgressAsync(this, "Info", Messages.GENERATING_MSG);
             var generator = InputGenerator.GetInstance();
-            await generator.GenerateAsync(Configuration.Postcode);
+            await generator.GenerateAsync(Configuration.Postcode, _maxNumberOfJobsToGenerate);
             await progressBar.CloseAsync();
 
             if (generator.Input == null)
@@ -159,10 +176,19 @@ namespace ResearchPlatform.ViewModels
                 WriteIndented = true,
                 Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Latin1Supplement, UnicodeRanges.LatinExtendedA)
             };
+
+            var allDistances = CalculateCombination(input.Nodes.Count);
+
             var serializeInput = System.Text.Json.JsonSerializer.Serialize(input, serializerOptions);
-            File.WriteAllText($"{INPUT_FILE}_{DateTime.Now:yyyy-MM-dd hhmmss}.json", serializeInput.ToString(), Encoding.UTF8);
+            File.WriteAllText($"{INPUT_FILE}_{DateTime.Now:yyyy-MM-dd hh-mm}{(allDistances == input.DistanceMatrix.Count ? "" : "_damaged")}.json", 
+                serializeInput.ToString(), Encoding.UTF8);
 
             await _dialogCoordinator.ShowMessageAsync(this, "Info", Messages.POSTCODE_SAVE_MSG);
+        }
+
+        private int CalculateCombination(int countOfNodes)
+        {
+            return (((countOfNodes - 1)*(countOfNodes))/2) + countOfNodes;
         }
 
         private void ReadInputFile(string inputFile)

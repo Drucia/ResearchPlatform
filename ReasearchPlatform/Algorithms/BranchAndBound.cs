@@ -81,7 +81,7 @@ namespace ResearchPlatform.Algorithms
         {
             _visitedNodes++;
 
-            var currentValue = _helper.CalculateValueOfGoalFunction(_base, done, workTime);
+            var currentValue = _helper.CalculateValueOfGoalFunction(done);
 
             if (_helper.AreAllConstraintsSatisfied(currNode, currentJob, done, workTime, drivenTime, wholeDrivenTime))
             {
@@ -94,7 +94,7 @@ namespace ResearchPlatform.Algorithms
                     DFSRec(currNode, job, done, breaks, all, wT, dT, wholeDT, allCheckedJobsPath);
                 }
 
-                currentValue = _helper.CalculateValueOfGoalFunction(_base, done, workTime);
+                currentValue = _helper.CalculateValueOfGoalFunction(done);
 
                 // leaf
                 if (allPossible.Count == 0 && _best.Value <= currentValue)

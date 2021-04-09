@@ -77,25 +77,30 @@ namespace ResearchPlatform.Helpers
             return true;
         }
 
-        public double CalculateValueOfGoalFunction(Node baze, List<JobToProceed> done, int workTime)
+        public double CalculateValueOfGoalFunction(List<JobToProceed> done)
         {
             if (done.Count < 2)
                 return double.NegativeInfinity;
 
+            var profitAndTime = CalculateRealProfitAndDrive(done);
+            var realProfit = profitAndTime.Item1;
+            var realTime = profitAndTime.Item2;
+
             var utilityAvg = done.Average(job => job.Utility);
-            var price = CalculateRealProfit(baze, done) / done.Sum(job => job.Price);
-            var time = (double) workTime / IBranchAndBoundHelper.MAX_TIME_WITH_WORKING;
-            var re = _weights[0] * utilityAvg + _weights[1] * price - _weights[2] * time;
+            var price = (realProfit / done.Sum(job => job.Price));
+            var time = realTime / IBranchAndBoundHelper.MAX_TIME_WITH_WORKING;
 
             return _weights[0] * utilityAvg + _weights[1] * price - _weights[2] * time;
         }
 
-        private double CalculateRealProfit(Node baze, List<JobToProceed> done)
+        private Tuple<double, double> CalculateRealProfitAndDrive(List<JobToProceed> done)
         {
-            Tuple<double /* profit */, Node /* last node */> profit =
-                          done.Aggregate(Tuple.Create(0.0, done.First().To), (acc, job) => {
+            Tuple<Tuple<double /* profit */, double /* time */>, Node /* last node */> profit =
+                          done.Aggregate(Tuple.Create(Tuple.Create(0.0, 0.0), done.First().To), (acc, job) => {
 
-                              var currProfit = acc.Item1;
+                              var currProfit = acc.Item1.Item1;
+                              var currTimeForDrive = acc.Item1.Item2;
+
                               var distanceToStart = _manager.GetDistanceBetween(acc.Item2, job.From);
                               var distanceFromStartToEnd = _manager.GetDistanceBetween(job.From, job.To);
 
@@ -103,7 +108,10 @@ namespace ResearchPlatform.Helpers
                               ((distanceToStart.DistanceInMeters + distanceFromStartToEnd.DistanceInMeters) / 1000) *
                               (_configuration.AvgFuelConsumption * _configuration.FuelCost + _configuration.CostOfMaintain));
 
-                              return Tuple.Create(currProfit, job.To);
+                              currTimeForDrive += distanceToStart.DurationInSeconds / 60;
+                              currTimeForDrive += 2 * job.LoadingTime;
+
+                              return Tuple.Create(Tuple.Create(currProfit, currTimeForDrive), job.To);
                           });
 
             return profit.Item1;

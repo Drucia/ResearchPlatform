@@ -12,6 +12,7 @@ using ResearchPlatform.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -43,7 +44,7 @@ namespace ResearchPlatform.ViewModels
 
         private readonly Dictionary<string, Result> _allResDict;
         private string _axisYName;
-        private int _stepSize;
+        private double _stepSize;
         private double _minYValue;
 
         public Configuration Configuration
@@ -121,7 +122,7 @@ namespace ResearchPlatform.ViewModels
             set => SetProperty(ref _axisYName, value);
         }
 
-        public int StepSize
+        public double StepSize
         {
             get => _stepSize;
             set => SetProperty(ref _stepSize, value);
@@ -134,7 +135,6 @@ namespace ResearchPlatform.ViewModels
         }
 
         public ICommand LaunchSettingsCommand { get; set; }
-        public ICommand GenerateInputCommand { get; set; }
         public ICommand RunAlgorithmsCommand { get; set; }
         public ICommand RefreshFileListCommand { get; set; }
         public ICommand DrawDurationPlotCommand { get; set; }
@@ -147,7 +147,6 @@ namespace ResearchPlatform.ViewModels
             _configuration = Configuration.Create;
 
             LaunchSettingsCommand = new RelayCommand(new Action(LaunchSetting));
-            GenerateInputCommand = new RelayCommand(new Action(GenerateInput));
             RunAlgorithmsCommand = new RelayCommand(new Action(RunAlgorithms));
             RefreshFileListCommand = new RelayCommand(new Action(() => { 
                 InputFileList = GetInputFileList();
@@ -183,7 +182,7 @@ namespace ResearchPlatform.ViewModels
                                                     .X(resConfig => resConfig.AmountOfJobs)
                                                     .Y(resConfig => resConfig.Duration);
                         AxisYName = "Duration [ms]";
-                        StepSize = 100;
+                        StepSize = double.NaN;
                         MinYValue = double.NaN;
                         break;
                     case "Nodes":
@@ -191,7 +190,7 @@ namespace ResearchPlatform.ViewModels
                                                     .X(resConfig => resConfig.AmountOfJobs)
                                                     .Y(resConfig => resConfig.VisitedNodes);
                         AxisYName = "Visited nodes";
-                        StepSize = 100;
+                        StepSize = double.NaN;
                         MinYValue = double.NaN;
                         break;
                     case "Breaks":
@@ -295,32 +294,6 @@ namespace ResearchPlatform.ViewModels
                 using StreamReader r = new StreamReader(SelectedInputFile);
                 string json = r.ReadToEnd();
                 Input = JsonConvert.DeserializeObject<Models.Input>(json);
-            }
-        }
-
-        private async void GenerateInput()
-        {
-            var progressBar = await _dialogCoordinator.ShowProgressAsync(this, "Info", Messages.GENERATING_MSG);
-
-            var generator = InputGenerator.GetInstance();
-            await generator.GenerateAsync(Configuration.Postcode);
-
-            await progressBar.CloseAsync();
-
-            if (generator.Input == null)
-            {
-                await _dialogCoordinator.ShowMessageAsync(this, "Error", Messages.POSTCODE_ERROR_MSG);
-            } else
-            {
-                var serializerOptions = new JsonSerializerOptions() { 
-                    WriteIndented = true,
-                    Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Latin1Supplement, UnicodeRanges.LatinExtendedA)
-                };
-
-                var serializeInput = System.Text.Json.JsonSerializer.Serialize(generator.Input, serializerOptions);
-                File.WriteAllText($"{INPUT_FILE}_{DateTime.Now:yyyy-MM-dd hhmmss}.json", serializeInput.ToString(), Encoding.UTF8);
-
-                await _dialogCoordinator.ShowMessageAsync(this, "Info", Messages.POSTCODE_SAVE_MSG);
             }
         }
 

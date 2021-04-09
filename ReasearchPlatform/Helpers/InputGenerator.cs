@@ -19,6 +19,7 @@ namespace ResearchPlatform.Helpers
         private static readonly int MARGIN_FOR_LOADING_TIME = 45;
         private static readonly int AMOUNT_OF_CLIENTS = 150;
         private static readonly int MAX_NUMBER_OF_REPEAT_CALLS = 10;
+        private static readonly int MAX_LOGS_COUNT = 10;
 
         private static InputGenerator _instance;
         private static Random _random;
@@ -44,14 +45,16 @@ namespace ResearchPlatform.Helpers
             if (nodesAround == null)
                 return null;
 
-            var distances = await GetAllDistancesForAsync(centralNode, nodesAround);
+            var logs = new List<string>();
+
+            var distances = await GetAllDistancesForAsync(centralNode, nodesAround, logs);
 
             Input = new Models.Input() {
                 Base = centralNode,
                 Nodes = nodesAround,
                 DistanceMatrix = distances,
                 Jobs = new List<Job>(),
-                Logs = new List<string>(),
+                Logs = logs,
                 Clients = new List<Client>()
             };
 
@@ -104,11 +107,14 @@ namespace ResearchPlatform.Helpers
             return this;
         }
 
-        public async System.Threading.Tasks.Task GenerateAsync(string postcode)
+        public async System.Threading.Tasks.Task GenerateAsync(string postcode, int amountOfJobsToGenerate)
         {
             await GenerateInputDataAsync(postcode);
-            GenerateJobs(Input, AMOUNT_OF_JOBS_TO_GENERATE);
+            GenerateJobs(Input, amountOfJobsToGenerate);
             GenerateClientsWithOpinions();
+            Input.DistanceMatrix = Input.DistanceMatrix.Concat(GetAllDistancesToFetch(
+                    Input.Base, Input.Nodes, Input.DistanceMatrix
+                )).ToList();
         }
 
         private Node GetRandomNode(Node node = null)
@@ -139,7 +145,7 @@ namespace ResearchPlatform.Helpers
                 return Input.Nodes[idx];
         }
 
-        public async Task<List<Distance>> GetAllDistancesForAsync(Node centralNode, List<Node> nodesAround)
+        public async Task<List<Distance>> GetAllDistancesForAsync(Node centralNode, List<Node> nodesAround, List<string> logs)
         {
             List<Distance> distances = new List<Distance>();
 
@@ -154,28 +160,51 @@ namespace ResearchPlatform.Helpers
                         distance = await Fetcher.FetchDistanceBetweenNodesAsync(nodesAround[i], nodesAround[j]);
                         counter++;
                     }
-                    distances.Add(distance);
+
+                    if (distance != null)
+                    {
+                        distances.Add(distance);
+                    }
+                    else
+                    {
+                        logs.Add($"Error with distance from {nodesAround[i].ID} to {nodesAround[j].ID}");
+                    }
+
+                    if (logs.Count > MAX_LOGS_COUNT)
+                        break;
                 }
             }
 
-            nodesAround.ForEach(async node => { 
-                var distance = await Fetcher.FetchDistanceBetweenNodesAsync(centralNode, node);
+            for (int i=0; i < nodesAround.Count; i++)
+            {
+                var distance = await Fetcher.FetchDistanceBetweenNodesAsync(centralNode, nodesAround[i]);
                 var counter = 0;
                 while (distance == null && counter < MAX_NUMBER_OF_REPEAT_CALLS)
                 {
-                    distance = await Fetcher.FetchDistanceBetweenNodesAsync(centralNode, node);
+                    distance = await Fetcher.FetchDistanceBetweenNodesAsync(centralNode, nodesAround[i]);
                     counter++;
                 }
-                distances.Add(distance);
-            });
+
+                if (distance != null)
+                {
+                    distances.Add(distance);
+                }
+                else
+                {
+                    logs.Add($"Error with distance from {centralNode.ID} to {nodesAround[i].ID}");
+                }
+
+                if (logs.Count > MAX_LOGS_COUNT)
+                    break;
+            }
 
             return distances;
         }
 
-        public async Task<List<Distance>> GetAllDistancesForAsync(Node centralNode, List<Job> jobs, List<Distance> fetchedDistances)
+        public async Task<List<Distance>> GetAllDistancesForAsync(Node centralNode, List<Node> nodesAround, List<Distance> fetchedDistances, List<string> logs)
         {
             List<Distance> distances = new List<Distance>();
-            var distancesToCalc = GetAllDistancesToFetch(centralNode, fetchedDistances, jobs);
+            var distancesToCalc = GetAllDistancesToFetch(centralNode, nodesAround, fetchedDistances);
 
             foreach (var distance in distancesToCalc)
             {
@@ -187,31 +216,40 @@ namespace ResearchPlatform.Helpers
                     calculatedDistance = await Fetcher.FetchDistanceBetweenNodesAsync(distance.From, distance.To);
                     counter++;
                 }
-                distances.Add(calculatedDistance);
+
+                if (calculatedDistance != null)
+                {
+                    distances.Add(calculatedDistance);
+                } else
+                {
+                    logs.Add($"Error with distance from {distance.From.ID} to {distance.To.ID}");
+                }
+
+                if (logs.Count > MAX_LOGS_COUNT)
+                    break;
             }
 
-            return distances;
+             return distances;
         }
 
-        private List<Distance> GetAllDistancesToFetch(Node centralNode, List<Distance> distances, List<Job> jobs)
+        private List<Distance> GetAllDistancesToFetch(Node centralNode, List<Node> nodesAround, List<Distance> distances)
         {
-            // from jobs
-            var distancesToMake = jobs.Select(job => new Distance() { From = job.From, To = job.To }).Distinct().ToList();
+            var allDistances = new List<Distance>();
+            for (int i = 0; i < nodesAround.Count; i++)
+            {
+                for (int j = i + 1; j < nodesAround.Count; j++)
+                {
+                    allDistances.Add(new Distance() { From = nodesAround[i], To = nodesAround[j] });
+                }
+            }
 
-            // from base to jobs
-            var distancesToMakeFromBase = jobs.Select(job => new Distance() { From = centralNode, To = job.From } ).ToList();
-            var distancesToMakeToBase = jobs.Select(job => new Distance() { From = centralNode, To = job.To }).ToList();
-
-            var distWithBase = distancesToMakeFromBase.Concat(distancesToMakeToBase).Distinct().ToList();
-            distancesToMake = distancesToMake.Concat(distWithBase).ToList();
-            return distancesToMake.Where(dist => !distances.Contains(dist)).ToList();
+            nodesAround.ForEach(node => allDistances.Add(new Distance() { From = centralNode, To = node }));
+            return allDistances.Where(dist => !distances.Contains(dist)).ToList();
         }
 
         public void GenerateClientsWithOpinions()
         {
             var _random = new Random();
-
-            // end of risk and type of loading
 
             var allClientsId = Input.Jobs
                                         .Select(job => job.ClientId)

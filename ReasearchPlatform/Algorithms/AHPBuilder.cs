@@ -10,9 +10,9 @@ namespace ResearchPlatform.Algorithms
         private static readonly double RANDOM_JUDGEMENT_FOR_4_CRITERIA = 0.9;
         private static readonly double CONSISTENCY_LIMES = 0.1;
 
-        private List<List<double>> _matrix;
-        private List<List<double>> _normalizedMatrix;
-        private List<double> _tmp;
+        public List<List<double>> _matrix;
+        public List<List<double>> _normalizedMatrix;
+        public List<double> _tmp;
         private List<double> _weights;
         public bool IsConsistent { get; private set;  }
 
@@ -50,7 +50,7 @@ namespace ResearchPlatform.Algorithms
             {
                 for (int col = 0; col < _matrix.Count; col++)
                 {
-                    _normalizedMatrix[row][col] = _matrix[row][col] / _tmp[col];
+                    _normalizedMatrix[row][col] = Math.Round(_matrix[row][col] / _tmp[col], 4);
                 }
             }
 
@@ -61,7 +61,7 @@ namespace ResearchPlatform.Algorithms
         {
             for (int row = 0; row < _matrix.Count; row++)
             {
-                _weights[row] = _matrix[row].Sum() / _matrix.Count();
+                _weights[row] = Math.Round(_normalizedMatrix[row].Sum() / _normalizedMatrix.Count(), 2);
             }
 
             return this;
@@ -83,7 +83,7 @@ namespace ResearchPlatform.Algorithms
             {
                 for (int col = 0; col < _matrix.Count; col++)
                 {
-                    _matrix[row][col] = _matrix[row][col] * _weights[col];
+                    _matrix[row][col] = Math.Round(_matrix[row][col] * _weights[col], 2);
                 }
             }
         }
@@ -92,7 +92,7 @@ namespace ResearchPlatform.Algorithms
         {
             for (int row = 0; row < _matrix.Count; row++)
             {
-                _tmp[row] = _matrix[row].Sum();
+                _tmp[row] = Math.Round(_matrix[row].Sum(), 2);
             }
         }
 
@@ -100,7 +100,7 @@ namespace ResearchPlatform.Algorithms
         {
             for (int row = 0; row < _matrix.Count; row++)
             {
-                _tmp[row] = _tmp[row] / _weights[row];
+                _tmp[row] = Math.Round(_tmp[row] / _weights[row], 2);
             }
         }
 

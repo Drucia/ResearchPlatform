@@ -62,8 +62,8 @@ namespace ResearchPlatform.Models
             if (from.Equals(to))
                 return new Distance() { DistanceInMeters = 0, DurationInSeconds = 0, Costs = 0 };
 
-            return _distances.Find(distance => distance.From.Equals(from) && distance.To.Equals(to) ||
-                distance.From.Equals(to) && distance.To.Equals(from));
+            return _distances.Find(distance => (distance.From.Equals(from) && distance.To.Equals(to)) ||
+                (distance.From.Equals(to) && distance.To.Equals(from)));
         }
     }
 
