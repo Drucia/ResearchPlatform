@@ -1,24 +1,15 @@
 ﻿using GalaSoft.MvvmLight.Command;
 using LiveCharts;
 using LiveCharts.Configurations;
-using LiveCharts.Wpf;
 using MahApps.Metro.Controls.Dialogs;
 using Newtonsoft.Json;
-using OxyPlot;
-using OxyPlot.Series;
-using ResearchPlatform.Helpers;
 using ResearchPlatform.Models;
 using ResearchPlatform.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Text.Encodings.Web;
-using System.Text.Json;
-using System.Text.Unicode;
 using System.Windows.Input;
 
 namespace ResearchPlatform.ViewModels

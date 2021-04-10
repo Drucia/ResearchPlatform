@@ -34,7 +34,7 @@ namespace ReasearchPlatformUT
         [Fact]
         public void CalculateSumOfComparisons()
         {
-            var ahpBuilder = new AHPBuilder(comparisionMatrix);
+            var ahpBuilder = new AHPBuilder(comparisionMatrix, null);
             ahpBuilder.CalculateSumOfComparisons();
 
             var res = ahpBuilder._tmp.Select(t => Math.Round(t, 2));
@@ -45,7 +45,7 @@ namespace ReasearchPlatformUT
         [Fact]
         public void NormalizeMatrix()
         {
-            var ahpBuilder = new AHPBuilder(comparisionMatrix);
+            var ahpBuilder = new AHPBuilder(comparisionMatrix, null);
             ahpBuilder.CalculateSumOfComparisons()
                       .NormalizeMatrix();
 
@@ -58,7 +58,7 @@ namespace ReasearchPlatformUT
         [Fact]
         public void CalculateCriteriaWeights()
         {
-            var ahpBuilder = new AHPBuilder(comparisionMatrix);
+            var ahpBuilder = new AHPBuilder(comparisionMatrix, null);
             ahpBuilder.CalculateSumOfComparisons()
                                 .NormalizeMatrix()
                                 .CalculateCriteriaWeights();

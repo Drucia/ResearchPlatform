@@ -10,7 +10,7 @@ namespace ResearchPlatform
     {
         public static bool CheckMatrixConsistency(IEnumerable<IEnumerable<string>> matrix)
         {
-            var ahp = new AHPBuilder(matrix);
+            var ahp = new AHPBuilder(matrix, null);
             ahp.Run();
             return ahp.IsConsistent;
         }
@@ -32,10 +32,15 @@ namespace ResearchPlatform
             // removes jobs with -1 id - no distances to do this job
             jobsToProceed = jobsToProceed.Where(job => job.ID != -1).ToList();
 
+            // by default for promethee and electre weight from ahp
+            var ahp = new AHPBuilder(configuration.ComparisionMatrix, null);
+            ahp.Run();
+            var ahpWeights = ahp.GetWeights();
+
             var algorithmsToRun = new List<Task>
             {
                 new Task(
-                    new AHPBuilder(configuration.ComparisionMatrix),
+                    new AHPBuilder(configuration.ComparisionMatrix, jobsToProceed),
                     branchAndBoundHelper,
                     input,
                     new List<bool>(algorithmsMatrix[(int)MultiCriteriaAlgorithm.AHP]),
@@ -43,7 +48,7 @@ namespace ResearchPlatform
                     distanceManager),
 
                 new Task(
-                    new AHPBuilder(configuration.ComparisionMatrix),
+                    new PROMETHEEBuilder(ahpWeights, jobsToProceed),
                     branchAndBoundHelper,
                     input,
                     new List<bool>(algorithmsMatrix[(int)MultiCriteriaAlgorithm.PROMETHEE]),
@@ -51,7 +56,7 @@ namespace ResearchPlatform
                     distanceManager),
 
                 new Task(
-                    new OwnWeightsBuilder(configuration.CriteriaWeights.Select(w => w / 100.0).ToList()),
+                    new ELECTREEBuilder(ahpWeights, jobsToProceed),
                     branchAndBoundHelper,
                     input,
                     new List<bool>(algorithmsMatrix[(int)MultiCriteriaAlgorithm.ELECTRE]),
@@ -59,7 +64,7 @@ namespace ResearchPlatform
                     distanceManager),
 
                 new Task(
-                    new OwnWeightsBuilder(configuration.CriteriaWeights.Select(w => w / 100.0).ToList()),
+                    new OwnWeightsBuilder(configuration.CriteriaWeights.Select(w => w / 100.0).ToList(), jobsToProceed),
                     branchAndBoundHelper,
                     input,
                     new List<bool>(algorithmsMatrix[(int)MultiCriteriaAlgorithm.OwnWeights]),

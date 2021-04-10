@@ -7,7 +7,6 @@ namespace ResearchPlatform
 {
     public static class CriteriaCalculator
     {
-        private static readonly int SHIFT_FOR_UTILITY = 100000;
         public static void CalculateCriteria(List<JobToProceed> jobs, 
             Configuration configuration, DistancesManager distancesManager, 
             Node baze, List<Client> clients)

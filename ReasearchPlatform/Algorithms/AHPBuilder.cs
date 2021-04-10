@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ResearchPlatform.Models;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -14,9 +15,10 @@ namespace ResearchPlatform.Algorithms
         public List<List<double>> _normalizedMatrix;
         public List<double> _tmp;
         private List<double> _weights;
+        private List<Models.JobToProceed> _jobs;
         public bool IsConsistent { get; private set;  }
 
-        public AHPBuilder(IEnumerable<IEnumerable<string>> matrix)
+        public AHPBuilder(IEnumerable<IEnumerable<string>> matrix, List<Models.JobToProceed> jobsToProceed)
         {
             var dataTable = new DataTable();
             _matrix = matrix
@@ -29,6 +31,7 @@ namespace ResearchPlatform.Algorithms
                 .ToList();
             _tmp = Enumerable.Repeat(0.0, _matrix.Count).ToList();
             _weights = Enumerable.Repeat(0.0, _matrix.Count).ToList();
+            _jobs = jobsToProceed;
         }
 
         public AHPBuilder CalculateSumOfComparisons()
@@ -124,6 +127,28 @@ namespace ResearchPlatform.Algorithms
         public List<double> GetWeights()
         {
             return _weights;
+        }
+
+        public List<JobToProceed> GetJobsWithCalculatedUtility()
+        {
+            var minProfit = _jobs.Min(job => job.Profit);
+            var maxProfit = _jobs.Max(job => job.Profit) + Math.Abs(minProfit < 0 ? minProfit : 0);
+
+            var minTimeOfExec = _jobs.Min(job => job.TimeOfExecution);
+            var maxClientOpinion = _jobs.Max(job => job.ClientOpinion);
+            var maxPossOfNextJobs = _jobs.Max(job => job.PossibilityOfNextJobs);
+            var maxComfortOfWork = _jobs.Max(job => job.ComfortOfWork);
+
+            _jobs.ForEach(job => {
+                job.Utility =
+                    _weights[(int)Criteria.Profit] * ((job.Profit + Math.Abs(minProfit < 0 ? minProfit : 0)) / maxProfit) +
+                    _weights[(int)Criteria.DrivingTime] * (minTimeOfExec / job.TimeOfExecution) +
+                    _weights[(int)Criteria.CustomerReliability] * (job.ClientOpinion / maxClientOpinion) +
+                    _weights[(int)Criteria.CompletedJobs] * (job.PossibilityOfNextJobs / maxPossOfNextJobs) +
+                    _weights[(int)Criteria.ComfortOfWork] * (job.ComfortOfWork / maxComfortOfWork);
+            });
+
+            return _jobs;
         }
     }
 }
