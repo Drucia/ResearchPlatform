@@ -161,13 +161,13 @@ namespace ResearchPlatform.Helpers
                         counter++;
                     }
 
-                    if (distance != null)
+                    if (distance == null || distance.DistanceInMeters == 0)
                     {
-                        distances.Add(distance);
+                        logs.Add($"Error with distance from {nodesAround[i].ID} to {nodesAround[j].ID} - {(distance.DistanceInMeters == 0 ? "NULL" : "0")}");
                     }
                     else
                     {
-                        logs.Add($"Error with distance from {nodesAround[i].ID} to {nodesAround[j].ID}");
+                        distances.Add(distance);
                     }
 
                     if (logs.Count > MAX_LOGS_COUNT)
@@ -185,13 +185,13 @@ namespace ResearchPlatform.Helpers
                     counter++;
                 }
 
-                if (distance != null)
+                if (distance == null || distance.DistanceInMeters == 0)
                 {
-                    distances.Add(distance);
+                    logs.Add($"Error with distance from {centralNode.ID} to {nodesAround[i].ID} - {(distance.DistanceInMeters == 0 ? "NULL" : "0")}");
                 }
                 else
                 {
-                    logs.Add($"Error with distance from {centralNode.ID} to {nodesAround[i].ID}");
+                    distances.Add(distance);
                 }
 
                 if (logs.Count > MAX_LOGS_COUNT)
@@ -217,12 +217,12 @@ namespace ResearchPlatform.Helpers
                     counter++;
                 }
 
-                if (calculatedDistance != null)
+                if (distance == null || distance.DistanceInMeters == 0)
                 {
-                    distances.Add(calculatedDistance);
+                    logs.Add($"Error with distance from {distance.From.ID} to {distance.To.ID} - {(distance.DistanceInMeters == 0 ? "NULL" : "0")}");
                 } else
                 {
-                    logs.Add($"Error with distance from {distance.From.ID} to {distance.To.ID}");
+                    distances.Add(calculatedDistance);
                 }
 
                 if (logs.Count > MAX_LOGS_COUNT)

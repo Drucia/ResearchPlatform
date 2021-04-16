@@ -21,11 +21,6 @@ namespace ResearchPlatform.Algorithms
             throw new NotImplementedException();
         }
 
-        public List<double> GetWeights()
-        {
-            throw new NotImplementedException();
-        }
-
         public void Run()
         {
             throw new NotImplementedException();

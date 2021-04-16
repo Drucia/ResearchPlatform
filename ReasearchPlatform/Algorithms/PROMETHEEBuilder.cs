@@ -11,6 +11,9 @@ namespace ResearchPlatform.Algorithms
         private List<double> _weights;
         private List<JobToProceed> _jobs;
         private List<JobWithCriteria> _decisionMatrix;
+        private Dictionary<JobToProceed, List<JobWithCriteria>> _preferencesMatrix;
+        private List<Tuple<JobToProceed, List<double>>> _aggregatePreferences;
+        private Dictionary<JobToProceed, Tuple<double, double>> _outrinkingFlows;
 
         private struct JobWithCriteria
         {
@@ -19,7 +22,7 @@ namespace ResearchPlatform.Algorithms
             public double ComfortOfWork { get; set; } // beneficial
             public double TimeOfExecution { get; set; } // non beneficial
             public double Reliability { get; set; } // beneficial
-            public int PossibilityOfNextJobs { get; set; } // beneficial
+            public double PossibilityOfNextJobs { get; set; } // beneficial
         }
 
         public PROMETHEEBuilder(List<double> weights, List<JobToProceed> jobs)
@@ -32,11 +35,9 @@ namespace ResearchPlatform.Algorithms
                 Reliability = j.Reliability,
                 TimeOfExecution = j.TimeOfExecution
             }).ToList();
-        }
-
-        public List<JobToProceed> GetJobsWithCalculatedUtility()
-        {
-            throw new NotImplementedException();
+            _preferencesMatrix = new Dictionary<JobToProceed, List<JobWithCriteria>>();
+            _aggregatePreferences = new List<Tuple<JobToProceed, List<double>>>();
+            _outrinkingFlows = new Dictionary<JobToProceed, Tuple<double, double>>();
         }
 
         public PROMETHEEBuilder NormalizeDecisionMatrix()
@@ -67,21 +68,106 @@ namespace ResearchPlatform.Algorithms
             return this;
         }
 
-        public PROMETHEEBuilder CalculateEvaluativeDifferences()
+        public PROMETHEEBuilder CalculatePreferences()
         {
-            // TODO
+            for (var row = 0; row < _decisionMatrix.Count; row++)
+            {
+                var left = _decisionMatrix[row];
+                _preferencesMatrix.Add(left.Job, new List<JobWithCriteria>());
+
+                for (var compare = 0; compare < _decisionMatrix.Count; compare++)
+                {
+                    var right = _decisionMatrix[compare];
+                    _preferencesMatrix.GetValueOrDefault(left.Job).Add(new JobWithCriteria()
+                    {
+                        Job = right.Job,
+                        Profit = (left.Profit - right.Profit) <= 0 ? 0 : (left.Profit - right.Profit) * _weights[(int)Criteria.Profit],
+                        PossibilityOfNextJobs = (left.PossibilityOfNextJobs - right.PossibilityOfNextJobs) <= 0 ? 0 :
+                            (left.PossibilityOfNextJobs - right.PossibilityOfNextJobs) * _weights[(int)Criteria.CompletedJobs],
+                        ComfortOfWork = (left.ComfortOfWork - right.ComfortOfWork) <= 0 ? 0 : (left.ComfortOfWork - right.ComfortOfWork) 
+                            * _weights[(int)Criteria.ComfortOfWork],
+                        Reliability = (left.Reliability - right.Reliability) <= 0 ? 0 : (left.Reliability - right.Reliability) 
+                            * _weights[(int)Criteria.CustomerReliability],
+                        TimeOfExecution = (left.TimeOfExecution - right.TimeOfExecution) <= 0 ? 0 : (left.TimeOfExecution - right.TimeOfExecution) 
+                            * _weights[(int)Criteria.DrivingTime]
+                    });
+                }
+            }
+
             return this;
         }
 
-        public List<double> GetWeights()
+        public PROMETHEEBuilder CalculateAggregatePreferences()
         {
-            throw new NotImplementedException();
+            foreach (var job in _preferencesMatrix)
+            {
+                var agg = new List<double>();
+                foreach (var preference in job.Value)
+                {
+                    agg.Add(
+                        (preference.Profit + preference.PossibilityOfNextJobs + preference.ComfortOfWork 
+                        + preference.Reliability + preference.TimeOfExecution) / _weights.Sum());
+                }
+                _aggregatePreferences.Add(Tuple.Create(job.Key, agg));
+            }
+
+            return this;
+        }
+
+        public PROMETHEEBuilder DetermineOutrankingFlows()
+        {
+            for (var row = 0; row < _aggregatePreferences.Count; row++)
+            {
+                var preference = _aggregatePreferences[row];
+                _outrinkingFlows.Add(preference.Item1, 
+                    Tuple.Create(CalculateLeavingFlow(preference.Item2), CalculateEnteringFlow(row)));
+            }
+            return this;
+        }
+
+        private double CalculateLeavingFlow(List<double> preferences)
+        {
+            return preferences.Sum() / (preferences.Count - 1);
+        }
+
+        private double CalculateEnteringFlow(int column)
+        {
+            var preferencesByColumn = _aggregatePreferences.Select(p => p.Item2[column]).ToList();
+            return preferencesByColumn.Sum() / (preferencesByColumn.Count - 1);
         }
 
         public void Run()
         {
             this.NormalizeDecisionMatrix()
-                .CalculateEvaluativeDifferences();
+                .CalculatePreferences()
+                .CalculateAggregatePreferences()
+                .DetermineOutrankingFlows()
+                .CalculateNetOutrankingValue();
+        }
+
+        public PROMETHEEBuilder CalculateNetOutrankingValue()
+        {
+            _jobs = _outrinkingFlows.Select(outranking => {
+                var job = outranking.Key;
+                var netValue = outranking.Value.Item1 - outranking.Value.Item2;
+                job.Utility = netValue;
+                return job;
+            }).ToList();
+
+            return this;
+        }
+
+        public List<JobToProceed> GetJobsWithCalculatedUtility()
+        {
+            var minUtility = _jobs.Min(j => j.Utility);
+            var maxUtility = _jobs.Max(j => j.Utility) + Math.Abs(minUtility < 0 ? minUtility : 0);
+
+            _jobs.ForEach(job =>
+            {
+                job.Utility = (job.Utility + Math.Abs(minUtility < 0 ? minUtility : 0)) / maxUtility;
+            });
+
+            return _jobs;
         }
     }
 }

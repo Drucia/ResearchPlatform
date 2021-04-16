@@ -243,13 +243,13 @@ namespace ResearchPlatform.ViewModels
 
             var ahp = allRes[(int)MultiCriteriaAlgorithm.AHP];
             var pro = allRes[(int)MultiCriteriaAlgorithm.PROMETHEE];
-            var ele = allRes[(int)MultiCriteriaAlgorithm.ELECTRE];
-            var own = allRes[(int)MultiCriteriaAlgorithm.OwnWeights];
+            //var ele = allRes[(int)MultiCriteriaAlgorithm.ELECTRE];
+            //var own = allRes[(int)MultiCriteriaAlgorithm.OwnWeights];
 
             AddResultsToList(ahp, "AHP");
-            AddResultsToList(own, "Own Weights");
+            //AddResultsToList(own, "Own Weights");
             AddResultsToList(pro, "PROMETHEE");
-            AddResultsToList(ele, "ELECTRE");
+            //AddResultsToList(ele, "ELECTRE");
 
             SelectedAlgorithmResult = _allResDict.First().Key;
         }

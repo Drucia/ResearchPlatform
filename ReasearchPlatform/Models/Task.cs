@@ -37,8 +37,6 @@ namespace ResearchPlatform.Models
             _criteriaBuilder.Run();
             var jobsWithUtility = _criteriaBuilder.GetJobsWithCalculatedUtility();
 
-            //CriteriaCalculator.CalculateUtility(_jobsToProceed, weights);
-
             var bAb = new BranchAndBound(_input.Base, _distanceManager, jobsWithUtility, _branchAndBoundHelper);
 
             foreach (SearchTreeAlgorithm alg in Enum.GetValues(typeof(SearchTreeAlgorithm)))

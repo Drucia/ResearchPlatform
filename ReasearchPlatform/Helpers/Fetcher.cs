@@ -43,8 +43,7 @@ namespace ResearchPlatform.Input
                 result = JsonSerializer.Deserialize<OverpassApiResult>(jsonNode);
             }
 
-            // to change
-            return result == null && result.elements.Count == 0 ? null : Node.CreateFromOverpassDTO(result.elements).Take(50).ToList();
+            return result == null && result.elements.Count == 0 ? null : Node.CreateFromOverpassDTO(result.elements).Take(60).ToList();
         }
 
         public static async Task<Distance> FetchDistanceBetweenNodesAsync(Node from, Node to)
@@ -57,7 +56,19 @@ namespace ResearchPlatform.Input
                 distance = JsonSerializer.Deserialize<DistanceDTO>(jsonDistance);
             }
 
-            return distance == null ? null : Distance.CreateFromDTO(distance, from, to);
+            Distance res = null;
+
+            if (distance != null)
+            {
+                res = Distance.CreateFromDTO(distance, from, to);
+
+                if (res.DistanceInMeters == 0)
+                {
+                    res = null;
+                }
+            }
+
+            return res;
         }
     }
 }

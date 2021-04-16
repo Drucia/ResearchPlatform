@@ -66,18 +66,20 @@ namespace ResearchPlatform.Algorithms
                 Delivery = Tuple.Create(0, IBranchAndBoundHelper.MAX_TIME_WITH_WORKING)
             };
 
-            var results = new List<List<JobToProceed>>();
-
             DFSRec(currentNode, dummyJob, new List<JobToProceed>(), new List<Break>(),
-                _jobsToProceed, 0, 0, 0, results);
+                _jobsToProceed, 0, 0, 0);
 
             _best.VisitedNodes = _visitedNodes;
+
+            int wT, dT, wholeDT;
+            var breaks = new List<Break>();
+            ExecuteJob(_best.ChosenJobs, out wT, out dT, out wholeDT, breaks);
 
             return _best;
         }
 
         private void DFSRec(Node currNode, JobToProceed currentJob, List<JobToProceed> done, List<Break> breaks,
-            List<JobToProceed> all, int workTime, int drivenTime, int wholeDrivenTime, List<List<JobToProceed>> allCheckedJobsPath)
+            List<JobToProceed> all, int workTime, int drivenTime, int wholeDrivenTime)
         {
             _visitedNodes++;
 
@@ -91,32 +93,21 @@ namespace ResearchPlatform.Algorithms
                 var allPossible = GetPossibleJobsToDo(all, done, currNode, wT);
                 foreach (var job in allPossible)
                 {
-                    DFSRec(currNode, job, done, breaks, all, wT, dT, wholeDT, allCheckedJobsPath);
+                    DFSRec(currNode, job, new List<JobToProceed>(done), new List<Break>(breaks), all, wT, dT, wholeDT);
                 }
 
                 currentValue = _helper.CalculateValueOfGoalFunction(done);
 
                 // leaf
                 if (allPossible.Count == 0 && _best.Value <= currentValue)
-                {
                     ChangeBestResult(currentValue, new List<JobToProceed>(done), breaks);
-                    allCheckedJobsPath.Add(new List<JobToProceed>(done));
-                }
             }
             else
             {
                 // cut tree
                 if (_best.Value <= currentValue)                
                     ChangeBestResult(currentValue, new List<JobToProceed>(done), breaks);
-
-                allCheckedJobsPath.Add(new List<JobToProceed>(done));
             }
-
-            if (done.Count > 1)
-                done.RemoveAt(done.Count - 1);
-
-            if (breaks.Count > 0)
-                breaks.RemoveAt(breaks.Count - 1);
         }
 
         private void ChangeBestResult(double currentValue, List<JobToProceed> done, List<Break> breaks)

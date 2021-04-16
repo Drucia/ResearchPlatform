@@ -55,13 +55,13 @@ namespace ResearchPlatform
                     jobsToProceed,
                     distanceManager),
 
-                new Task(
-                    new ELECTREEBuilder(ahpWeights, jobsToProceed),
-                    branchAndBoundHelper,
-                    input,
-                    new List<bool>(algorithmsMatrix[(int)MultiCriteriaAlgorithm.ELECTRE]),
-                    jobsToProceed,
-                    distanceManager),
+                //new Task(
+                //    new ELECTREEBuilder(ahpWeights, jobsToProceed),
+                //    branchAndBoundHelper,
+                //    input,
+                //    new List<bool>(algorithmsMatrix[(int)MultiCriteriaAlgorithm.ELECTRE]),
+                //    jobsToProceed,
+                //    distanceManager),
 
                 new Task(
                     new OwnWeightsBuilder(configuration.CriteriaWeights.Select(w => w / 100.0).ToList(), jobsToProceed),

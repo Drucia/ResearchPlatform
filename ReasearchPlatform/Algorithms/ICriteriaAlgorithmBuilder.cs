@@ -10,7 +10,6 @@ namespace ResearchPlatform.Algorithms
     public interface ICriteriaAlgorithmBuilder
     {
         public void Run();
-        public List<double> GetWeights();
         public List<JobToProceed> GetJobsWithCalculatedUtility();
     }
 }

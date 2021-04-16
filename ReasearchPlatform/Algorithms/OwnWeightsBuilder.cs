@@ -38,11 +38,6 @@ namespace ResearchPlatform.Algorithms
             return _jobs;
         }
 
-        public List<double> GetWeights()
-        {
-            return _weights;
-        }
-
         public void Run()
         {
         }
