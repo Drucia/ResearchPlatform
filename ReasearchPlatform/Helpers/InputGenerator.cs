@@ -65,7 +65,7 @@ namespace ResearchPlatform.Helpers
         {
             Input = input;
             var currentJobs = input.Jobs.Count == 0 ? 1 : input.Jobs.Count + 1;
-            for (int i = currentJobs; i <= currentJobs + numberOfJobs; i++)
+            for (int i = currentJobs; i < currentJobs + numberOfJobs; i++)
             {
                 var from = GetRandomNode();
                 var to = GetRandomNode(from);
@@ -77,7 +77,7 @@ namespace ResearchPlatform.Helpers
 
                 if (distance == null)
                 {
-                    Input.Logs.Add($"Error with distance from {from.ID} to {to.ID}");
+                    Input.Logs.Add($"Error with distance from {from.ID} to {to.ID} - NULL in generating jobs");
                     continue;
                 }
 
@@ -112,9 +112,8 @@ namespace ResearchPlatform.Helpers
             await GenerateInputDataAsync(postcode);
             GenerateJobs(Input, amountOfJobsToGenerate);
             GenerateClientsWithOpinions();
-            Input.DistanceMatrix = Input.DistanceMatrix.Concat(GetAllDistancesToFetch(
-                    Input.Base, Input.Nodes, Input.DistanceMatrix
-                )).ToList();
+            var missingDistances = await GetAllDistancesForAsync(Input.Base, Input.Nodes, Input.DistanceMatrix, Input.Logs);
+            Input.DistanceMatrix = Input.DistanceMatrix.Concat(missingDistances).ToList();
         }
 
         private Node GetRandomNode(Node node = null)
@@ -163,7 +162,7 @@ namespace ResearchPlatform.Helpers
 
                     if (distance == null || distance.DistanceInMeters == 0)
                     {
-                        logs.Add($"Error with distance from {nodesAround[i].ID} to {nodesAround[j].ID} - {(distance.DistanceInMeters == 0 ? "NULL" : "0")}");
+                        logs.Add($"Error with distance from {nodesAround[i].ID} to {nodesAround[j].ID} - {(distance == null ? "NULL" : "0")}");
                     }
                     else
                     {
@@ -187,7 +186,7 @@ namespace ResearchPlatform.Helpers
 
                 if (distance == null || distance.DistanceInMeters == 0)
                 {
-                    logs.Add($"Error with distance from {centralNode.ID} to {nodesAround[i].ID} - {(distance.DistanceInMeters == 0 ? "NULL" : "0")}");
+                    logs.Add($"Error with distance from {centralNode.ID} to {nodesAround[i].ID} - {(distance == null ? "NULL" : "0")}");
                 }
                 else
                 {
@@ -217,9 +216,9 @@ namespace ResearchPlatform.Helpers
                     counter++;
                 }
 
-                if (distance == null || distance.DistanceInMeters == 0)
+                if (calculatedDistance == null || calculatedDistance.DistanceInMeters == 0)
                 {
-                    logs.Add($"Error with distance from {distance.From.ID} to {distance.To.ID} - {(distance.DistanceInMeters == 0 ? "NULL" : "0")}");
+                    logs.Add($"Error with distance from {distance.From.ID} to {distance.To.ID} - {(distance == null ? "NULL" : "0")}");
                 } else
                 {
                     distances.Add(calculatedDistance);

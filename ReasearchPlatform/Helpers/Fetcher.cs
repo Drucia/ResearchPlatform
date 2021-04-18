@@ -56,19 +56,7 @@ namespace ResearchPlatform.Input
                 distance = JsonSerializer.Deserialize<DistanceDTO>(jsonDistance);
             }
 
-            Distance res = null;
-
-            if (distance != null)
-            {
-                res = Distance.CreateFromDTO(distance, from, to);
-
-                if (res.DistanceInMeters == 0)
-                {
-                    res = null;
-                }
-            }
-
-            return res;
+            return distance != null ? Distance.CreateFromDTO(distance, from, to) : null;
         }
     }
 }

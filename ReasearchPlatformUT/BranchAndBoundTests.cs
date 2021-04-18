@@ -56,8 +56,6 @@ namespace ReasearchPlatformUT
             
             Assert.NotEmpty(res.ChosenJobs);
             Assert.Equal(new List<JobToProceed> { _fakeJob }, res.ChosenJobs);
-            Assert.Equal(2, distanceManagerMock.Invocations.Count);
-            Assert.Equal(3, bAndBHelperMock.Invocations.Count);
         }
 
         [Fact]

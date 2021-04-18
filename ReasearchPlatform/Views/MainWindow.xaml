@@ -229,8 +229,10 @@
                     <RowDefinition MaxHeight="35"/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
-                <DockPanel Grid.Row="0" HorizontalAlignment="Right">
-                    <StackPanel Orientation="Horizontal">
+                <DockPanel Grid.Row="0">
+                    <Label Content="Liczba zadań: "/>
+                    <Label Content="{Binding Input.Jobs.Count}"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                         <Button Margin="0,0,10,5" Command="{Binding RefreshFileListCommand}" Background="{x:Null}" BorderBrush="{x:Null}">
                             <iconPacks:PackIconFontAwesome Kind="SyncAltSolid"
                                                         VerticalAlignment="Center"
