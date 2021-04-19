@@ -9,11 +9,11 @@ namespace ResearchPlatform.Models
     public class JobToProceed : Job
     {
         public double Utility { get; set; }
-        public double Profit { get; internal set; }
-        public double ComfortOfWork { get; internal set; }
-        public double TimeOfExecution { get; internal set; }
-        public double Reliability { get; internal set; }
-        public int PossibilityOfNextJobs { get; internal set; }
+        public double Profit { get; set; }
+        public double ComfortOfWork { get; set; }
+        public double TimeOfExecution { get; set; }
+        public double Reliability { get; set; }
+        public int PossibilityOfNextJobs { get; set; }
 
         public JobToProceed()
         {}

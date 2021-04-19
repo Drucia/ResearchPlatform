@@ -10,12 +10,12 @@ namespace ResearchPlatform.Algorithms
     {
         private List<double> _weights;
         private List<JobToProceed> _jobs;
-        private List<JobWithCriteria> _decisionMatrix;
-        private Dictionary<JobToProceed, List<JobWithCriteria>> _preferencesMatrix;
-        private List<Tuple<JobToProceed, List<double>>> _aggregatePreferences;
-        private Dictionary<JobToProceed, Tuple<double, double>> _outrinkingFlows;
+        public List<JobWithCriteria> _decisionMatrix;
+        public Dictionary<JobToProceed, List<JobWithCriteria>> _preferencesMatrix;
+        public List<Tuple<JobToProceed, List<double>>> _aggregatePreferences;
+        public Dictionary<JobToProceed, Tuple<double, double>> _outrinkingFlows;
 
-        private struct JobWithCriteria
+        public class JobWithCriteria
         {
             public JobToProceed Job { get; set; }
             public double Profit { get; set; } // beneficial
@@ -23,6 +23,17 @@ namespace ResearchPlatform.Algorithms
             public double TimeOfExecution { get; set; } // non beneficial
             public double Reliability { get; set; } // beneficial
             public double PossibilityOfNextJobs { get; set; } // beneficial
+
+            public override bool Equals(object obj)
+            {
+                return obj is JobWithCriteria criteria &&
+                       EqualityComparer<JobToProceed>.Default.Equals(Job, criteria.Job) &&
+                       Profit == criteria.Profit &&
+                       ComfortOfWork == criteria.ComfortOfWork &&
+                       TimeOfExecution == criteria.TimeOfExecution &&
+                       Reliability == criteria.Reliability &&
+                       PossibilityOfNextJobs == criteria.PossibilityOfNextJobs;
+            }
         }
 
         public PROMETHEEBuilder(List<double> weights, List<JobToProceed> jobs)
