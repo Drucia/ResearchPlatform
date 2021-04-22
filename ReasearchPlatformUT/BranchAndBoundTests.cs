@@ -4,7 +4,6 @@ using ResearchPlatform.Helpers;
 using ResearchPlatform.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Xunit;
 
 namespace ReasearchPlatformUT
