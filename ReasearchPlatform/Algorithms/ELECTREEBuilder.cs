@@ -14,6 +14,7 @@ namespace ResearchPlatform.Algorithms
         private List<double> _v = new List<double>() { 3, 180, 700, 6, 3};
 
         private List<JobToProceed> _jobs;
+        private List<JobToProceed> _sortedJobs;
         public List<JobWithCriteria> _decisionMatrix;
         public List<Tuple<JobWithCriteria, List<double>>> _corcondanceMatrix;
         public List<Tuple<JobWithCriteria, List<double>>> _reliabilityMatrix;
@@ -68,6 +69,7 @@ namespace ResearchPlatform.Algorithms
 
             _corcondanceMatrix = new List<Tuple<JobWithCriteria, List<double>>>();
             _reliabilityMatrix = new List<Tuple<JobWithCriteria, List<double>>>();
+            _sortedJobs = new List<JobToProceed>();
         }
 
         public List<JobToProceed> GetJobsWithCalculatedUtility()
@@ -79,7 +81,7 @@ namespace ResearchPlatform.Algorithms
         {
             this.CalculateCorcondanceMatrix()
                 .CalculateReliabilityMatrix();
-                //.CreateOrderByDestilations();
+                .CreateOrderByDestilations();
             //this.NormalizeDecisionMatrix()
             //    .CalculateConcordanceIntervalMatrix()
             //    .CalculateConcordanceIndexMatrix()
@@ -200,18 +202,34 @@ namespace ResearchPlatform.Algorithms
             return (right - left + p) / (v - p);
         }
 
-        public ELECTREEBuilder CreateOrderByDestilations(List<Tuple<JobWithCriteria, List<double>>> rel)
-        {// not working correctly for x3 - is only 1 not 2
-            _reliabilityMatrix = rel;
-            var lambda = GetLambdaValue(Enumerable.Range(0, _reliabilityMatrix.Count).ToList(), _reliabilityMatrix.Max(row => row.Item2.Max()));
+        public ELECTREEBuilder CreateOrderByDestilations()
+        {
+            var jobsToCompare = Enumerable.Range(0, _reliabilityMatrix.Count).ToList();
+            var initialLambda = GetInitialLambdaValue(jobsToCompare);
+
+            DestilationRec(jobsToCompare, initialLambda);
+
+            return this;
+        }
+
+        private void DestilationRec(List<int> jobsToCompare, double initialLambda)
+        {
+            var lambda = GetLambdaValue(jobsToCompare, initialLambda);
             var jobsWhichAreBetterThan = new Dictionary<int, List<int>>(); // for each of job set of jobs which is better
 
             for (var row = 0; row < _reliabilityMatrix.Count; row++)
             {
+                // check only compared jobs
+                if (!jobsToCompare.Contains(row))
+                    continue;
+
                 jobsWhichAreBetterThan.Add(row, new List<int>());
 
                 for (var compare = 0; compare < _reliabilityMatrix.Count; compare++)
                 {
+                    // check only compared jobs
+                    if (!jobsToCompare.Contains(compare))
+                        continue;
                     // check if row > compare
                     var reliabilityRatio = _reliabilityMatrix[row].Item2[compare];
                     var discriminationLevel = CalculateDiscrimationLevel(reliabilityRatio);
@@ -227,13 +245,35 @@ namespace ResearchPlatform.Algorithms
             foreach (var jobWhichAreBetterThan in jobsWhichAreBetterThan)
             {
                 var betterThanCount = jobWhichAreBetterThan.Value.Count();
-                var worstThanCount = jobsWhichAreBetterThan.Where(j => j.Key != jobWhichAreBetterThan.Key 
+                var worstThanCount = jobsWhichAreBetterThan.Where(j => j.Key != jobWhichAreBetterThan.Key
                     && j.Value.Contains(jobWhichAreBetterThan.Key)).Count();
 
-                grades.Add(Tuple.Create(jobWhichAreBetterThan.Key, new List<int>() { betterThanCount , worstThanCount, betterThanCount - worstThanCount}));
+                grades.Add(Tuple.Create(jobWhichAreBetterThan.Key, new List<int>() { betterThanCount, worstThanCount, betterThanCount - worstThanCount }));
             }
 
-            return this;
+            var maxGrade = grades.Max(g => g.Item2[2]);
+            var bests = grades.Where(g => g.Item2[2] == maxGrade).Select(g => g.Item1).ToList();
+            
+            if (bests.Count == 1 || lambda == 0)
+            {
+                bests.ForEach(best => _sortedJobs.Add(_reliabilityMatrix[best].Item1.Job));
+            }
+            else
+            {
+                DestilationRec(bests, lambda);
+            }
+
+            jobsToCompare = jobsToCompare.Where(j => !bests.Contains(j)).ToList();
+
+            if (jobsToCompare.Count < 2)
+            {
+                jobsToCompare.ForEach(compare => _sortedJobs.Add(_reliabilityMatrix[compare].Item1.Job));
+                return;
+            }
+            else
+            {
+                DestilationRec(jobsToCompare, GetInitialLambdaValue(jobsToCompare));
+            }
         }
 
         private double CalculateDiscrimationLevel(double lambda)
@@ -264,6 +304,23 @@ namespace ResearchPlatform.Algorithms
             return onlyToCompareReliabilities.Where(val => val < difference).Max();
         }
 
+        private double GetInitialLambdaValue(List<int> rows)
+        {
+            var onlyToCompareReliabilities = new List<double>();
+
+            foreach (var row in rows)
+            {
+                var rowReliability = _reliabilityMatrix[row].Item2;
+
+                for (var col = 0; col < rowReliability.Count; col++)
+                {
+                    if (rows.Contains(col))
+                        onlyToCompareReliabilities.Add(rowReliability[col]);
+                }
+            }
+
+            return onlyToCompareReliabilities.Max();
+        }
 
         // ------------------ ELECTRE ------------------- \\
 
