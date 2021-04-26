@@ -65,8 +65,6 @@ namespace ResearchPlatform.Algorithms
             _corcondanceIndexMatrix = new List<Tuple<JobWithCriteria, List<double>>>();
             _discordanceIndexMatrix = new List<Tuple<JobWithCriteria, List<double>>>();
 
-
-
             _corcondanceMatrix = new List<Tuple<JobWithCriteria, List<double>>>();
             _reliabilityMatrix = new List<Tuple<JobWithCriteria, List<double>>>();
             _sortedJobs = new List<JobToProceed>();
@@ -74,20 +72,26 @@ namespace ResearchPlatform.Algorithms
 
         public List<JobToProceed> GetJobsWithCalculatedUtility()
         {
-            throw new NotImplementedException();
+            for (var idx = 0; idx < _sortedJobs.Count; idx++)
+            {
+                _sortedJobs[idx].Utility = _sortedJobs.Count - idx;
+            }
+
+            var maxUtility = _sortedJobs.Max(j => j.Utility);
+
+            _sortedJobs.ForEach(job =>
+            {
+                job.Utility /= maxUtility;
+            });
+
+            return _sortedJobs;
         }
 
         public void Run()
         {
             this.CalculateCorcondanceMatrix()
-                .CalculateReliabilityMatrix();
+                .CalculateReliabilityMatrix()
                 .CreateOrderByDestilations();
-            //this.NormalizeDecisionMatrix()
-            //    .CalculateConcordanceIntervalMatrix()
-            //    .CalculateConcordanceIndexMatrix()
-            //    .CalculateDiscordanceIntervalMatrix()
-            //    .CalculateDiscordanceIndexMatrix()
-            //    .CalculateSuperiorAndInferiorValues();
         }
 
         // ------------------ ELECTRE III ------------------- \\
@@ -133,7 +137,7 @@ namespace ResearchPlatform.Algorithms
             if ((left + q) >= right)
                 return 1;
 
-            if ((left + q) < right && (left + p) >= right)
+            if ((left + p) >= right)
                 return (left + p - right) / (p - q);
 
             return 0;
@@ -199,7 +203,7 @@ namespace ResearchPlatform.Algorithms
             if (right <= left + p)
                 return 0;
 
-            return (right - left + p) / (v - p);
+            return (right - left - p) / (v - p);
         }
 
         public ELECTREEBuilder CreateOrderByDestilations()
@@ -248,7 +252,8 @@ namespace ResearchPlatform.Algorithms
                 var worstThanCount = jobsWhichAreBetterThan.Where(j => j.Key != jobWhichAreBetterThan.Key
                     && j.Value.Contains(jobWhichAreBetterThan.Key)).Count();
 
-                grades.Add(Tuple.Create(jobWhichAreBetterThan.Key, new List<int>() { betterThanCount, worstThanCount, betterThanCount - worstThanCount }));
+                grades.Add(Tuple.Create(jobWhichAreBetterThan.Key, 
+                    new List<int>() { betterThanCount, worstThanCount, betterThanCount - worstThanCount }));
             }
 
             var maxGrade = grades.Max(g => g.Item2[2]);

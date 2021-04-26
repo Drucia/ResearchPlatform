@@ -23,7 +23,7 @@ namespace ReasearchPlatformUT
             };
 
             var electree = new ELECTREEBuilder(new List<double>(), new List<JobToProceed>());
-            electree.CreateOrderByDestilations(reliabilityMatrix);
+            electree.CreateOrderByDestilations();
         }
     }
 }
