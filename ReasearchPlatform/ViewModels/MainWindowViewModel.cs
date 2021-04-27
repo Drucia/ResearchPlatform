@@ -1,6 +1,7 @@
 ﻿using GalaSoft.MvvmLight.Command;
 using LiveCharts;
 using LiveCharts.Configurations;
+using LiveCharts.Helpers;
 using MahApps.Metro.Controls.Dialogs;
 using Newtonsoft.Json;
 using ResearchPlatform.Models;
@@ -11,6 +12,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace ResearchPlatform.ViewModels
 {
@@ -160,6 +162,7 @@ namespace ResearchPlatform.ViewModels
         }
         public Func<double, string> Formatter { get; set; }
         public SeriesCollection Series { get; set; }
+        public List<string> Labels { get; set; }
 
         private void PreparePlot(string name)
         {
@@ -169,47 +172,61 @@ namespace ResearchPlatform.ViewModels
                 switch (name)
                 {
                     case "Duration":
-                        Series.Configuration = Mappers.Xy<Result>()
-                                                    .X(resConfig => resConfig.AmountOfJobs)
-                                                    .Y(resConfig => resConfig.Duration);
                         AxisYName = "Duration [ms]";
                         StepSize = double.NaN;
                         MinYValue = double.NaN;
+
+                        Series.Add(new LiveCharts.Wpf.StackedColumnSeries
+                        {
+                            Title = "Scheduling",
+                            Values = _allResDict.Select(r => r.Value.Duration).AsChartValues(),
+                            StackMode = StackMode.Values,
+                            DataLabels = true,
+                            Fill = Brushes.DarkSlateBlue
+                        });
+
+                        Series.Add(new LiveCharts.Wpf.StackedColumnSeries
+                        {
+                            Title = "Multi criteria",
+                            Values = _allResDict.Select(r => r.Value.CriteriaDuration).AsChartValues(),
+                            StackMode = StackMode.Values,
+                            DataLabels = true,
+                            Fill = Brushes.DarkCyan
+                        });
                         break;
                     case "Nodes":
-                        Series.Configuration = Mappers.Xy<Result>()
-                                                    .X(resConfig => resConfig.AmountOfJobs)
-                                                    .Y(resConfig => resConfig.VisitedNodes);
                         AxisYName = "Visited nodes";
                         StepSize = double.NaN;
                         MinYValue = double.NaN;
+
+                        Series.Add(new LiveCharts.Wpf.StackedColumnSeries
+                        {
+                            Title = "Nodes",
+                            Values = _allResDict.Select(r => r.Value.VisitedNodes).AsChartValues(),
+                            StackMode = StackMode.Values,
+                            DataLabels = true,
+                            Fill = Brushes.DarkCyan
+                        });
                         break;
                     case "Breaks":
-                        Series.Configuration = Mappers.Xy<Result>()
-                                                    .X(resConfig => resConfig.AmountOfJobs)
-                                                    .Y(resConfig => resConfig.Breaks.Count);
                         AxisYName = "Breaks count";
                         StepSize = 10;
                         MinYValue = 0;
+
+                        Series.Add(new LiveCharts.Wpf.StackedColumnSeries
+                        {
+                            Title = "Breaks",
+                            Values = _allResDict.Select(r => r.Value.Breaks.Count).AsChartValues(),
+                            StackMode = StackMode.Values,
+                            DataLabels = true,
+                            Fill = Brushes.DarkCyan
+                        });
                         break;
                 }
+
+                Labels = _allResDict.Select(r => r.Key).ToList();
+            
             });
-
-            foreach (var result in _allResDict)
-            {
-                App.Current.Dispatcher.Invoke((Action)delegate
-                {
-                    Series.Add(new LiveCharts.Wpf.ColumnSeries
-                    {
-                        Title = result.Key,
-
-                        Values = new ChartValues<Result>
-                        {
-                            result.Value
-                        }
-                    });
-                });
-            }
         }
 
         private async void RunAlgorithms()

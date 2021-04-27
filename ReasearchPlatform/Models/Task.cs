@@ -9,7 +9,7 @@ namespace ResearchPlatform.Models
 {
     public class Task
     {
-        private readonly static int NUMBER_OF_REAPET_ALG = 5;
+        private readonly static int NUMBER_OF_REPEAT_ALG = 5;
 
         private readonly ICriteriaAlgorithmBuilder _criteriaBuilder;
         private readonly IBranchAndBoundHelper _branchAndBoundHelper;
@@ -34,7 +34,10 @@ namespace ResearchPlatform.Models
 
         public void Run()
         {
+            var criteriaWatch = System.Diagnostics.Stopwatch.StartNew();
             _criteriaBuilder.Run();
+            criteriaWatch.Stop();
+
             var jobsWithUtility = _criteriaBuilder.GetJobsWithCalculatedUtility();
 
             var bAb = new BranchAndBound(_input.Base, _distanceManager, jobsWithUtility, _branchAndBoundHelper);
@@ -47,7 +50,7 @@ namespace ResearchPlatform.Models
                     var times = new List<long>();
                     var counter = 0;
 
-                    while (counter < NUMBER_OF_REAPET_ALG)
+                    while (counter < NUMBER_OF_REPEAT_ALG)
                     {
                         var watch = System.Diagnostics.Stopwatch.StartNew();
                         res = bAb.Run(alg);
@@ -61,6 +64,7 @@ namespace ResearchPlatform.Models
                         Jobs = res.ChosenJobs, 
                         Breaks = res.Breaks, 
                         Duration = (long) times.Average(),
+                        CriteriaDuration = criteriaWatch.ElapsedMilliseconds,
                         VisitedNodes = res.VisitedNodes,
                         AmountOfJobs = _jobsToProceed.Count
                     });

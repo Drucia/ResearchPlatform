@@ -9,5 +9,6 @@ namespace ResearchPlatform.Models
         public long Duration { get; set; }
         public int VisitedNodes { get; set; }
         public int AmountOfJobs { get; set; }
+        public long CriteriaDuration { get; internal set; }
     }
 }
