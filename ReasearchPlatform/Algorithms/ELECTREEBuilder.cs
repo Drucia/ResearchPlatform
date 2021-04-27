@@ -14,17 +14,11 @@ namespace ResearchPlatform.Algorithms
         private List<double> _v = new List<double>() { 3, 180, 700, 6, 3};
 
         private List<JobToProceed> _jobs;
-        private List<JobToProceed> _sortedJobs;
+        public List<JobToProceed> _sortedJobs;
         public List<JobWithCriteria> _decisionMatrix;
         public List<Tuple<JobWithCriteria, List<double>>> _corcondanceMatrix;
         public List<Tuple<JobWithCriteria, List<double>>> _reliabilityMatrix;
 
-
-        public List<Tuple<JobWithCriteria, List<double>>> _corcondanceIntervalMatrix;
-        public List<Tuple<JobWithCriteria, List<double>>> _discordanceIntervalMatrix;
-        public List<Tuple<JobWithCriteria, List<double>>> _corcondanceIndexMatrix;
-        public List<Tuple<JobWithCriteria, List<double>>> _discordanceIndexMatrix;
-        public List<Tuple<JobWithCriteria, List<double>>> _netValues;
 
         public class JobWithCriteria
         {
@@ -58,12 +52,8 @@ namespace ResearchPlatform.Algorithms
                 PossibilityOfNextJobs = j.PossibilityOfNextJobs,
                 ComfortOfWork = j.ComfortOfWork,
                 Reliability = j.Reliability,
-                TimeOfExecution = j.TimeOfExecution
+                TimeOfExecution = -j.TimeOfExecution
             }).ToList();
-            _corcondanceIntervalMatrix = new List<Tuple<JobWithCriteria, List<double>>>();
-            _discordanceIntervalMatrix = new List<Tuple<JobWithCriteria, List<double>>>();
-            _corcondanceIndexMatrix = new List<Tuple<JobWithCriteria, List<double>>>();
-            _discordanceIndexMatrix = new List<Tuple<JobWithCriteria, List<double>>>();
 
             _corcondanceMatrix = new List<Tuple<JobWithCriteria, List<double>>>();
             _reliabilityMatrix = new List<Tuple<JobWithCriteria, List<double>>>();
@@ -326,190 +316,5 @@ namespace ResearchPlatform.Algorithms
 
             return onlyToCompareReliabilities.Max();
         }
-
-        // ------------------ ELECTRE ------------------- \\
-
-        private ELECTREEBuilder CalculateSuperiorAndInferiorValues()
-        {
-            var superiorsByRow = _corcondanceIntervalMatrix.Select(row => row.Item2.Sum()).ToList();
-            var superiorsByCol = new List<double>();
-            var inferiorsByRow = _discordanceIntervalMatrix.Select(row => row.Item2.Sum()).ToList();
-            var inferiorsByCol = new List<double>();
-
-            for (var col = 0; col < _corcondanceIntervalMatrix.Count; col++)
-            {
-                superiorsByCol.Add(_corcondanceIntervalMatrix.Sum(row => row.Item2[col]));
-                inferiorsByCol.Add(_discordanceIntervalMatrix.Sum(row => row.Item2[col]));
-            }
-
-            return this;
-        }
-
-        private ELECTREEBuilder CalculateDiscordanceIndexMatrix()
-        {
-            var matrixSize = _discordanceIntervalMatrix.Count;
-            var discordanceIndex = _discordanceIntervalMatrix.Sum(cor => cor.Item2.Sum()) * matrixSize * (matrixSize - 1);
-
-            for (var row = 0; row < matrixSize; row++)
-            {
-                var left = _corcondanceIntervalMatrix[row];
-                var results = new List<double>();
-
-                foreach (var interval in left.Item2)
-                {
-                    results.Add(interval > discordanceIndex ? 0 : 1);
-                }
-
-                _discordanceIndexMatrix.Add(Tuple.Create(left.Item1, results));
-            }
-
-            return this;
-        }
-
-        private ELECTREEBuilder CalculateDiscordanceIntervalMatrix()
-        {
-            for (var row = 0; row < _decisionMatrix.Count; row++)
-            {
-                var left = _decisionMatrix[row];
-                var results = new List<double>();
-
-                for (var compare = 0; compare < _decisionMatrix.Count; compare++)
-                {
-                    var discordanceInterval = 0.0;
-
-                    if (row == compare)
-                    {
-                        results.Add(discordanceInterval);
-                        continue;
-                    }
-
-                    var right = _decisionMatrix[compare];
-                    var allAbsValues = new List<double>();
-                    var discordacesValues = new List<double>();
-
-                    allAbsValues.Add(Math.Abs(left.Profit - right.Profit));
-                    allAbsValues.Add(Math.Abs(left.PossibilityOfNextJobs - right.PossibilityOfNextJobs));
-                    allAbsValues.Add(Math.Abs(left.Reliability - right.Reliability));
-                    allAbsValues.Add(Math.Abs(left.TimeOfExecution - right.TimeOfExecution));
-                    allAbsValues.Add(Math.Abs(left.ComfortOfWork - right.ComfortOfWork));
-
-                    if (left.Profit < right.Profit)
-                        discordacesValues.Add(Math.Abs(left.Profit - right.Profit));
-
-                    if (left.PossibilityOfNextJobs < right.PossibilityOfNextJobs)
-                        discordacesValues.Add(Math.Abs(left.PossibilityOfNextJobs - right.PossibilityOfNextJobs));
-
-                    if (left.Reliability < right.Reliability)
-                        discordacesValues.Add(Math.Abs(left.Reliability - right.Reliability));
-
-                    if (left.TimeOfExecution < right.TimeOfExecution)
-                        discordacesValues.Add(Math.Abs(left.TimeOfExecution - right.TimeOfExecution));
-
-                    if (left.ComfortOfWork < right.ComfortOfWork)
-                        discordacesValues.Add(Math.Abs(left.ComfortOfWork - right.ComfortOfWork));
-
-                    var maxDiscordance = discordacesValues.Max();
-                    var maxAbs = allAbsValues.Max();
-                    discordanceInterval = maxDiscordance / maxAbs;
-
-                    results.Add(discordanceInterval);
-                }
-
-                _discordanceIntervalMatrix.Add(Tuple.Create(left, results));
-            }
-
-            return this;
-        }
-
-        private ELECTREEBuilder CalculateConcordanceIndexMatrix()
-        {
-            var matrixSize = _corcondanceIntervalMatrix.Count;
-            var corcondanceIndex = _corcondanceIntervalMatrix.Sum(cor => cor.Item2.Sum()) * matrixSize * (matrixSize - 1);
-
-            for (var row = 0; row < matrixSize; row++)
-            {
-                var left = _corcondanceIntervalMatrix[row];
-                var results = new List<double>();
-
-                foreach (var interval in left.Item2)
-                {
-                    results.Add(interval >= corcondanceIndex ? 1 : 0);
-                }
-
-                _corcondanceIndexMatrix.Add(Tuple.Create(left.Item1, results));
-            }
-
-            return this;
-        }
-
-        private ELECTREEBuilder CalculateConcordanceIntervalMatrix()
-        {
-            for (var row = 0; row < _decisionMatrix.Count; row++)
-            {
-                var left = _decisionMatrix[row];
-                var results = new List<double>();
-
-                for (var compare = 0; compare < _decisionMatrix.Count; compare++)
-                {
-                    var result = 0.0;
-
-                    if (row == compare)
-                    {
-                        results.Add(result);
-                        continue;
-                    }
-
-                    var right = _decisionMatrix[compare];
-
-                    if (left.Profit >= right.Profit)
-                        result += _weights[(int) Criteria.Profit];
-
-                    if (left.PossibilityOfNextJobs >= right.PossibilityOfNextJobs)
-                        result += _weights[(int)Criteria.CompletedJobs];
-
-                    if (left.Reliability >= right.Reliability)
-                        result += _weights[(int)Criteria.CustomerReliability];
-
-                    if (left.TimeOfExecution >= right.TimeOfExecution)
-                        result += _weights[(int)Criteria.DrivingTime];
-
-                    if (left.ComfortOfWork >= right.ComfortOfWork)
-                        result += _weights[(int)Criteria.ComfortOfWork];
-
-                    results.Add(result);
-                }
-
-                _corcondanceIntervalMatrix.Add(Tuple.Create(left, results));
-            }
-
-            return this;
-        }
-        //public ELECTREEBuilder NormalizeDecisionMatrix()
-        //{
-        //    _decisionMatrix.ForEach(job => {
-        //        job.Profit = Math.Pow(job.Profit, 2);
-        //        job.PossibilityOfNextJobs = Math.Pow(job.PossibilityOfNextJobs, 2);
-        //        job.ComfortOfWork = Math.Pow(job.ComfortOfWork, 2);
-        //        job.Reliability = Math.Pow(job.Reliability, 2);
-        //        job.TimeOfExecution = Math.Pow(job.TimeOfExecution, 2);
-        //    });
-
-        //    var sqrtOfProfit = Math.Sqrt(_decisionMatrix.Sum(job => job.Profit));
-        //    var sqrtOfNextJobs = Math.Sqrt(_decisionMatrix.Sum(job => job.PossibilityOfNextJobs));
-        //    var sqrtOfComfort = Math.Sqrt(_decisionMatrix.Sum(job => job.ComfortOfWork));
-        //    var sqrtOfReliability = Math.Sqrt(_decisionMatrix.Sum(job => job.Reliability));
-        //    var sqrtOfTime = Math.Sqrt(_decisionMatrix.Sum(job => job.TimeOfExecution));
-
-        //    _decisionMatrix.ForEach(job => {
-        //        job.Profit = job.Profit / sqrtOfProfit * _weights[(int) Criteria.Profit];
-        //        job.PossibilityOfNextJobs = job.PossibilityOfNextJobs / sqrtOfNextJobs * _weights[(int)Criteria.CompletedJobs];
-        //        job.ComfortOfWork = job.ComfortOfWork / sqrtOfComfort * _weights[(int)Criteria.ComfortOfWork];
-        //        job.Reliability = job.Reliability / sqrtOfReliability * _weights[(int)Criteria.CustomerReliability];
-        //        job.TimeOfExecution = job.TimeOfExecution / sqrtOfTime * _weights[(int)Criteria.DrivingTime];
-        //    });
-
-        //    return this;
-        //}
-
     }
 }
