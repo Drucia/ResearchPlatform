@@ -10,12 +10,14 @@ namespace ResearchPlatform.Helpers
         private readonly DistancesManager _manager;
         private readonly List<double> _weights;
         private readonly Configuration _configuration;
+        private readonly Node _base;
 
-        public BranchAndBoundHelper(DistancesManager distancesManager, IEnumerable<int> weights, Configuration configuration)
+        public BranchAndBoundHelper(DistancesManager distancesManager, IEnumerable<int> weights, Configuration configuration, Node base_)
         {
             _manager = distancesManager;
             _weights = weights.Select(w => w / 100.0).ToList();
             _configuration = configuration;
+            _base = base_;
         }
 
         public bool AreAllConstraintsSatisfied(Node currNode, JobToProceed currentJob, List<JobToProceed> done, 
@@ -80,7 +82,7 @@ namespace ResearchPlatform.Helpers
         public double CalculateValueOfGoalFunction(List<JobToProceed> done)
         {
             if (done.Count < 2)
-                return double.NegativeInfinity;
+                return 0.0;
 
             var profitAndTime = CalculateRealProfitAndDrive(done);
             var realProfit = profitAndTime.Item1;
@@ -93,10 +95,48 @@ namespace ResearchPlatform.Helpers
             return _weights[0] * utilityAvg + _weights[1] * price - _weights[2] * time;
         }
 
+        private double CalculateValueOfHightLimes(List<JobToProceed> chosen)
+        {
+            // for done
+            //var realProfitSum = 0.0;
+            //var realTimeSum = 0.0;
+            //var utilitySum = 0.0;
+
+            //var realProfitSum = done.Sum(d => d.Profit);
+            //var realTimeSum = done.Sum(d => d.TimeOfExecution);
+            //var utilitySum = done.Sum(job => job.Utility);
+
+            //if (done.Count > 1)
+            //{
+            //    var profitAndTime = CalculateRealProfitAndDrive(done);
+
+            //    realProfitSum = profitAndTime.Item1;
+            //    realTimeSum = profitAndTime.Item2;
+            //    utilitySum = done.Sum(job => job.Utility);
+            //}
+
+            // for chosen
+            var chosenProfitSum = CalculateRealProfitAndDrive(chosen);
+            var chosenUtilitySum = chosen.Sum(j => j.Utility);
+
+            //var avgProfit = (realProfitSum + chosenProfitSum.Item1) / (done.Sum(d => d.Price) + chosen.Sum(c => c.Price));
+            var avgProfit = chosenProfitSum.Item1 / chosen.Sum(c => c.Price);
+            var avgUtility = chosenUtilitySum / chosen.Count;
+
+            var res = _weights[0] * avgUtility + _weights[1] * avgProfit;
+
+            return res;
+        }
+
         private Tuple<double, double> CalculateRealProfitAndDrive(List<JobToProceed> done)
         {
+            return CalculateRealProfitAndDriveWithStartNode(done, done.First().To);
+        }
+
+        private Tuple<double, double> CalculateRealProfitAndDriveWithStartNode(List<JobToProceed> done, Node start)
+        {
             Tuple<Tuple<double /* profit */, double /* time */>, Node /* last node */> profit =
-                          done.Aggregate(Tuple.Create(Tuple.Create(0.0, 0.0), done.First().To), (acc, job) => {
+                          done.Aggregate(Tuple.Create(Tuple.Create(0.0, 0.0), start), (acc, job) => {
 
                               var currProfit = acc.Item1.Item1;
                               var currTimeForDrive = acc.Item1.Item2;
@@ -104,7 +144,7 @@ namespace ResearchPlatform.Helpers
                               var distanceToStart = _manager.GetDistanceBetween(acc.Item2, job.From);
                               var distanceFromStartToEnd = _manager.GetDistanceBetween(job.From, job.To);
 
-                              currProfit += job.Price - (distanceToStart.Costs * 0.001 + distanceFromStartToEnd.Costs * 0.001 + 
+                              currProfit += job.Price - (distanceToStart.Costs * 0.001 + distanceFromStartToEnd.Costs * 0.001 +
                               ((distanceToStart.DistanceInMeters + distanceFromStartToEnd.DistanceInMeters) / 1000) *
                               (_configuration.AvgFuelConsumption * _configuration.FuelCost + _configuration.CostOfMaintain));
 
@@ -115,6 +155,37 @@ namespace ResearchPlatform.Helpers
                           });
 
             return profit.Item1;
+        }
+
+        public double GetMaxPossibleValue(List<JobToProceed> done, List<JobToProceed> restPossibleJobs, double currentValue, double workTime)
+        {
+            if (restPossibleJobs.Count == 0)
+                return currentValue;
+            else
+            {
+                var jobsToDo = new List<JobToProceed>(restPossibleJobs);
+                var maxPrice = jobsToDo.Max(j => j.Price);
+                jobsToDo.Sort((left, right) => (int) ((
+                _weights[1] * (right.Profit / maxPrice) + _weights[0] * right.Utility // right
+                    - _weights[1] * (left.Profit / maxPrice) - _weights[0] * left.Utility // left
+                    ) * 1000));
+                var tmpWorkTime = workTime;
+                var chosenJobs = new List<JobToProceed>();
+                
+                while(jobsToDo.Count > 0 && tmpWorkTime <= IBranchAndBoundHelper.MAX_TIME_WITH_WORKING)
+                {
+                    var chosenJob = jobsToDo[0];
+                    if (chosenJob.Profit > 0)
+                    {
+                        chosenJobs.Add(chosenJob);
+                        tmpWorkTime += chosenJob.TimeOfExecution;
+                    }
+                    
+                    jobsToDo.RemoveAt(0);
+                }
+
+                return chosenJobs.Count == 0 ? currentValue : CalculateValueOfHightLimes(done.Concat(chosenJobs).ToList());
+            }
         }
     }
 }

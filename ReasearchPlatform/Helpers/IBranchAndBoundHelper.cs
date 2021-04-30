@@ -12,5 +12,6 @@ namespace ResearchPlatform.Helpers
         public double CalculateValueOfGoalFunction(List<JobToProceed> done);
         public bool AreAllConstraintsSatisfied(Node currNode, JobToProceed currentJob, List<JobToProceed> done, 
             int workTime, int drivenTime, int wholeDrivenTime);
+        public double GetMaxPossibleValue(List<JobToProceed> done, List<JobToProceed> restPossibleJobs, double currentValue, double workTime);
     }
 }

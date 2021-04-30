@@ -237,7 +237,7 @@
                                                             HorizontalAlignment="Stretch" Width="100" Height="100"/>
                     <lvc:CartesianChart Grid.Row="0" x:Name="RankGraph" Series="{Binding Series}" LegendLocation="Right" Visibility="{Binding ShowResults, Converter={StaticResource BoolToHiddenConverter}}">
                         <lvc:CartesianChart.AxisX>
-                            <lvc:Axis Title="Algorithms" Labels="{Binding Labels}">
+                            <lvc:Axis Title="Algorithms" Labels="{Binding Labels, Mode=TwoWay}">
                                 <lvc:Axis.Separator>
                                     <lvc:Separator Step="1" />
                                 </lvc:Axis.Separator>

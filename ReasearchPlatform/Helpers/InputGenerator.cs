@@ -64,6 +64,7 @@ namespace ResearchPlatform.Helpers
         public InputGenerator GenerateJobs(Models.Input input, int numberOfJobs)
         {
             Input = input;
+            var maxPossibleDistance = Input.DistanceMatrix.Select(d => d.DistanceInMeters).Max();
             var currentJobs = input.Jobs.Count == 0 ? 1 : input.Jobs.Count + 1;
             for (int i = currentJobs; i < currentJobs + numberOfJobs; i++)
             {
@@ -72,8 +73,6 @@ namespace ResearchPlatform.Helpers
 
                 var distance = Input.DistanceMatrix.Find(distance => (distance.From.Equals(from) && distance.To.Equals(to)) 
                     || (distance.To.Equals(from) && distance.From.Equals(to)));
-
-                var maxPossibleDistance = Input.DistanceMatrix.Select(d => d.DistanceInMeters).Max();
 
                 if (distance == null)
                 {
@@ -94,7 +93,7 @@ namespace ResearchPlatform.Helpers
                     ID = i,
                     From = from,
                     To = to,
-                    Price = (distance.DistanceInMeters / 1000) * (MIN_PRISE_FOR_KM_FOR_JOB + _random.NextDouble() * MAX_PRISE_FOR_KM_FOR_JOB),
+                    Price = ((distance.DistanceInMeters + maxPossibleDistance) / 1000) * (MIN_PRISE_FOR_KM_FOR_JOB + _random.NextDouble() * MAX_PRISE_FOR_KM_FOR_JOB),
                     LoadingTime = loadingTime,
                     Pickup = Tuple.Create(pickupStart, pickupEnd),
                     Delivery = Tuple.Create(deliveryStart, (int)(pickupEnd + distance.DurationInSeconds / 60)),

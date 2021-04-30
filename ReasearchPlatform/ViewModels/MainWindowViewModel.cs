@@ -159,6 +159,7 @@ namespace ResearchPlatform.ViewModels
 
             Series = new SeriesCollection();
             ShowResults = false;
+            Labels = new List<string>();
         }
         public Func<double, string> Formatter { get; set; }
         public SeriesCollection Series { get; set; }
@@ -197,11 +198,11 @@ namespace ResearchPlatform.ViewModels
                     case "Nodes":
                         AxisYName = "Visited nodes";
                         StepSize = double.NaN;
-                        MinYValue = double.NaN;
+                        MinYValue = 0;
 
                         Series.Add(new LiveCharts.Wpf.StackedColumnSeries
                         {
-                            Title = "Nodes",
+                            Title = "Percentage of visited nodes",
                             Values = _allResDict.Select(r => r.Value.VisitedNodes).AsChartValues(),
                             StackMode = StackMode.Values,
                             DataLabels = true,
@@ -224,8 +225,9 @@ namespace ResearchPlatform.ViewModels
                         break;
                 }
 
-                Labels = _allResDict.Select(r => r.Key).ToList();
-            
+                Labels.Clear();
+
+                _allResDict.Select(r => r.Key).ToList().ForEach(k => Labels.Add(k));
             });
         }
 

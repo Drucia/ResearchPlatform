@@ -58,9 +58,9 @@ namespace ResearchPlatform.Models
         public int TrackWidth { get; set; } = 800;
         public int TrackDepth { get; set; } = 200;
         public int MaxLoadCapacity { get; set; } = 2000;
-        public double AvgFuelConsumption { get; set; } = 6.5;
+        public double AvgFuelConsumption { get; set; } = 5.0;
         public double FuelCost { get; set; } = 4.0;
-        public double CostOfMaintain { get; set; } = 1.5;
+        public double CostOfMaintain { get; set; } = 0.5;
         public string Postcode { get; set; } = "58-400";
 
         public double TypeOfLoadingMultipler { get; set; } = 0.4;

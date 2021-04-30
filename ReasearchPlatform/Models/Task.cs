@@ -49,24 +49,32 @@ namespace ResearchPlatform.Models
                     var res = new BestResult();
                     var times = new List<long>();
                     var counter = 0;
+                    var turnOffApprox = false;
 
                     while (counter < NUMBER_OF_REPEAT_ALG)
                     {
                         var watch = System.Diagnostics.Stopwatch.StartNew();
-                        res = bAb.Run(alg);
+                        res = bAb.Run(alg, turnOffApprox);
                         watch.Stop();
                         times.Add(watch.ElapsedMilliseconds);
 
                         counter++;
                     }
-                    
+
+                    turnOffApprox = true;
+
+                    var w = System.Diagnostics.Stopwatch.StartNew();
+                    var resWithoutApp = bAb.Run(alg, turnOffApprox);
+                    w.Stop();
+
                     _results.Add(alg, new Result() { 
                         Jobs = res.ChosenJobs, 
                         Breaks = res.Breaks, 
                         Duration = (long) times.Average(),
                         CriteriaDuration = criteriaWatch.ElapsedMilliseconds,
-                        VisitedNodes = res.VisitedNodes,
-                        AmountOfJobs = _jobsToProceed.Count
+                        VisitedNodes = Math.Round((double) res.VisitedNodes / resWithoutApp.VisitedNodes, 2),
+                        AmountOfJobs = _jobsToProceed.Count,
+                        Value = res.Value
                     });
                 }
             }

@@ -14,6 +14,7 @@ namespace ResearchPlatform.Algorithms
             public List<JobToProceed> ChosenJobs { get; set; }
             public List<Break> Breaks { get; set; }
             public int VisitedNodes { get; set; }
+            public double Prox { get; set; }
         }
 
         // input
@@ -36,11 +37,11 @@ namespace ResearchPlatform.Algorithms
             _jobsToProceed = new List<JobToProceed>(jobs);
         }
 
-        public BestResult Run(SearchTreeAlgorithm searchTreeAlgorithm)
+        public BestResult Run(SearchTreeAlgorithm searchTreeAlgorithm, bool turnOffApprox)
         {
             switch (searchTreeAlgorithm)
             {
-                case SearchTreeAlgorithm.DFS: return RunWithDFS();
+                case SearchTreeAlgorithm.DFS: return RunWithDFS(turnOffApprox);
                 case SearchTreeAlgorithm.BFS:
                     break;
                 case SearchTreeAlgorithm.Heuristic:
@@ -52,13 +53,13 @@ namespace ResearchPlatform.Algorithms
             return new BestResult();
         }
 
-        private BestResult RunWithDFS()
+        private BestResult RunWithDFS(bool turnOffApprox)
         {
             // sort jobs
             _jobsToProceed.Sort((left, right) => (int)((right.Utility - left.Utility) * 100));
 
             var currentNode = _base;
-            _best = new BestResult(){ Value = double.NegativeInfinity, ChosenJobs = new List<JobToProceed>()};
+            _best = new BestResult(){ Value = 0.0, ChosenJobs = new List<JobToProceed>()};
             var dummyJob = new JobToProceed() { 
                 From = _base, 
                 To = _base,
@@ -67,7 +68,7 @@ namespace ResearchPlatform.Algorithms
             };
 
             DFSRec(currentNode, dummyJob, new List<JobToProceed>(), new List<Break>(),
-                _jobsToProceed, 0, 0, 0);
+                _jobsToProceed, 0, 0, 0, turnOffApprox);
 
             _best.VisitedNodes = _visitedNodes;
 
@@ -79,42 +80,58 @@ namespace ResearchPlatform.Algorithms
         }
 
         private void DFSRec(Node currNode, JobToProceed currentJob, List<JobToProceed> done, List<Break> breaks,
-            List<JobToProceed> all, int workTime, int drivenTime, int wholeDrivenTime)
+            List<JobToProceed> all, int workTime, int drivenTime, int wholeDrivenTime, bool turnOffApprox)
         {
             _visitedNodes++;
 
             var currentValue = _helper.CalculateValueOfGoalFunction(done);
+            var prox = _helper.GetMaxPossibleValue(done, GetRestJobsToDo(done, all, workTime), currentValue, workTime);
 
-            if (_helper.AreAllConstraintsSatisfied(currNode, currentJob, done, workTime, drivenTime, wholeDrivenTime))
+            if (_best.Value <= prox || turnOffApprox)
             {
-                done.Add(currentJob);
-                currNode = ExecuteJob(done, out int wT, out int dT, out int wholeDT, breaks);
-
-                var allPossible = GetPossibleJobsToDo(all, done, currNode, wT);
-                foreach (var job in allPossible)
+                if (_helper.AreAllConstraintsSatisfied(currNode, currentJob, done, workTime, drivenTime, wholeDrivenTime))
                 {
-                    DFSRec(currNode, job, new List<JobToProceed>(done), new List<Break>(breaks), all, wT, dT, wholeDT);
+                    done.Add(currentJob);
+                    currNode = ExecuteJob(done, out int wT, out int dT, out int wholeDT, breaks);
+
+                    var allPossible = GetPossibleJobsToDo(all, done, currNode, wT);
+                    foreach (var job in allPossible)
+                    {
+                        DFSRec(currNode, job, new List<JobToProceed>(done), new List<Break>(breaks), all, wT, dT, wholeDT, turnOffApprox);
+                    }
+
+                    currentValue = _helper.CalculateValueOfGoalFunction(done);
+
+                    // leaf
+                    if (allPossible.Count == 0 && _best.Value <= currentValue)
+                        ChangeBestResult(currentValue, new List<JobToProceed>(done), breaks, prox);
                 }
-
-                currentValue = _helper.CalculateValueOfGoalFunction(done);
-
-                // leaf
-                if (allPossible.Count == 0 && _best.Value <= currentValue)
-                    ChangeBestResult(currentValue, new List<JobToProceed>(done), breaks);
+                else
+                {
+                    // cut tree
+                    if (_best.Value <= currentValue)
+                        ChangeBestResult(currentValue, new List<JobToProceed>(done), breaks, prox);
+                }
             }
             else
             {
                 // cut tree
-                if (_best.Value <= currentValue)                
-                    ChangeBestResult(currentValue, new List<JobToProceed>(done), breaks);
+                if (_best.Value <= currentValue)
+                    ChangeBestResult(currentValue, new List<JobToProceed>(done), breaks, prox);
             }
         }
 
-        private void ChangeBestResult(double currentValue, List<JobToProceed> done, List<Break> breaks)
+        private List<JobToProceed> GetRestJobsToDo(List<JobToProceed> done, List<JobToProceed> all, double currWorkTime)
+        {
+            return all.Where(j => !done.Contains(j) && currWorkTime <= j.Pickup.Item2).ToList();
+        }
+
+        private void ChangeBestResult(double currentValue, List<JobToProceed> done, List<Break> breaks, double prox)
         {
             _best.Value = currentValue;
             _best.ChosenJobs = done;
             _best.Breaks = breaks;
+            _best.Prox = prox;
         }
 
         private Node ExecuteJob(List<JobToProceed> done, out int wT, out int dT, out int wholeDT, List<Break> breaks)
