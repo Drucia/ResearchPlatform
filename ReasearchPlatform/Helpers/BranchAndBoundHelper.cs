@@ -98,8 +98,9 @@ namespace ResearchPlatform.Helpers
             var chosenUtilitySum = chosen.Sum(j => j.Utility);
             var avgProfit = chosen.Sum(c => c.Profit) / chosen.Sum(c => c.Price);
             var avgUtility = chosenUtilitySum / chosen.Count;
+            var time = chosen.Sum(c => c.TimeOfExecution) / IBranchAndBoundHelper.MAX_TIME_WITH_WORKING;
 
-            var res = _weights[0] * avgUtility + _weights[1] * avgProfit;
+            var res = _weights[0] * avgUtility + _weights[1] * avgProfit - _weights[2] * time;
 
             return res;
         }
@@ -141,8 +142,8 @@ namespace ResearchPlatform.Helpers
             {
                 var jobsToDo = new List<JobToProceed>(restPossibleJobs);
                 jobsToDo.Sort((left, right) => (int) ((
-                _weights[1] * (right.Profit / maxPrice) + _weights[0] * right.Utility // right
-                    - _weights[1] * (left.Profit / maxPrice) - _weights[0] * left.Utility // left
+                _weights[1] * (right.Profit / maxPrice) + _weights[0] * right.Utility - _weights[2] * (right.TimeOfExecution / IBranchAndBoundHelper.MAX_TIME_WITH_DRIVING) // right
+                    - _weights[1] * (left.Profit / maxPrice) - _weights[0] * left.Utility + _weights[2] * (left.TimeOfExecution / IBranchAndBoundHelper.MAX_TIME_WITH_DRIVING) // left
                     ) * 1000));
                 var tmpWorkTime = workTime;
                 var chosenJobs = new List<JobToProceed>();
@@ -150,11 +151,8 @@ namespace ResearchPlatform.Helpers
                 while(jobsToDo.Count > 0 && tmpWorkTime <= IBranchAndBoundHelper.MAX_TIME_WITH_WORKING)
                 {
                     var chosenJob = jobsToDo[0];
-                    if (chosenJob.Profit > 0)
-                    {
-                        chosenJobs.Add(chosenJob);
-                        tmpWorkTime += chosenJob.TimeOfExecution;
-                    }
+                    chosenJobs.Add(chosenJob);
+                    tmpWorkTime += chosenJob.TimeOfExecution;
                     
                     jobsToDo.RemoveAt(0);
                 }

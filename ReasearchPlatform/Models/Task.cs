@@ -40,8 +40,7 @@ namespace ResearchPlatform.Models
             criteriaWatch.Stop();
 
             var jobsWithUtility = _criteriaBuilder.GetJobsWithCalculatedUtility();
-
-            var bAb = new BranchAndBound(_input.Base, _distanceManager, jobsWithUtility, _branchAndBoundHelper);
+            var bAndb = new BranchAndBound(_input.Base, _distanceManager, jobsWithUtility, _branchAndBoundHelper);
 
             foreach (SearchTreeAlgorithm alg in Enum.GetValues(typeof(SearchTreeAlgorithm)))
             {
@@ -55,7 +54,7 @@ namespace ResearchPlatform.Models
                     while (counter < NUMBER_OF_REPEAT_ALG)
                     {
                         var watch = Stopwatch.StartNew();
-                        res = bAb.Run(alg, turnOffApprox);
+                        res = bAndb.Run(alg, turnOffApprox);
                         watch.Stop();
                         times.Add(watch.ElapsedMilliseconds);
 
@@ -65,11 +64,11 @@ namespace ResearchPlatform.Models
                     turnOffApprox = true;
 
                     var w = Stopwatch.StartNew();
-                    var resWithoutApp = bAb.Run(alg, turnOffApprox);
+                    var resWithoutApp = bAndb.Run(alg, turnOffApprox);
                     w.Stop();
 
-                    Debug.Assert(res.ChosenJobs.All(j => resWithoutApp.ChosenJobs.Contains(j)), "Mismatch in algorithm with approx and without approx!!");
-                    Debug.Assert(resWithoutApp.ChosenJobs.All(j => res.ChosenJobs.Contains(j)), "Mismatch in algorithm with approx and without approx!!");
+                    //Debug.Assert(res.ChosenJobs.All(j => resWithoutApp.ChosenJobs.Contains(j)), "Mismatch in algorithm with approx and without approx!!");
+                    //Debug.Assert(resWithoutApp.ChosenJobs.All(j => res.ChosenJobs.Contains(j)), "Mismatch in algorithm with approx and without approx!!");
 
                     _results.Add(alg, new Result() { 
                         Jobs = res.ChosenJobs, 

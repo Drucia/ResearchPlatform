@@ -9,7 +9,6 @@ namespace ResearchPlatform.Models
     public enum SearchTreeAlgorithm
     {
         DFS,
-        BFS,
         Heuristic,
         Random
     }

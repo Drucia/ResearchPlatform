@@ -25,7 +25,7 @@ namespace ResearchPlatform.Algorithms
         private BestResult _best;
 
         // processing
-        private readonly List<JobToProceed> _jobsToProceed;
+        private List<JobToProceed> _jobsToProceed;
 
         public BranchAndBound(Node startNode, IDistancesManager distances,
             List<JobToProceed> jobs, IBranchAndBoundHelper helper)
@@ -39,18 +39,42 @@ namespace ResearchPlatform.Algorithms
 
         public BestResult Run(SearchTreeAlgorithm searchTreeAlgorithm, bool turnOffApprox)
         {
+            _visitedNodes = 0;
+            _best = new BestResult();
+
             switch (searchTreeAlgorithm)
             {
                 case SearchTreeAlgorithm.DFS: return RunWithDFS(turnOffApprox);
-                case SearchTreeAlgorithm.BFS:
-                    break;
-                case SearchTreeAlgorithm.Heuristic:
-                    break;
-                case SearchTreeAlgorithm.Random:
-                    break;
+                case SearchTreeAlgorithm.Heuristic: return RunWithHeuristic(turnOffApprox);
+                case SearchTreeAlgorithm.Random: return RunWithRandom(turnOffApprox);
             }
 
-            return new BestResult();
+            return _best;
+        }
+
+        private BestResult RunWithHeuristic(bool turnOffApprox)
+        {
+            // sort jobs according to heuristic
+            _jobsToProceed.Sort((left, right) => (int)((right.Profit / right.TimeOfExecution - left.Profit / left.TimeOfExecution) * 100));
+
+            return PrepareAndRunRec(_jobsToProceed, turnOffApprox);
+        }
+
+        private BestResult RunWithRandom(bool turnOffApprox)
+        {
+            // sort jobs according to random
+            var tmp = new List<JobToProceed>(_jobsToProceed);
+            var random = new Random();
+            var sorted = new List<JobToProceed>();
+
+            while(tmp.Count > 0)
+            {
+                var randomIdx = random.Next(0, tmp.Count);
+                sorted.Add(_jobsToProceed[randomIdx]);
+                tmp.RemoveAt(randomIdx);
+            }
+
+            return PrepareAndRunRec(sorted, turnOffApprox);
         }
 
         private BestResult RunWithDFS(bool turnOffApprox)
@@ -58,17 +82,23 @@ namespace ResearchPlatform.Algorithms
             // sort jobs
             _jobsToProceed.Sort((left, right) => (int)((right.Utility - left.Utility) * 100));
 
+            return PrepareAndRunRec(_jobsToProceed, turnOffApprox);
+        }
+
+        private BestResult PrepareAndRunRec(List<JobToProceed> sorted, bool turnOffApprox)
+        {
             var currentNode = _base;
-            _best = new BestResult(){ Value = 0.0, ChosenJobs = new List<JobToProceed>()};
-            var dummyJob = new JobToProceed() { 
-                From = _base, 
+            _best = new BestResult() { Value = 0.0, ChosenJobs = new List<JobToProceed>() };
+            var dummyJob = new JobToProceed()
+            {
+                From = _base,
                 To = _base,
                 Pickup = Tuple.Create(0, IBranchAndBoundHelper.MAX_TIME_WITH_WORKING),
                 Delivery = Tuple.Create(0, IBranchAndBoundHelper.MAX_TIME_WITH_WORKING)
             };
 
             DFSRec(currentNode, dummyJob, new List<JobToProceed>(), new List<Break>(),
-                _jobsToProceed, 0, 0, 0, turnOffApprox);
+                sorted, 0, 0, 0, turnOffApprox);
 
             _best.VisitedNodes = _visitedNodes;
 
@@ -81,10 +111,10 @@ namespace ResearchPlatform.Algorithms
             _visitedNodes++;
 
             var currentValue = _helper.CalculateValueOfGoalFunction(done);
-            var maxPrice = all.Count > 0 ? all.Max(j => j.Price) : 0;
+            var maxPrice = all.Count > 0 ? all.Max(j => j.Price) : 1;
             var prox = _helper.GetMaxPossibleValue(done, GetRestJobsToDo(done, all, workTime), currentValue, workTime, maxPrice);
 
-            if (_best.Value <= prox || turnOffApprox)
+            if (turnOffApprox || _best.Value <= prox)
             {
                 if (_helper.AreAllConstraintsSatisfied(currNode, currentJob, done, workTime, drivenTime, wholeDrivenTime))
                 {
