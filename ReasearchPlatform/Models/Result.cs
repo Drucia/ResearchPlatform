@@ -11,5 +11,6 @@ namespace ResearchPlatform.Models
         public int AmountOfJobs { get; set; }
         public long CriteriaDuration { get; set; }
         public double Value { get; set; }
+        public int DrivenTime { get; set; }
     }
 }

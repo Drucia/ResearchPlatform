@@ -39,6 +39,7 @@ namespace ResearchPlatform.ViewModels
         private string _axisYName;
         private double _stepSize;
         private double _minYValue;
+        private int _drivenTimeResults;
 
         public Configuration Configuration
         {
@@ -88,6 +89,7 @@ namespace ResearchPlatform.ViewModels
             {
                 JobResults = _allResDict[selectedAlgorithmResult].Jobs.Cast<Job>().ToList();
                 BreaksResults = _allResDict[selectedAlgorithmResult].Breaks;
+                DrivenTimeResults = _allResDict[selectedAlgorithmResult].DrivenTime;
             }
         }
 
@@ -95,6 +97,12 @@ namespace ResearchPlatform.ViewModels
         {
             get => _showResults;
             set => SetProperty(ref _showResults, value);
+        }
+
+        public int DrivenTimeResults
+        {
+            get => _drivenTimeResults;
+            set => SetProperty(ref _drivenTimeResults, value);
         }
 
         public List<Job> JobResults
@@ -108,7 +116,6 @@ namespace ResearchPlatform.ViewModels
             get => _breaksResults;
             set => SetProperty(ref _breaksResults, value);
         }
-
         public string AxisYName
         {
             get => _axisYName;
@@ -196,7 +203,7 @@ namespace ResearchPlatform.ViewModels
                         });
                         break;
                     case "Nodes":
-                        AxisYName = "Visited nodes";
+                        AxisYName = "Visited nodes [%]";
                         StepSize = double.NaN;
                         MinYValue = 0;
 

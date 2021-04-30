@@ -69,11 +69,12 @@ namespace ResearchPlatform.Algorithms
             var maxTime = _decisionMatrix.Max(j => j.TimeOfExecution);
 
             _decisionMatrix.ForEach(job => {
-                job.Profit = (job.Profit - minProfit) / (maxProfit - minProfit);
-                job.PossibilityOfNextJobs = (job.PossibilityOfNextJobs - minPossibility) / (maxPossibility - minPossibility);
-                job.ComfortOfWork = (job.ComfortOfWork - minComfort) / (maxComfort - minComfort);
-                job.Reliability = (job.Reliability - minReliability) / (maxReliability - minReliability);
-                job.TimeOfExecution = (maxTime - job.TimeOfExecution) / (maxTime - minTime);
+                job.Profit = ((maxProfit - minProfit) == 0 ? 0 : ((job.Profit - minProfit) / (maxProfit - minProfit)));
+                job.PossibilityOfNextJobs = ((maxPossibility - minPossibility) == 0 ? 0 
+                    : ((job.PossibilityOfNextJobs - minPossibility) / (maxPossibility - minPossibility)));
+                job.ComfortOfWork = ((maxComfort - minComfort) == 0 ? 0 : ((job.ComfortOfWork - minComfort) / (maxComfort - minComfort)));
+                job.Reliability = ((maxReliability - minReliability) == 0 ? 0 : ((job.Reliability - minReliability) / (maxReliability - minReliability)));
+                job.TimeOfExecution = ((maxTime - minTime) == 0 ? 0 : ((maxTime - job.TimeOfExecution) / (maxTime - minTime)));
             });
 
             return this;

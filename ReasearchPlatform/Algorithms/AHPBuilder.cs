@@ -141,11 +141,11 @@ namespace ResearchPlatform.Algorithms
 
             _jobs.ForEach(job => {
                 job.Utility =
-                    _weights[(int)Criteria.Profit] * ((job.Profit + Math.Abs(minProfit < 0 ? minProfit : 0)) / maxProfit) +
-                    _weights[(int)Criteria.DrivingTime] * (minTimeOfExec / job.TimeOfExecution) +
-                    _weights[(int)Criteria.CustomerReliability] * (job.ClientOpinion / maxClientOpinion) +
-                    _weights[(int)Criteria.CompletedJobs] * (job.PossibilityOfNextJobs / maxPossOfNextJobs) +
-                    _weights[(int)Criteria.ComfortOfWork] * (job.ComfortOfWork / maxComfortOfWork);
+                    (maxProfit == 0 ? 0 : (_weights[(int)Criteria.Profit] * ((job.Profit + Math.Abs(minProfit < 0 ? minProfit : 0)) / maxProfit))) +
+                    (job.TimeOfExecution == 0 ? 0 : (_weights[(int)Criteria.DrivingTime] * (minTimeOfExec / job.TimeOfExecution))) +
+                    (maxClientOpinion == 0 ? 0 : (_weights[(int)Criteria.CustomerReliability] * (job.ClientOpinion / maxClientOpinion))) +
+                    (maxPossOfNextJobs == 0 ? 0 : (_weights[(int)Criteria.CompletedJobs] * (job.PossibilityOfNextJobs / maxPossOfNextJobs))) +
+                    (maxComfortOfWork  == 0 ? 0 : (_weights[(int)Criteria.ComfortOfWork] * (job.ComfortOfWork / maxComfortOfWork)));
             });
 
             return _jobs;

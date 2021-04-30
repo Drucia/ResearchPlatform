@@ -10,14 +10,12 @@ namespace ResearchPlatform.Helpers
         private readonly DistancesManager _manager;
         private readonly List<double> _weights;
         private readonly Configuration _configuration;
-        private readonly Node _base;
 
-        public BranchAndBoundHelper(DistancesManager distancesManager, IEnumerable<int> weights, Configuration configuration, Node base_)
+        public BranchAndBoundHelper(DistancesManager distancesManager, IEnumerable<int> weights, Configuration configuration)
         {
             _manager = distancesManager;
             _weights = weights.Select(w => w / 100.0).ToList();
             _configuration = configuration;
-            _base = base_;
         }
 
         public bool AreAllConstraintsSatisfied(Node currNode, JobToProceed currentJob, List<JobToProceed> done, 
@@ -97,30 +95,8 @@ namespace ResearchPlatform.Helpers
 
         private double CalculateValueOfHightLimes(List<JobToProceed> chosen)
         {
-            // for done
-            //var realProfitSum = 0.0;
-            //var realTimeSum = 0.0;
-            //var utilitySum = 0.0;
-
-            //var realProfitSum = done.Sum(d => d.Profit);
-            //var realTimeSum = done.Sum(d => d.TimeOfExecution);
-            //var utilitySum = done.Sum(job => job.Utility);
-
-            //if (done.Count > 1)
-            //{
-            //    var profitAndTime = CalculateRealProfitAndDrive(done);
-
-            //    realProfitSum = profitAndTime.Item1;
-            //    realTimeSum = profitAndTime.Item2;
-            //    utilitySum = done.Sum(job => job.Utility);
-            //}
-
-            // for chosen
-            var chosenProfitSum = CalculateRealProfitAndDrive(chosen);
             var chosenUtilitySum = chosen.Sum(j => j.Utility);
-
-            //var avgProfit = (realProfitSum + chosenProfitSum.Item1) / (done.Sum(d => d.Price) + chosen.Sum(c => c.Price));
-            var avgProfit = chosenProfitSum.Item1 / chosen.Sum(c => c.Price);
+            var avgProfit = chosen.Sum(c => c.Profit) / chosen.Sum(c => c.Price);
             var avgUtility = chosenUtilitySum / chosen.Count;
 
             var res = _weights[0] * avgUtility + _weights[1] * avgProfit;
@@ -157,14 +133,13 @@ namespace ResearchPlatform.Helpers
             return profit.Item1;
         }
 
-        public double GetMaxPossibleValue(List<JobToProceed> done, List<JobToProceed> restPossibleJobs, double currentValue, double workTime)
+        public double GetMaxPossibleValue(List<JobToProceed> done, List<JobToProceed> restPossibleJobs, double currentValue, double workTime, double maxPrice)
         {
             if (restPossibleJobs.Count == 0)
                 return currentValue;
             else
             {
                 var jobsToDo = new List<JobToProceed>(restPossibleJobs);
-                var maxPrice = jobsToDo.Max(j => j.Price);
                 jobsToDo.Sort((left, right) => (int) ((
                 _weights[1] * (right.Profit / maxPrice) + _weights[0] * right.Utility // right
                     - _weights[1] * (left.Profit / maxPrice) - _weights[0] * left.Utility // left
@@ -182,6 +157,11 @@ namespace ResearchPlatform.Helpers
                     }
                     
                     jobsToDo.RemoveAt(0);
+                }
+
+                if (chosenJobs.Count > 0)
+                {
+                    var prox = CalculateValueOfHightLimes(done.Concat(chosenJobs).ToList());
                 }
 
                 return chosenJobs.Count == 0 ? currentValue : CalculateValueOfHightLimes(done.Concat(chosenJobs).ToList());

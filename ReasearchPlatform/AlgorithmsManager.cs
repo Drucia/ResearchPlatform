@@ -19,7 +19,7 @@ namespace ResearchPlatform
         {
             var algorithmsMatrix = configuration.AlgorithmsMatrix;
             var distanceManager = new DistancesManager(input.DistanceMatrix);
-            var branchAndBoundHelper = new BranchAndBoundHelper(distanceManager, configuration.GoalFunctionWeights, configuration, input.Base);
+            var branchAndBoundHelper = new BranchAndBoundHelper(distanceManager, configuration.GoalFunctionWeights, configuration);
             var jobsToProceed = input.Jobs.Select(j => new JobToProceed(j)).ToList();
 
             CriteriaCalculator.CalculateCriteria(

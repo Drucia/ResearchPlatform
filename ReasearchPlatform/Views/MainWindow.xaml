@@ -191,8 +191,8 @@
                     <RowDefinition/>
                 </Grid.RowDefinitions>
                 <DockPanel Grid.Row="0">
-                    <Label Content="Liczba zadań: "/>
-                    <Label Content="{Binding Input.Jobs.Count}"/>
+                    <Label Content="Base: "/>
+                    <Label Content="{Binding Input.Base.Name}"/>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                         <Button Margin="0,0,10,5" Command="{Binding RefreshFileListCommand}" Background="{x:Null}" BorderBrush="{x:Null}">
                             <iconPacks:PackIconFontAwesome Kind="SyncAltSolid"
@@ -277,14 +277,16 @@
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition MaxHeight="30"/>
-                        <RowDefinition/>
-                        <RowDefinition/>
+                        <RowDefinition Height="3*"/>
+                        <RowDefinition Height="2*"/>
                     </Grid.RowDefinitions>
                     <iconPacks:PackIconFontAwesome Visibility="{Binding ShowResults, Converter={StaticResource FalseToVisibleConverter}}" Grid.RowSpan="3" Kind="TableSolid"
                                                             VerticalAlignment="Stretch"
                                                             HorizontalAlignment="Stretch" Width="100" Height="100"/>
-                    <DockPanel Grid.Row="0" HorizontalAlignment="Right">
-                        <ComboBox ItemsSource="{Binding AlgorithmsResults, Mode=TwoWay}" Visibility="{Binding ShowResults, Converter={StaticResource BoolToHiddenConverter}}" SelectedValue="{Binding SelectedAlgorithmResult, Mode=TwoWay}" MinWidth="150" Margin="0,0,0,5" VerticalAlignment="Center"/>
+                    <DockPanel Grid.Row="0" Visibility="{Binding ShowResults, Converter={StaticResource BoolToHiddenConverter}}">
+                        <Label Content="Sum of driven minutes: " HorizontalAlignment="Left"/>
+                        <Label Content="{Binding DrivenTimeResults}" HorizontalAlignment="Left"/>
+                        <ComboBox ItemsSource="{Binding AlgorithmsResults, Mode=TwoWay}" SelectedValue="{Binding SelectedAlgorithmResult, Mode=TwoWay}" MinWidth="150" Margin="0,0,0,5" VerticalAlignment="Center" HorizontalAlignment="Right"/>
                     </DockPanel>
                     <ListView ItemsSource="{Binding JobResults}" Grid.Row="1" Visibility="{Binding ShowResults, Converter={StaticResource BoolToHiddenConverter}}"
                                       Style="{StaticResource MahApps.Styles.ListView.Virtualized}" ScrollViewer.CanContentScroll="True" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">

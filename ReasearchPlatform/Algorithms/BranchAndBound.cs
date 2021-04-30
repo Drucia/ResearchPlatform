@@ -14,7 +14,7 @@ namespace ResearchPlatform.Algorithms
             public List<JobToProceed> ChosenJobs { get; set; }
             public List<Break> Breaks { get; set; }
             public int VisitedNodes { get; set; }
-            public double Prox { get; set; }
+            public int DrivenTime { get; set; }
         }
 
         // input
@@ -72,10 +72,6 @@ namespace ResearchPlatform.Algorithms
 
             _best.VisitedNodes = _visitedNodes;
 
-            int wT, dT, wholeDT;
-            var breaks = new List<Break>();
-            ExecuteJob(_best.ChosenJobs, out wT, out dT, out wholeDT, breaks);
-
             return _best;
         }
 
@@ -85,7 +81,8 @@ namespace ResearchPlatform.Algorithms
             _visitedNodes++;
 
             var currentValue = _helper.CalculateValueOfGoalFunction(done);
-            var prox = _helper.GetMaxPossibleValue(done, GetRestJobsToDo(done, all, workTime), currentValue, workTime);
+            var maxPrice = all.Max(j => j.Price);
+            var prox = _helper.GetMaxPossibleValue(done, GetRestJobsToDo(done, all, workTime), currentValue, workTime, maxPrice);
 
             if (_best.Value <= prox || turnOffApprox)
             {
@@ -104,20 +101,20 @@ namespace ResearchPlatform.Algorithms
 
                     // leaf
                     if (allPossible.Count == 0 && _best.Value <= currentValue)
-                        ChangeBestResult(currentValue, new List<JobToProceed>(done), breaks, prox);
+                        ChangeBestResult(currentValue, new List<JobToProceed>(done), breaks, wholeDT);
                 }
                 else
                 {
                     // cut tree
                     if (_best.Value <= currentValue)
-                        ChangeBestResult(currentValue, new List<JobToProceed>(done), breaks, prox);
+                        ChangeBestResult(currentValue, new List<JobToProceed>(done), breaks, wholeDrivenTime);
                 }
             }
             else
             {
                 // cut tree
                 if (_best.Value <= currentValue)
-                    ChangeBestResult(currentValue, new List<JobToProceed>(done), breaks, prox);
+                    ChangeBestResult(currentValue, new List<JobToProceed>(done), breaks, wholeDrivenTime);
             }
         }
 
@@ -126,12 +123,12 @@ namespace ResearchPlatform.Algorithms
             return all.Where(j => !done.Contains(j) && currWorkTime <= j.Pickup.Item2).ToList();
         }
 
-        private void ChangeBestResult(double currentValue, List<JobToProceed> done, List<Break> breaks, double prox)
+        private void ChangeBestResult(double currentValue, List<JobToProceed> done, List<Break> breaks, int wholeDT)
         {
             _best.Value = currentValue;
             _best.ChosenJobs = done;
             _best.Breaks = breaks;
-            _best.Prox = prox;
+            _best.DrivenTime = wholeDT;
         }
 
         private Node ExecuteJob(List<JobToProceed> done, out int wT, out int dT, out int wholeDT, List<Break> breaks)

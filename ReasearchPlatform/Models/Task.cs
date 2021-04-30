@@ -2,6 +2,7 @@
 using ResearchPlatform.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using static ResearchPlatform.Algorithms.BranchAndBound;
 
@@ -53,7 +54,7 @@ namespace ResearchPlatform.Models
 
                     while (counter < NUMBER_OF_REPEAT_ALG)
                     {
-                        var watch = System.Diagnostics.Stopwatch.StartNew();
+                        var watch = Stopwatch.StartNew();
                         res = bAb.Run(alg, turnOffApprox);
                         watch.Stop();
                         times.Add(watch.ElapsedMilliseconds);
@@ -63,9 +64,12 @@ namespace ResearchPlatform.Models
 
                     turnOffApprox = true;
 
-                    var w = System.Diagnostics.Stopwatch.StartNew();
+                    var w = Stopwatch.StartNew();
                     var resWithoutApp = bAb.Run(alg, turnOffApprox);
                     w.Stop();
+
+                    Debug.Assert(res.ChosenJobs.All(j => resWithoutApp.ChosenJobs.Contains(j)), "Mismatch in algorithm with approx and without approx!!");
+                    Debug.Assert(resWithoutApp.ChosenJobs.All(j => res.ChosenJobs.Contains(j)), "Mismatch in algorithm with approx and without approx!!");
 
                     _results.Add(alg, new Result() { 
                         Jobs = res.ChosenJobs, 
@@ -74,7 +78,8 @@ namespace ResearchPlatform.Models
                         CriteriaDuration = criteriaWatch.ElapsedMilliseconds,
                         VisitedNodes = Math.Round((double) res.VisitedNodes / resWithoutApp.VisitedNodes, 2),
                         AmountOfJobs = _jobsToProceed.Count,
-                        Value = res.Value
+                        Value = res.Value,
+                        DrivenTime = res.DrivenTime
                     });
                 }
             }
