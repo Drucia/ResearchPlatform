@@ -80,7 +80,7 @@ namespace ResearchPlatform.Algorithms
         private BestResult RunWithDFS(bool turnOffApprox)
         {
             // sort jobs
-            _jobsToProceed.Sort((left, right) => (int)((right.Utility - left.Utility) * 100));
+            //_jobsToProceed.Sort((left, right) => (int)((right.Utility - left.Utility) * 100));
 
             return PrepareAndRunRec(_jobsToProceed, turnOffApprox);
         }
@@ -114,7 +114,7 @@ namespace ResearchPlatform.Algorithms
             var maxPrice = all.Count > 0 ? all.Max(j => j.Price) : 1;
             var prox = _helper.GetMaxPossibleValue(done, GetRestJobsToDo(done, all, workTime), currentValue, workTime, maxPrice);
 
-            if (turnOffApprox || _best.Value <= prox)
+            if (turnOffApprox || _best.Value < prox)
             {
                 if (_helper.AreAllConstraintsSatisfied(currNode, currentJob, done, workTime, drivenTime, wholeDrivenTime))
                 {
@@ -130,20 +130,20 @@ namespace ResearchPlatform.Algorithms
                     currentValue = _helper.CalculateValueOfGoalFunction(done);
 
                     // leaf
-                    if (allPossible.Count == 0 && _best.Value <= currentValue)
+                    if (allPossible.Count == 0 && _best.Value < currentValue)
                         ChangeBestResult(currentValue, new List<JobToProceed>(done), breaks, wholeDT);
                 }
                 else
                 {
                     // cut tree
-                    if (_best.Value <= currentValue)
+                    if (_best.Value < currentValue)
                         ChangeBestResult(currentValue, new List<JobToProceed>(done), breaks, wholeDrivenTime);
                 }
             }
             else
             {
                 // cut tree
-                if (_best.Value <= currentValue)
+                if (_best.Value < currentValue)
                     ChangeBestResult(currentValue, new List<JobToProceed>(done), breaks, wholeDrivenTime);
             }
         }

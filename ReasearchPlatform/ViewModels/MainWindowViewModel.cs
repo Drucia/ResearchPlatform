@@ -203,13 +203,13 @@ namespace ResearchPlatform.ViewModels
                         });
                         break;
                     case "Nodes":
-                        AxisYName = "Visited nodes [%]";
+                        AxisYName = "Visited nodes";
                         StepSize = double.NaN;
                         MinYValue = 0;
 
                         Series.Add(new LiveCharts.Wpf.StackedColumnSeries
                         {
-                            Title = "Percentage of visited nodes",
+                            Title = "Visited nodes",
                             Values = _allResDict.Select(r => r.Value.VisitedNodes).AsChartValues(),
                             StackMode = StackMode.Values,
                             DataLabels = true,
