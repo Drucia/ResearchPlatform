@@ -51,7 +51,7 @@ namespace ReasearchPlatformUT
             distanceManagerMock.Setup(manager => manager.GetDistanceBetween(_base, _base))
                 .Returns(GetDistance(_base, _base));
 
-            var res = bAndB.Run(SearchTreeAlgorithm.DFS);
+            var res = bAndB.Run(SearchTreeAlgorithm.DFS, false);
             
             Assert.NotEmpty(res.ChosenJobs);
             Assert.Equal(new List<JobToProceed> { _fakeJob }, res.ChosenJobs);
@@ -93,7 +93,7 @@ namespace ReasearchPlatformUT
                 DurationInSeconds = 16 * 60
             });
 
-            var res = bAndB.Run(SearchTreeAlgorithm.DFS);
+            var res = bAndB.Run(SearchTreeAlgorithm.DFS, false);
 
             Assert.NotEmpty(res.ChosenJobs);
             Assert.Equal(new List<JobToProceed> { _fakeJob, jobsToProceed[0]}, res.ChosenJobs);
@@ -150,7 +150,7 @@ namespace ReasearchPlatformUT
                 Tuple.Create(_Marciszow, _Walbrzych),
             });
 
-            var res = bAndB.Run(SearchTreeAlgorithm.DFS);
+            var res = bAndB.Run(SearchTreeAlgorithm.DFS, false);
 
             Assert.NotEmpty(res.ChosenJobs);
             Assert.Equal(3, res.ChosenJobs.Count);
@@ -208,7 +208,7 @@ namespace ReasearchPlatformUT
                 Tuple.Create(_Marciszow, _Walbrzych),
             });
 
-            var res = bAndB.Run(SearchTreeAlgorithm.DFS);
+            var res = bAndB.Run(SearchTreeAlgorithm.DFS, false);
 
             Assert.NotEmpty(res.ChosenJobs);
             Assert.Equal(3, res.ChosenJobs.Count);
@@ -278,7 +278,7 @@ namespace ReasearchPlatformUT
                 Tuple.Create(_Marciszow, _Walbrzych),
             });
 
-            var res = bAndB.Run(SearchTreeAlgorithm.DFS);
+            var res = bAndB.Run(SearchTreeAlgorithm.DFS, false);
 
             Assert.NotEmpty(res.ChosenJobs);
             Assert.Equal(2, res.ChosenJobs.Count);

@@ -81,7 +81,7 @@ namespace ResearchPlatform.Algorithms
             _visitedNodes++;
 
             var currentValue = _helper.CalculateValueOfGoalFunction(done);
-            var maxPrice = all.Max(j => j.Price);
+            var maxPrice = all.Count > 0 ? all.Max(j => j.Price) : 0;
             var prox = _helper.GetMaxPossibleValue(done, GetRestJobsToDo(done, all, workTime), currentValue, workTime, maxPrice);
 
             if (_best.Value <= prox || turnOffApprox)
