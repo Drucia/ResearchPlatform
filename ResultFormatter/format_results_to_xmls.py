@@ -19,9 +19,9 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 GOAL_FUNCTIONS = {
-    "1": (1, [35, 60, 5]),
-    "2": (77, [15, 80, 5]),
-    "3": (153, [45, 45, 10]),
+    "1": [35, 60, 5],
+    "2": [15, 80, 5],
+    "3": [45, 45, 10],
 }
 
 def get_results_files(location):
@@ -32,33 +32,33 @@ def decode_json(filename):
     with open(filename, 'r', encoding='utf-8-sig') as file:
         return json.load(file)
 
-def process_file(filename, worksheet, workbook):
+def process_file(filename, worksheet, workbook, start_row, goal_fun_factors, print_goal_factors):
     results_per_file = decode_json(filename)
-    splitted = filename.split(".json")[0]
-    number = splitted[len(splitted) - 1]
-    row, goal_fun_factors = GOAL_FUNCTIONS[number]
 
     col = 1
-    
-    goal_function_str = f"Goal function: U - {goal_fun_factors[0]}%, P - {goal_fun_factors[1]}%, T - {goal_fun_factors[1]}%"
-    worksheet.merge_range(f'B{row+1}:D{row+1}', goal_function_str, add_bg_format_with_border(workbook, 'green'))
 
-    row = 3
+    if print_goal_factors:
+        goal_function_str = f"Goal function: U - {goal_fun_factors[0]}%, P - {goal_fun_factors[1]}%, T - {goal_fun_factors[1]}%"
+        worksheet.merge_range(f'B{start_row+1}:D{start_row+1}', goal_function_str, add_bg_format_with_border(workbook, 'green'))
 
-    headers = ['Multi criteria', 'Tree search', 'Amount of jobs', 'Goal function value', 'Utility',
-        'Profit', 'Time', 'Duration of scheduling [ms]', 'Duration of multi criteria [ms]', 'Nodes', 'Breaks']
+        start_row += 2
 
-    for title in headers:
-        worksheet.write(row, col, title, add_bg_format_with_border(workbook, 'yellow'))
-        col += 1
+        headers = ['Multi criteria', 'Tree search', 'Amount of jobs', 'Goal function value', 'Utility',
+            'Profit', 'Time', 'Duration of scheduling [ms]', 'Duration of multi criteria [ms]', 'Nodes', 'Breaks']
 
-    worksheet.merge_range(f'M{row+1}:W{row+1}', 'Solution', add_bg_format_with_border(workbook, 'yellow'))
+        for title in headers:
+            worksheet.write(start_row, col, title, add_bg_format_with_border(workbook, 'yellow'))
+            col += 1
 
-    processing_row = row + 1
+        worksheet.merge_range(f'M{start_row+1}:W{start_row+1}', 'Solution', add_bg_format_with_border(workbook, 'yellow'))
+
+    processing_row = start_row + 1
     
     for result in results_per_file:
         save_results_to_worksheet(result, worksheet, workbook, processing_row)
         processing_row += 6
+
+    return processing_row
 
 def save_results_to_worksheet(result, worksheet, workbook, start_row):
     col = 1
@@ -93,9 +93,20 @@ def process_results(dirname, results_path, workbook):
 
     worksheet = workbook.add_worksheet(dirname)
     results_files = get_results_files(results_path)
+    sorted_results = list(filter(lambda file: file.find("GF1") >= 0, results_files))
+    sorted_results.extend(list(filter(lambda file: file.find("GF2") >= 0, results_files)))
+    sorted_results.extend(list(filter(lambda file: file.find("GF3") >= 0, results_files)))
 
-    for file in tqdm(results_files):
-        process_file(file, worksheet, workbook)
+    processing_row = 0
+    goal_fun_factors = []
+
+    for file in tqdm(sorted_results):
+        splitted = file.split(".json")[0]
+        number = splitted[len(splitted) - 1]
+        new_goal_fun_factors = GOAL_FUNCTIONS[number]
+        processing_row = process_file(file, worksheet, workbook, processing_row, new_goal_fun_factors,
+            goal_fun_factors != new_goal_fun_factors)
+        goal_fun_factors = new_goal_fun_factors
 
 def add_bg_format_with_border(workbook, bg_color):
     format = workbook.add_format({'bg_color': bg_color})
