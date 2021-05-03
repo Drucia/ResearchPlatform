@@ -62,7 +62,6 @@ namespace ResearchPlatform.Models
         public double FuelCost { get; set; } = 4.0;
         public double CostOfMaintain { get; set; } = 0.5;
         public string Postcode { get; set; } = "58-400";
-
         public double TypeOfLoadingMultipler { get; set; } = 0.4;
         public double RiskMultipler { get; set; } = 0.6;
         public static Configuration Create => new Configuration();

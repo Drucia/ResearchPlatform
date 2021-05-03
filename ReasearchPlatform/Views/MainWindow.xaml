@@ -11,7 +11,7 @@
         Dialog:DialogParticipation.Register="{Binding}"
         mc:Ignorable="d"
         xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
-        Title="Research Platform" Height="450" Width="800" WindowState="Maximized"
+        Title="Research Platform" Height="650" Width="900" WindowState="Maximized"
         FocusManager.FocusedElement="{Binding ElementName=RunButton}">
     <mah:MetroWindow.LeftWindowCommands>
         <mah:WindowCommands>
@@ -129,43 +129,44 @@
                             <CheckBox HorizontalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="{Binding Configuration.AlgorithmsMatrix[3][1], UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" Checked="OnCommitMatrixBindingGroup" Unchecked="OnCommitMatrixBindingGroup"/>
                         </Border>-->
                         <Border Grid.Row="4" Grid.Column="2" BorderBrush="Gray" BorderThickness="1,1,1,1" Margin="0,0,0,5">
-                            <CheckBox HorizontalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="{Binding Configuration.AlgorithmsMatrix[3][2], UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" Checked="OnCommitMatrixBindingGroup" Unchecked="OnCommitMatrixBindingGroup"/>
+                            <CheckBox HorizontalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="{Binding Configuration.AlgorithmsMatrix[3][1], UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" Checked="OnCommitMatrixBindingGroup" Unchecked="OnCommitMatrixBindingGroup"/>
                         </Border>
                         <Border Grid.Row="4" Grid.Column="3" BorderBrush="Gray" BorderThickness="1,1,1,1" Margin="0,0,5,5">
-                            <CheckBox HorizontalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="{Binding Configuration.AlgorithmsMatrix[3][3], UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" Checked="OnCommitMatrixBindingGroup" Unchecked="OnCommitMatrixBindingGroup"/>
+                            <CheckBox HorizontalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="{Binding Configuration.AlgorithmsMatrix[3][2], UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" Checked="OnCommitMatrixBindingGroup" Unchecked="OnCommitMatrixBindingGroup"/>
                         </Border>
                     </Grid>
                     <Label Content="Choose weights for goal function:" Margin="10,20,0,5" FontStyle="Italic"/>
-                    <DockPanel>
-                        <Grid x:Name="WeightsGrid" Margin="25,0,0,10" HorizontalAlignment="Left" Validation.ErrorTemplate="{StaticResource MahApps.Templates.ValidationError}">
-                            <Grid.BindingGroup>
-                                <BindingGroup>
-                                    <BindingGroup.ValidationRules>
-                                        <validators:GoalFunctionWeightsValidationRule/>
-                                    </BindingGroup.ValidationRules>
-                                </BindingGroup>
-                            </Grid.BindingGroup>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="55*"/>
-                                <ColumnDefinition Width="35*"/>
-                                <ColumnDefinition Width="50*"/>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
-                            <Label Grid.Row="0" Grid.Column="0" Content="Weight for utility: " HorizontalAlignment="Right" VerticalAlignment="Center" Height="26"/>
-                            <Label Grid.Row="1" Grid.Column="0" Content="Weight for profit: " HorizontalAlignment="Right" VerticalAlignment="Center" Height="26"/>
-                            <Label Grid.Row="2" Grid.Column="0" Content="Weight for time: " HorizontalAlignment="Right" VerticalAlignment="Center" Height="26"/>
-                            <mah:NumericUpDown Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" MinWidth="78" Margin="20,5,0,0" VerticalAlignment="Center" Height="26" Minimum="0" Maximum="100" Width="78" Value="{Binding Configuration.GoalFunctionWeights[0], UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" ValueChanged="OnCommitBindingGroup" />
-                            <mah:NumericUpDown Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" MinWidth="78" Margin="20,5,0,0" VerticalAlignment="Center" Height="26" Minimum="0" Maximum="100" Width="78" Value="{Binding Configuration.GoalFunctionWeights[1], UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" ValueChanged="OnCommitBindingGroup" />
-                            <mah:NumericUpDown Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" MinWidth="78" Margin="20,5,0,0" VerticalAlignment="Center" Height="26" Minimum="0" Maximum="100" Width="78" Value="{Binding Configuration.GoalFunctionWeights[2], UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" ValueChanged="OnCommitBindingGroup" />
-                            <Label Grid.Column="2" Grid.Row="0" Content="%" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,5,0,0" Height="26" Width="20"/>
-                            <Label Grid.Column="2" Grid.Row="1" Content="%" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,5,0,0" Height="26" Width="20"/>
-                            <Label Grid.Column="2" Grid.Row="2" Content="%" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,5,0,0" Height="26" Width="20"/>
-                        </Grid>
-                        <Button x:Name="RunButton" HorizontalAlignment="Right" Padding="0 5 0 5" Margin="12,0,40,0" Width="95" VerticalAlignment="Center" Command="{Binding RunAlgorithmsCommand}">
+                    <Grid x:Name="WeightsGrid" Margin="25,0,0,10" Validation.ErrorTemplate="{StaticResource MahApps.Templates.ValidationError}">
+                        <Grid.BindingGroup>
+                            <BindingGroup>
+                                <BindingGroup.ValidationRules>
+                                    <validators:GoalFunctionWeightsValidationRule/>
+                                </BindingGroup.ValidationRules>
+                            </BindingGroup>
+                        </Grid.BindingGroup>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition MinWidth="120"/>
+                            <ColumnDefinition MinWidth="90"/>
+                            <ColumnDefinition MaxWidth="20"/>
+                            <ColumnDefinition MinWidth="160"/>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="3*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Label Grid.Row="0" Grid.Column="0" Content="Weight for utility: " HorizontalAlignment="Right" VerticalAlignment="Center" Height="26"/>
+                        <Label Grid.Row="1" Grid.Column="0" Content="Weight for profit: " HorizontalAlignment="Right" VerticalAlignment="Center" Height="26"/>
+                        <Label Grid.Row="2" Grid.Column="0" Content="Weight for time: " HorizontalAlignment="Right" VerticalAlignment="Center" Height="26"/>
+                        <mah:NumericUpDown Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" MinWidth="78" Margin="5,5,0,0" VerticalAlignment="Center" Height="26" Minimum="0" Maximum="100" Width="78" Value="{Binding Configuration.GoalFunctionWeights[0], UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" ValueChanged="OnCommitBindingGroup" />
+                        <mah:NumericUpDown Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" MinWidth="78" Margin="5,5,0,0" VerticalAlignment="Center" Height="26" Minimum="0" Maximum="100" Width="78" Value="{Binding Configuration.GoalFunctionWeights[1], UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" ValueChanged="OnCommitBindingGroup" />
+                        <mah:NumericUpDown Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" MinWidth="78" Margin="5,5,0,0" VerticalAlignment="Center" Height="26" Minimum="0" Maximum="100" Width="78" Value="{Binding Configuration.GoalFunctionWeights[2], UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" ValueChanged="OnCommitBindingGroup" />
+                        <Label Grid.Column="2" Grid.Row="0" Content="%" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="2,5,0,0" Height="26" Width="20"/>
+                        <Label Grid.Column="2" Grid.Row="1" Content="%" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="2,5,0,0" Height="26" Width="20"/>
+                        <Label Grid.Column="2" Grid.Row="2" Content="%" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="2,5,0,0" Height="26" Width="20"/>
+                        <Button Grid.RowSpan="3" Grid.Column="5" x:Name="RunButton" HorizontalAlignment="Right" Margin="12,0,40,0" Padding="0 5 0 5"  Width="95" MinHeight="80" VerticalAlignment="Center" Command="{Binding RunAlgorithmsCommand}">
                             <Button.IsEnabled>
                                 <MultiBinding Converter="{StaticResource InverseBooleanConverter}" Mode="TwoWay">
                                     <Binding ElementName="MatrixGrid" Path="(Validation.HasError)" />
@@ -179,7 +180,7 @@
                                                     HorizontalAlignment="Center" Margin="2,0,0,0" />
                             </StackPanel>
                         </Button>
-                    </DockPanel>
+                    </Grid>
                 </StackPanel>
             </ScrollViewer>
         </GroupBox>
@@ -287,7 +288,14 @@
                     <DockPanel Grid.Row="0" Visibility="{Binding ShowResults, Converter={StaticResource BoolToHiddenConverter}}">
                         <Label Content="Sum of driven minutes: " HorizontalAlignment="Left"/>
                         <Label Content="{Binding DrivenTimeResults}" HorizontalAlignment="Left"/>
-                        <ComboBox ItemsSource="{Binding AlgorithmsResults, Mode=TwoWay}" SelectedValue="{Binding SelectedAlgorithmResult, Mode=TwoWay}" MinWidth="150" Margin="0,0,0,5" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                        <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                            <Button Margin="0,0,10,5" Command="{Binding SaveResultsCommand}" Background="{x:Null}" BorderBrush="{x:Null}">
+                                <iconPacks:PackIconFontAwesome Kind="DownloadSolid"
+                                                            VerticalAlignment="Center"
+                                                            HorizontalAlignment="Center"/>
+                            </Button>
+                            <ComboBox ItemsSource="{Binding AlgorithmsResults, Mode=TwoWay}" SelectedValue="{Binding SelectedAlgorithmResult, Mode=TwoWay}" MinWidth="150" Margin="0,0,0,5" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                        </StackPanel>
                     </DockPanel>
                     <ListView ItemsSource="{Binding JobResults}" Grid.Row="1" Visibility="{Binding ShowResults, Converter={StaticResource BoolToHiddenConverter}}"
                                       Style="{StaticResource MahApps.Styles.ListView.Virtualized}" ScrollViewer.CanContentScroll="True" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">

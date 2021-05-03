@@ -19,7 +19,6 @@ namespace ResearchPlatform
         {
             var algorithmsMatrix = configuration.AlgorithmsMatrix;
             var distanceManager = new DistancesManager(input.DistanceMatrix);
-            var branchAndBoundHelper = new BranchAndBoundHelper(distanceManager, configuration.GoalFunctionWeights, configuration);
             var jobsToProceed = input.Jobs.Select(j => new JobToProceed(j)).ToList();
 
             CriteriaCalculator.CalculateCriteria(
@@ -31,6 +30,8 @@ namespace ResearchPlatform
 
             // removes jobs with -1 id - no distances to do this job
             jobsToProceed = jobsToProceed.Where(job => job.ID != -1).ToList();
+
+            var branchAndBoundHelper = new BranchAndBoundHelper(distanceManager, configuration.GoalFunctionWeights, configuration, jobsToProceed);
 
             // by default for promethee and electre weight from ahp
             var ahp = new AHPBuilder(configuration.ComparisionMatrix, null);

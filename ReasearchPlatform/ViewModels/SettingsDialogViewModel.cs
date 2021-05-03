@@ -134,7 +134,7 @@ namespace ResearchPlatform.ViewModels
                 _input.DistanceMatrix = _input.DistanceMatrix.Concat(distances).ToList();
 
                 var serializeInput = System.Text.Json.JsonSerializer.Serialize(_input, serializerOptions);
-                File.WriteAllText($"{DISTANCES_FILE}_{DateTime.Now:yyyy-MM-dd hhmmss}.json", serializeInput.ToString(), Encoding.UTF8);
+                File.WriteAllText($"{DISTANCES_FILE}_{DateTime.Now:yyyy-MM-dd HHmmss}.json", serializeInput.ToString(), Encoding.UTF8);
 
                 await _dialogCoordinator.ShowMessageAsync(this, "Info", Messages.POSTCODE_SAVE_MSG);
             }
@@ -180,7 +180,7 @@ namespace ResearchPlatform.ViewModels
             var allDistances = CalculateCombination(input.Nodes.Count);
 
             var serializeInput = System.Text.Json.JsonSerializer.Serialize(input, serializerOptions);
-            File.WriteAllText($"{INPUT_FILE}_{DateTime.Now:yyyy-MM-dd hh-mm}{(allDistances == input.DistanceMatrix.Count ? "" : "_damaged")}.json", 
+            File.WriteAllText($"{INPUT_FILE}_{DateTime.Now:yyyy-MM-dd HH-mm}{(allDistances == input.DistanceMatrix.Count ? "" : "_damaged")}.json", 
                 serializeInput.ToString(), Encoding.UTF8);
 
             await _dialogCoordinator.ShowMessageAsync(this, "Info", Messages.POSTCODE_SAVE_MSG);

@@ -69,11 +69,8 @@ namespace ResearchPlatform.Models
                     var resWithoutApp = bAndb.Run(alg, turnOffApprox);
                     w.Stop();
 
-                    if (alg != SearchTreeAlgorithm.Random) // TODO for random
-                    {
-                        Debug.Assert(res.ChosenJobs.All(j => resWithoutApp.ChosenJobs.Contains(j)), "Mismatch in algorithm with approx and without approx!!");
-                        Debug.Assert(resWithoutApp.ChosenJobs.All(j => res.ChosenJobs.Contains(j)), "Mismatch in algorithm with approx and without approx!!");
-                    }
+                    Debug.Assert(res.ChosenJobs.All(j => resWithoutApp.ChosenJobs.Contains(j)), "Mismatch in algorithm with approx and without approx!!");
+                    Debug.Assert(resWithoutApp.ChosenJobs.All(j => res.ChosenJobs.Contains(j)), "Mismatch in algorithm with approx and without approx!!");
 
                     _results.Add(alg, new Result() { 
                         Jobs = res.ChosenJobs, 
@@ -83,7 +80,8 @@ namespace ResearchPlatform.Models
                         VisitedNodes = (int) nodes.Average(),
                         AmountOfJobs = _jobsToProceed.Count,
                         Value = res.Value,
-                        DrivenTime = res.DrivenTime
+                        DrivenTime = res.DrivenTime,
+                        Factors = res.Factors
                     });
                 }
             }

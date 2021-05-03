@@ -3,6 +3,7 @@ using LiveCharts;
 using LiveCharts.Configurations;
 using LiveCharts.Helpers;
 using MahApps.Metro.Controls.Dialogs;
+using Microsoft.Win32;
 using Newtonsoft.Json;
 using ResearchPlatform.Models;
 using ResearchPlatform.Views;
@@ -11,6 +12,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Unicode;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -19,6 +24,7 @@ namespace ResearchPlatform.ViewModels
     class MainWindowViewModel : ViewModelBase
     {
         private static readonly string INPUT_FILE = "Input";
+        private static readonly string RESULTS_FILE = "Results";
 
         private readonly IDialogCoordinator _dialogCoordinator;
 
@@ -140,6 +146,7 @@ namespace ResearchPlatform.ViewModels
         public ICommand DrawDurationPlotCommand { get; set; }
         public ICommand DrawNodesPlotCommand { get; set; }
         public ICommand DrawBreaksPlotCommand { get; set; }
+        public ICommand SaveResultsCommand { get; set; }
 
         public MainWindowViewModel(IDialogCoordinator dialogCoordinator)
         {
@@ -155,6 +162,7 @@ namespace ResearchPlatform.ViewModels
             DrawDurationPlotCommand = new RelayCommand(new Action(() => PreparePlot("Duration")));
             DrawNodesPlotCommand = new RelayCommand(new Action(() => PreparePlot("Nodes")));
             DrawBreaksPlotCommand = new RelayCommand(new Action(() => PreparePlot("Breaks")));
+            SaveResultsCommand = new RelayCommand(new Action(SaveResults));
 
             _inputFileList = GetInputFileList();
             SelectedInputFile = _inputFileList.First();
@@ -278,6 +286,37 @@ namespace ResearchPlatform.ViewModels
             AddResultsToList(ele, "ELECTRE");
 
             SelectedAlgorithmResult = _allResDict.First().Key;
+        }
+
+        private async void SaveResults()
+        {
+            var serializerOptions = new JsonSerializerOptions()
+            {
+                WriteIndented = true,
+                Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Latin1Supplement, UnicodeRanges.LatinExtendedA)
+            };
+
+            var results = new List<FileResult>();
+
+            foreach (var res in _allResDict)
+            {
+                results.Add(new FileResult(res.Value, _selectedInputFile, res.Key));
+            }
+
+            var saveDialog = new SaveFileDialog
+            {
+                FileName = $"{RESULTS_FILE}_{DateTime.Now:yyyy-MM-dd HHmmss}.json",
+                Filter = "JSON Files|*.json",
+                FilterIndex = 2,
+                RestoreDirectory = true
+            };
+
+            if (saveDialog.ShowDialog() == true)
+            {
+                var serializeInput = System.Text.Json.JsonSerializer.Serialize(results, serializerOptions);
+                File.WriteAllText(saveDialog.FileName, serializeInput.ToString(), Encoding.UTF8);
+                await _dialogCoordinator.ShowMessageAsync(this, "File exported", "Results file successfully exported!");
+            }
         }
 
         private void AddResultsToList(Dictionary<SearchTreeAlgorithm, Result> results, string nameOfCriteriaAlg)
