@@ -63,15 +63,6 @@ namespace ResearchPlatform.Models
                         counter++;
                     }
 
-                    turnOffApprox = true;
-
-                    var w = Stopwatch.StartNew();
-                    var resWithoutApp = bAndb.Run(alg, turnOffApprox);
-                    w.Stop();
-
-                    Debug.Assert(res.ChosenJobs.All(j => resWithoutApp.ChosenJobs.Contains(j)), "Mismatch in algorithm with approx and without approx!!");
-                    Debug.Assert(resWithoutApp.ChosenJobs.All(j => res.ChosenJobs.Contains(j)), "Mismatch in algorithm with approx and without approx!!");
-
                     _results.Add(alg, new Result() { 
                         Jobs = res.ChosenJobs, 
                         Breaks = res.Breaks, 
