@@ -90,7 +90,7 @@ namespace ResearchPlatform.Algorithms
         private BestResult PrepareAndRunRec(List<JobToProceed> sorted, bool turnOffApprox)
         {
             var currentNode = _base;
-            _best = new BestResult() { Value = 0.0, ChosenJobs = new List<JobToProceed>() };
+            _best = new BestResult() { Value = 0.0, ChosenJobs = new List<JobToProceed>(), Breaks = new List<Break>()};
             var dummyJob = new JobToProceed()
             {
                 From = _base,
@@ -157,10 +157,6 @@ namespace ResearchPlatform.Algorithms
 
         private void ChangeBestResult(double currentValue, List<JobToProceed> done, List<Break> breaks, int wholeDT, int workTime)
         {
-            if (done.Where(j => j.ID == 0 || j.ID == 6 || j.ID == 8).Count() == 3)
-            {
-                var tt = "";
-            }
             _best.Value = currentValue;
             _best.ChosenJobs = done;
             _best.Breaks = breaks;

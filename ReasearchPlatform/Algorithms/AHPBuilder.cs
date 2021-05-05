@@ -15,10 +15,10 @@ namespace ResearchPlatform.Algorithms
         public List<List<double>> _normalizedMatrix;
         public List<double> _tmp;
         private List<double> _weights;
-        private List<JobToProceed> _jobs;
+        private List<Models.JobToProceed> _jobs;
         public bool IsConsistent { get; private set;  }
 
-        public AHPBuilder(IEnumerable<IEnumerable<string>> matrix, List<JobToProceed> jobsToProceed)
+        public AHPBuilder(IEnumerable<IEnumerable<string>> matrix, List<Models.JobToProceed> jobsToProceed)
         {
             var dataTable = new DataTable();
             _matrix = matrix
