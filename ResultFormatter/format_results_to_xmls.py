@@ -107,22 +107,26 @@ def get_solution_str(solution):
     loading = solution['LoadingTime']
     return f"{from_name} -> {to_name}, Price: {price}, Pickup: {pickup}, Delivery: {delivery}, Loading: {loading}"
 
+def filter_list(results_files, value):
+    return list(filter(lambda file: file.find(value) >= 0, results_files))
+    
 def process_results(dirname, results_path, workbook):
     print(f'{bcolors.OKCYAN}🧐 Processing: {dirname}')
     print(f'{bcolors.WARNING}')
 
     worksheet = workbook.add_worksheet(dirname)
     results_files = get_results_files(results_path)
-    sorted_results = list(filter(lambda file: file.find("GF1") >= 0, results_files))
-    sorted_results.extend(list(filter(lambda file: file.find("GF2") >= 0, results_files)))
-    sorted_results.extend(list(filter(lambda file: file.find("GF3") >= 0, results_files)))
+    sorted_results = []
+
+    for key in GOAL_FUNCTIONS.keys():
+        sorted_results.extend(filter_list(results_files, f"GF{key}"))
 
     processing_row = 0
     goal_fun_factors = []
 
     for file in tqdm(sorted_results):
         splitted = file.split(".json")[0]
-        number = splitted[len(splitted) - 1]
+        number = splitted.split("GF")[1]
         new_goal_fun_factors = GOAL_FUNCTIONS[number]
         processing_row = process_file(file, worksheet, workbook, processing_row, new_goal_fun_factors,
             goal_fun_factors != new_goal_fun_factors)
