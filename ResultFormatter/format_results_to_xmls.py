@@ -52,50 +52,42 @@ def decode_json(filename):
     with open(filename, 'r', encoding='utf-8-sig') as file:
         return json.load(file)
 
-def process_file(filename, worksheet, workbook, start_row, goal_fun_factors, print_goal_factors):
+def process_file(filename, worksheet, workbook, start_row, goal_fun_factors, print_headers):
     results_per_file = decode_json(filename)
 
-    col = 1
+    col = 0
 
-    if print_goal_factors:
-        goal_function_str = f"Goal function: U - {goal_fun_factors[0]}%, P - {goal_fun_factors[1]}%, T - {goal_fun_factors[1]}%"
-        worksheet.merge_range(f'B{start_row+1}:D{start_row+1}', goal_function_str, add_bg_format_with_border(workbook, 'green'))
-
-        start_row += 2
-
-        headers = ['Multi criteria', 'Tree search', 'Amount of jobs', 'Goal function value', 'Utility',
-            'Profit', 'Time', 'Duration of scheduling [ms]', 'Duration of multi criteria [ms]', 'Nodes', 'Breaks']
+    if print_headers:
+        headers = ['GF Utility', 'GF Profit', 'GF Time', 'Multi criteria', 'Tree search', 'Amount of jobs', 'Goal function value', 'Utility', 'Profit', 'Time', 'Duration of scheduling [ms]', 'Duration of multi criteria [ms]', 'Nodes', 'Breaks']
 
         for title in headers:
             worksheet.write(start_row, col, title, add_bg_format_with_border(workbook, 'yellow'))
             col += 1
 
-        worksheet.merge_range(f'M{start_row+1}:W{start_row+1}', 'Solution', add_bg_format_with_border(workbook, 'yellow'))
+        worksheet.merge_range(f'O{start_row+1}:Y{start_row+1}', 'Solution', add_bg_format_with_border(workbook, 'yellow'))
 
     processing_row = start_row + 1
     
     for result in results_per_file:
-        save_results_to_worksheet(result, worksheet, workbook, processing_row)
+        save_results_to_worksheet(result, worksheet, workbook, processing_row, goal_fun_factors)
         processing_row += 6
 
     return processing_row
 
-def save_results_to_worksheet(result, worksheet, workbook, start_row):
-    col = 1
+def save_results_to_worksheet(result, worksheet, workbook, start_row, goal_fun_factors):
+    col = 0
 
     # making row of values
     alg = result['AlgorithmName'].split('\u002B')
     tree_search = alg[0]
     multi_criteria = alg[1]
-    row_values = [multi_criteria, tree_search, result['AmountOfJobs'], result['Value'], result['Factors'][0],
-        result['Factors'][1], result['Factors'][2], result['Duration'], result['CriteriaDuration'], result['VisitedNodes'],
-        len(result['Breaks'])]
+    row_values = [goal_fun_factors[0], goal_fun_factors[1], goal_fun_factors[2], multi_criteria, tree_search, result['AmountOfJobs'], result['Value'], result['Factors'][0], result['Factors'][1], result['Factors'][2], result['Duration'], result['CriteriaDuration'], result['VisitedNodes'], len(result['Breaks'])]
 
     for value in row_values:
         worksheet.write(start_row, col, value, add_border_format(workbook))
         col += 1
 
-    worksheet.merge_range(f'M{start_row+1}:W{start_row+6}', '\n'.join([get_solution_str(sol) for sol in result['Jobs']]),
+    worksheet.merge_range(f'O{start_row+1}:Y{start_row+6}', '\n'.join([get_solution_str(sol) for sol in result['Jobs']]),
         add_border_format_with_wrap(workbook))
 
 def get_solution_str(solution):
@@ -123,14 +115,14 @@ def process_results(dirname, results_path, workbook):
 
     processing_row = 0
     goal_fun_factors = []
+    print_headers = True;
 
     for file in tqdm(sorted_results):
         splitted = file.split(".json")[0]
         number = splitted.split("GF")[1]
-        new_goal_fun_factors = GOAL_FUNCTIONS[number]
-        processing_row = process_file(file, worksheet, workbook, processing_row, new_goal_fun_factors,
-            goal_fun_factors != new_goal_fun_factors)
-        goal_fun_factors = new_goal_fun_factors
+        goal_fun_factors = GOAL_FUNCTIONS[number]
+        processing_row = process_file(file, worksheet, workbook, processing_row, goal_fun_factors, print_headers)
+        print_headers = False
 
 def add_bg_format_with_border(workbook, bg_color):
     format = workbook.add_format({'bg_color': bg_color})
