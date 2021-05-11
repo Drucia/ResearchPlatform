@@ -56,6 +56,7 @@ def process_file(filename, worksheet, workbook, start_row, goal_fun_factors, pri
     results_per_file = decode_json(filename)
 
     col = 0
+    processing_row = start_row
 
     if print_headers:
         headers = ['GF Utility', 'GF Profit', 'GF Time', 'Multi criteria', 'Tree search', 'Amount of jobs', 'Goal function value', 'Utility', 'Profit', 'Time', 'Duration of scheduling [ms]', 'Duration of multi criteria [ms]', 'Nodes', 'Breaks']
@@ -64,9 +65,9 @@ def process_file(filename, worksheet, workbook, start_row, goal_fun_factors, pri
             worksheet.write(start_row, col, title, add_bg_format_with_border(workbook, 'yellow'))
             col += 1
 
-        worksheet.merge_range(f'O{start_row+1}:Y{start_row+1}', 'Solution', add_bg_format_with_border(workbook, 'yellow'))
+        processing_row += 1 
 
-    processing_row = start_row + 1
+        worksheet.merge_range(f'O{processing_row}:Y{processing_row}', 'Solution', add_bg_format_with_border(workbook, 'yellow'))
     
     for result in results_per_file:
         save_results_to_worksheet(result, worksheet, workbook, processing_row, goal_fun_factors)
@@ -75,7 +76,7 @@ def process_file(filename, worksheet, workbook, start_row, goal_fun_factors, pri
     return processing_row
 
 def save_results_to_worksheet(result, worksheet, workbook, start_row, goal_fun_factors):
-    col = 0
+    col = ord('A')
 
     # making row of values
     alg = result['AlgorithmName'].split('\u002B')
@@ -84,7 +85,9 @@ def save_results_to_worksheet(result, worksheet, workbook, start_row, goal_fun_f
     row_values = [goal_fun_factors[0], goal_fun_factors[1], goal_fun_factors[2], multi_criteria, tree_search, result['AmountOfJobs'], result['Value'], result['Factors'][0], result['Factors'][1], result['Factors'][2], result['Duration'], result['CriteriaDuration'], result['VisitedNodes'], len(result['Breaks'])]
 
     for value in row_values:
-        worksheet.write(start_row, col, value, add_border_format(workbook))
+        # worksheet.write(start_row, col, value, add_border_format(workbook))
+        worksheet.merge_range(f'{chr(col)}{start_row+1}:{chr(col)}{start_row+6}', value, 
+        add_border_format_with_wrap(workbook))
         col += 1
 
     worksheet.merge_range(f'O{start_row+1}:Y{start_row+6}', '\n'.join([get_solution_str(sol) for sol in result['Jobs']]),
