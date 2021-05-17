@@ -295,16 +295,21 @@
                 <TabItem Header="Data Generator" mah:HeaderedControlHelper.HeaderFontSize="16" Padding="10,5,10,5" HorizontalAlignment="Stretch">
                     <StackPanel MinHeight="520">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="20,20,0,0">
-                            <TextBox Text="{Binding Configuration.Postcode}" MinWidth="200" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <Label Content="Postcode:"></Label>
+                            <TextBox Text="{Binding Configuration.Postcode}" MinWidth="150" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <Label Content="Number of jobs:"></Label>
                             <mah:NumericUpDown Grid.Column="1" HorizontalAlignment="Center" MinWidth="78" VerticalAlignment="Center" Height="26" Minimum="0" Maximum="1000" Width="110" Value="{Binding MaxNumberOfJobsToGenerate}" Margin="0,0,10,0"/>
                             <Button Content="Generate Input" VerticalAlignment="Center" Command="{Binding GenerateInputCommand}" Margin="0,0,10,0"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="20,10,0,0">
+                            <Label Content="Input file:"></Label>
                             <ComboBox Grid.Row="0" HorizontalAlignment="Right" ItemsSource="{Binding InputFilesList}" SelectedValue="{Binding SelectedInputFile}" MinWidth="150" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <Label Content="Number of jobs:"></Label>
                             <mah:NumericUpDown Grid.Column="1" HorizontalAlignment="Center" MinWidth="78" VerticalAlignment="Center" Height="26" Minimum="0" Maximum="1000" Width="110" Value="{Binding NumberOfJobsToGenerate}" Margin="0,0,10,0"/>
                             <Button Content="Generate more jobs" VerticalAlignment="Center" Command="{Binding GenerateMoreJobsCommand}" Margin="0,0,10,0"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="20,10,0,0">
+                            <Label Content="Input file:"></Label>
                             <ComboBox Grid.Row="0" HorizontalAlignment="Right" ItemsSource="{Binding InputFilesList}" SelectedValue="{Binding SelectedInputFileForDistances}" MinWidth="150" VerticalAlignment="Center" Margin="0,0,10,0"/>
                             <Button Content="Generate missing distances" VerticalAlignment="Center" Command="{Binding GenerateDistancesCommand}" Margin="0,0,10,0"/>
                         </StackPanel>

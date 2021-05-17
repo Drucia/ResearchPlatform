@@ -35,7 +35,7 @@ namespace ResearchPlatform.Models
 
         public void Run()
         {
-            var criteriaWatch = System.Diagnostics.Stopwatch.StartNew();
+            var criteriaWatch = Stopwatch.StartNew();
             _criteriaBuilder.Run();
             criteriaWatch.Stop();
 
@@ -72,7 +72,8 @@ namespace ResearchPlatform.Models
                         AmountOfJobs = _jobsToProceed.Count,
                         Value = res.Value,
                         DrivenTime = res.DrivenTime,
-                        Factors = res.Factors
+                        Factors = res.Factors,
+                        AllJobs = jobsWithUtility
                     });
                 }
             }

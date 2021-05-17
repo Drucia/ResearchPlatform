@@ -51,10 +51,9 @@ namespace ReasearchPlatformUT
             distanceManagerMock.Setup(manager => manager.GetDistanceBetween(_base, _base))
                 .Returns(GetDistance(_base, _base));
 
-            var res = bAndB.Run(SearchTreeAlgorithm.DFS, false);
+            var res = bAndB.Run(SearchTreeAlgorithm.DFS, true);
             
-            Assert.NotEmpty(res.ChosenJobs);
-            Assert.Equal(new List<JobToProceed> { _fakeJob }, res.ChosenJobs);
+            Assert.Empty(res.ChosenJobs);
         }
 
         [Fact]
@@ -79,10 +78,15 @@ namespace ReasearchPlatformUT
             bAndBHelperMock.Setup(helper => helper.AreAllConstraintsSatisfied(_base, jobsToProceed[0],
                 It.Is<List<JobToProceed>>(list => list.Count != 0), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>())).Returns(true);
 
+            bAndBHelperMock.Setup(helper => helper.CalculateValueOfGoalFunction(
+                 new List<JobToProceed>() { _fakeJob, jobsToProceed[0] }, It.IsAny<double>()))
+                     .Returns(2000.0);
+
             SetupDistanceManagerMock(distanceManagerMock, new List<Tuple<Node, Node>>() {
                 Tuple.Create(_base, _base),
                 Tuple.Create(_base, _Walbrzych),
             }); ;
+
 
             distanceManagerMock.Setup(manager => manager.GetDistanceBetween(_Walbrzych, _Swiebo)).Returns(new Distance()
             {
@@ -93,7 +97,7 @@ namespace ReasearchPlatformUT
                 DurationInSeconds = 16 * 60
             });
 
-            var res = bAndB.Run(SearchTreeAlgorithm.DFS, false);
+            var res = bAndB.Run(SearchTreeAlgorithm.DFS, true);
 
             Assert.NotEmpty(res.ChosenJobs);
             Assert.Equal(new List<JobToProceed> { _fakeJob, jobsToProceed[0]}, res.ChosenJobs);
@@ -125,19 +129,19 @@ namespace ReasearchPlatformUT
                     .Returns(true);
 
             bAndBHelperMock.Setup(helper => helper.CalculateValueOfGoalFunction(
-                new List<JobToProceed>() { _fakeJob, jobsToProceed[0] }))
+                new List<JobToProceed>() { _fakeJob, jobsToProceed[0] }, It.IsAny<double>()))
                     .Returns(2000.0);
 
             bAndBHelperMock.Setup(helper => helper.CalculateValueOfGoalFunction(
-                new List<JobToProceed>() { _fakeJob, jobsToProceed[0], jobsToProceed[1] }))
+                new List<JobToProceed>() { _fakeJob, jobsToProceed[0], jobsToProceed[1] }, It.IsAny<double>()))
                 .Returns(6000.0);
 
             bAndBHelperMock.Setup(helper => helper.CalculateValueOfGoalFunction(
-                new List<JobToProceed>() { _fakeJob, jobsToProceed[1] }))
+                new List<JobToProceed>() { _fakeJob, jobsToProceed[1] }, It.IsAny<double>()))
                 .Returns(4000.0);
 
             bAndBHelperMock.Setup(helper => helper.CalculateValueOfGoalFunction( 
-                new List<JobToProceed>() { _fakeJob, jobsToProceed[1], jobsToProceed[0] }))
+                new List<JobToProceed>() { _fakeJob, jobsToProceed[1], jobsToProceed[0] }, It.IsAny<double>()))
                 .Returns(5000.0);
 
             SetupDistanceManagerMock(distanceManagerMock, new List<Tuple<Node, Node>>() {
@@ -150,7 +154,7 @@ namespace ReasearchPlatformUT
                 Tuple.Create(_Marciszow, _Walbrzych),
             });
 
-            var res = bAndB.Run(SearchTreeAlgorithm.DFS, false);
+            var res = bAndB.Run(SearchTreeAlgorithm.DFS, true);
 
             Assert.NotEmpty(res.ChosenJobs);
             Assert.Equal(3, res.ChosenJobs.Count);
@@ -183,19 +187,19 @@ namespace ReasearchPlatformUT
                     .Returns(true);
 
             bAndBHelperMock.Setup(helper => helper.CalculateValueOfGoalFunction(
-                new List<JobToProceed>() { _fakeJob, jobsToProceed[0] }))
+                new List<JobToProceed>() { _fakeJob, jobsToProceed[0] }, It.IsAny<double>()))
                     .Returns(4000.0);
 
             bAndBHelperMock.Setup(helper => helper.CalculateValueOfGoalFunction(
-                new List<JobToProceed>() { _fakeJob, jobsToProceed[0], jobsToProceed[1] }))
+                new List<JobToProceed>() { _fakeJob, jobsToProceed[0], jobsToProceed[1] }, It.IsAny<double>()))
                 .Returns(5000.0);
 
             bAndBHelperMock.Setup(helper => helper.CalculateValueOfGoalFunction(
-                new List<JobToProceed>() { _fakeJob, jobsToProceed[1] }))
+                new List<JobToProceed>() { _fakeJob, jobsToProceed[1] }, It.IsAny<double>()))
                 .Returns(2000.0);
 
             bAndBHelperMock.Setup(helper => helper.CalculateValueOfGoalFunction(
-                new List<JobToProceed>() { _fakeJob, jobsToProceed[1], jobsToProceed[0] }))
+                new List<JobToProceed>() { _fakeJob, jobsToProceed[1], jobsToProceed[0] }, It.IsAny<double>()))
                 .Returns(6000.0);
 
             SetupDistanceManagerMock(distanceManagerMock, new List<Tuple<Node, Node>>() {
@@ -208,7 +212,7 @@ namespace ReasearchPlatformUT
                 Tuple.Create(_Marciszow, _Walbrzych),
             });
 
-            var res = bAndB.Run(SearchTreeAlgorithm.DFS, false);
+            var res = bAndB.Run(SearchTreeAlgorithm.DFS, true);
 
             Assert.NotEmpty(res.ChosenJobs);
             Assert.Equal(3, res.ChosenJobs.Count);
@@ -253,19 +257,19 @@ namespace ReasearchPlatformUT
                     .Returns(false);
 
             bAndBHelperMock.Setup(helper => helper.CalculateValueOfGoalFunction(
-                new List<JobToProceed>() { _fakeJob, jobsToProceed[0] }))
+                new List<JobToProceed>() { _fakeJob, jobsToProceed[0] }, It.IsAny<double>()))
                     .Returns(2000.0);
 
             bAndBHelperMock.Setup(helper => helper.CalculateValueOfGoalFunction(
-                new List<JobToProceed>() { _fakeJob, jobsToProceed[0], jobsToProceed[1] }))
+                new List<JobToProceed>() { _fakeJob, jobsToProceed[0], jobsToProceed[1] }, It.IsAny<double>()))
                     .Returns(6000.0);
 
             bAndBHelperMock.Setup(helper => helper.CalculateValueOfGoalFunction(
-                new List<JobToProceed>() { _fakeJob, jobsToProceed[1] }))
+                new List<JobToProceed>() { _fakeJob, jobsToProceed[1] }, It.IsAny<double>()))
                     .Returns(4000.0);
 
             bAndBHelperMock.Setup(helper => helper.CalculateValueOfGoalFunction(
-                new List<JobToProceed>() { _fakeJob, jobsToProceed[1], jobsToProceed[0] }))
+                new List<JobToProceed>() { _fakeJob, jobsToProceed[1], jobsToProceed[0] }, It.IsAny<double>()))
                     .Returns(5000.0);
 
             SetupDistanceManagerMock(distanceManagerMock, new List<Tuple<Node, Node>>() {
@@ -278,7 +282,7 @@ namespace ReasearchPlatformUT
                 Tuple.Create(_Marciszow, _Walbrzych),
             });
 
-            var res = bAndB.Run(SearchTreeAlgorithm.DFS, false);
+            var res = bAndB.Run(SearchTreeAlgorithm.DFS, true);
 
             Assert.NotEmpty(res.ChosenJobs);
             Assert.Equal(2, res.ChosenJobs.Count);

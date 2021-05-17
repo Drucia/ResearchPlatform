@@ -15,6 +15,7 @@ namespace ResearchPlatform.Models
         public double Value { get; set; }
         public int DrivenTime { get; set; }
         public List<double> Factors { get; set; }
+        public List<JobToProceed> AllJobs { get; set; }
 
         public Result(Result result)
         {
@@ -27,6 +28,7 @@ namespace ResearchPlatform.Models
             Value = result.Value;
             DrivenTime = result.DrivenTime;
             Factors = result.Factors;
+            AllJobs = result.AllJobs;
         }
 
         public Result()

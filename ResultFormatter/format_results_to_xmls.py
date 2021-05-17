@@ -100,7 +100,8 @@ def get_solution_str(solution):
     pickup = f"({solution['Pickup']['Item1']}, {solution['Pickup']['Item2']})"
     delivery = f"({solution['Delivery']['Item1']}, {solution['Delivery']['Item2']})"
     loading = solution['LoadingTime']
-    return f"{from_name} -> {to_name}, Price: {price}, Pickup: {pickup}, Delivery: {delivery}, Loading: {loading}"
+    utility = solution['Utility']
+    return f"{from_name} -> {to_name}, Utility: {utility}, Price: {price}, Pickup: {pickup}, Delivery: {delivery}, Loading: {loading}"
 
 def filter_list(results_files, value):
     return list(filter(lambda file: file.find(value) >= 0, results_files))

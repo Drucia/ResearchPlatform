@@ -14,21 +14,13 @@ namespace ResearchPlatform
             jobs.ForEach(job =>
             {
                 var distanceToDoJob = distancesManager.GetDistanceBetween(job.From, job.To);
-                //var distanceFromBase = distancesManager.GetDistanceBetween(baze, job.To);
-                //var distanceToBase = distancesManager.GetDistanceBetween(job.From, baze);
 
-                if (distanceToDoJob != null)// && distanceFromBase != null && distanceToBase != null)
+                if (distanceToDoJob != null)
                 {
-                    //job.Profit = job.Price - (distanceToDoJob.Costs * 0.001 + distanceFromBase.Costs * 0.001 + distanceToBase.Costs * 0.001 +
-                    //    ((distanceToDoJob.DistanceInMeters + distanceFromBase.DistanceInMeters + distanceToBase.DistanceInMeters) / 1000) *
-                    //    (configuration.AvgFuelConsumption * configuration.FuelCost + configuration.CostOfMaintain));
-
                     job.Profit = job.Price - (distanceToDoJob.Costs * 0.001 +
                         ((distanceToDoJob.DistanceInMeters) / 1000) * (configuration.AvgFuelConsumption * configuration.FuelCost + configuration.CostOfMaintain));
 
                     job.ComfortOfWork = configuration.TypeOfLoadingMultipler * job.TypeOfLoading + configuration.RiskMultipler * job.SeizureRisk;
-                    //job.TimeOfExecution = 2 * job.LoadingTime + (distanceToDoJob.DurationInSeconds + distanceFromBase.DurationInSeconds
-                    //    + distanceToBase.DurationInSeconds) / 60;
 
                     job.TimeOfExecution = 2 * job.LoadingTime + distanceToDoJob.DurationInSeconds / 60;
 
