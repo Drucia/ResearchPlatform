@@ -14,5 +14,6 @@ namespace ResearchPlatform.Helpers
             int workTime, int drivenTime, int wholeDrivenTime);
         public double GetMaxPossibleValue(List<JobToProceed> done, List<JobToProceed> restPossibleJobs, double currentValue, double workTime);
         public List<double> CalculateFactorsOfGoalFunction(List<JobToProceed> done, double workTime);
+        public void SetMaxForUtilityAndProfit(List<JobToProceed> allJobs);
     }
 }

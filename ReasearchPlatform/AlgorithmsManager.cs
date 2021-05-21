@@ -31,7 +31,7 @@ namespace ResearchPlatform
             // removes jobs with -1 id - no distances to do this job
             jobsToProceed = jobsToProceed.Where(job => job.ID != -1).ToList();
 
-            var branchAndBoundHelper = new BranchAndBoundHelper(distanceManager, configuration.GoalFunctionWeights, configuration, jobsToProceed);
+            var branchAndBoundHelper = new BranchAndBoundHelper(distanceManager, configuration.GoalFunctionWeights, configuration);
 
             // by default for promethee and electre weight from ahp
             var ahp = new AHPBuilder(configuration.ComparisionMatrix, null);

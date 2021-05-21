@@ -40,6 +40,7 @@ namespace ResearchPlatform.Models
             criteriaWatch.Stop();
 
             var jobsWithUtility = _criteriaBuilder.GetJobsWithCalculatedUtility();
+            _branchAndBoundHelper.SetMaxForUtilityAndProfit(jobsWithUtility);
             var bAndb = new BranchAndBound(_input.Base, _distanceManager, jobsWithUtility, _branchAndBoundHelper);
 
             foreach (SearchTreeAlgorithm alg in Enum.GetValues(typeof(SearchTreeAlgorithm)))

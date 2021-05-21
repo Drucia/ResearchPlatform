@@ -93,6 +93,7 @@ namespace ResearchPlatform.Algorithms
             _best = new BestResult() { Value = 0.0, ChosenJobs = new List<JobToProceed>(), Breaks = new List<Break>()};
             var dummyJob = new JobToProceed()
             {
+                ID = 0,
                 From = _base,
                 To = _base,
                 Pickup = Tuple.Create(0, IBranchAndBoundHelper.MAX_TIME_WITH_WORKING),

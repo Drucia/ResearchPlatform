@@ -10,15 +10,21 @@ namespace ResearchPlatform.Helpers
         private readonly DistancesManager _manager;
         private readonly List<double> _weights;
         private readonly Configuration _configuration;
-        private readonly double _maxPossibleProfit;
+        private double _maxPossibleProfit;
+        private double _maxPossibleUtility;
 
         public BranchAndBoundHelper(DistancesManager distancesManager, IEnumerable<int> weights,
-            Configuration configuration, List<JobToProceed> allJobs)
+            Configuration configuration)
         {
             _manager = distancesManager;
             _weights = weights.Select(w => w / 100.0).ToList();
             _configuration = configuration;
+        }
+
+        public void SetMaxForUtilityAndProfit(List<JobToProceed> allJobs)
+        {
             _maxPossibleProfit = GetMaxPossibleProfit(allJobs);
+            _maxPossibleUtility = GetMaxPossibleUtility(allJobs);
         }
 
         private double GetMaxPossibleProfit(List<JobToProceed> allJobs)
@@ -33,9 +39,6 @@ namespace ResearchPlatform.Helpers
                 var chosenJob = jobsToDo[0];
                 var percentage = (IBranchAndBoundHelper.MAX_TIME_WITH_WORKING - tmpWorkTime) / chosenJob.TimeOfExecution;
 
-                if (chosenJob.Profit <= 0)
-                    break;
-
                 if (percentage >= 1)
                     maxPossProfit += chosenJob.Profit;
                 else
@@ -47,6 +50,31 @@ namespace ResearchPlatform.Helpers
             }
 
             return Math.Round(maxPossProfit, 0);
+        }
+
+        private double GetMaxPossibleUtility(List<JobToProceed> allJobs)
+        {
+            var tmpWorkTime = 0.0;
+            var jobsToDo = new List<JobToProceed>(allJobs);
+            jobsToDo.Sort((left, right) => (int)((right.Utility - left.Utility) * 1000));
+            var maxPossUtility = 0.0;
+
+            while (jobsToDo.Count > 0 && tmpWorkTime <= IBranchAndBoundHelper.MAX_TIME_WITH_WORKING)
+            {
+                var chosenJob = jobsToDo[0];
+                var percentage = (IBranchAndBoundHelper.MAX_TIME_WITH_WORKING - tmpWorkTime) / chosenJob.TimeOfExecution;
+
+                if (percentage >= 1)
+                    maxPossUtility += chosenJob.Utility;
+                else
+                    maxPossUtility += chosenJob.Utility * percentage;
+
+                tmpWorkTime += chosenJob.TimeOfExecution;
+
+                jobsToDo.RemoveAt(0);
+            }
+
+            return Math.Round(maxPossUtility, 4);
         }
 
         public bool AreAllConstraintsSatisfied(Node currNode, JobToProceed currentJob, List<JobToProceed> done,
@@ -116,7 +144,7 @@ namespace ResearchPlatform.Helpers
             var profitAndTime = CalculateRealProfit(done);
             var realProfit = profitAndTime;
 
-            var utilityAvg = done.Average(job => job.Utility);
+            var utilityAvg = done.Sum(job => job.Utility) / _maxPossibleUtility;
             var price = realProfit / _maxPossibleProfit;
             var time = workTime / IBranchAndBoundHelper.MAX_TIME_WITH_WORKING;
 
@@ -131,7 +159,7 @@ namespace ResearchPlatform.Helpers
             var profitAndTime = CalculateRealProfit(done);
             var realProfit = profitAndTime;
 
-            var utilityAvg = done.Average(job => job.Utility);
+            var utilityAvg = done.Sum(job => job.Utility) / _maxPossibleUtility;
             var price = realProfit / _maxPossibleProfit;
             var time = workTime / IBranchAndBoundHelper.MAX_TIME_WITH_WORKING;
 
@@ -159,13 +187,13 @@ namespace ResearchPlatform.Helpers
                 if (idx == chosen.Count - 1)
                 {
                     avgProfit = (tmp.SkipLast(1).Sum(c => c.Profit) + chosen[idx].Profit * percForLast + profitDone) / _maxPossibleProfit;
-                    avgUtility = (done.Concat(tmp.SkipLast(1)).Sum(j => j.Utility) + chosen[idx].Utility * percForLast) / (done.Count + chosen.Count);
+                    avgUtility = (done.Concat(tmp.SkipLast(1)).Sum(j => j.Utility) + chosen[idx].Utility * percForLast) / _maxPossibleUtility;
                     time = (tmp.SkipLast(1).Sum(c => c.TimeOfExecution) + chosen[idx].TimeOfExecution * percForLast + workTime) / IBranchAndBoundHelper.MAX_TIME_WITH_WORKING;
                 }
                 else
                 {
                     avgProfit = (tmp.Sum(c => c.Profit) + profitDone) / _maxPossibleProfit;
-                    avgUtility = done.Concat(tmp).Average(j => j.Utility);
+                    avgUtility = done.Concat(tmp).Sum(j => j.Utility) / _maxPossibleUtility;
                     time = (tmp.Sum(c => c.TimeOfExecution) + workTime) / IBranchAndBoundHelper.MAX_TIME_WITH_WORKING;
                 }
 
@@ -210,9 +238,9 @@ namespace ResearchPlatform.Helpers
             {
                 var jobsToDo = new List<JobToProceed>(restPossibleJobs);
                 jobsToDo.Sort((left, right) => (int)((
-                _weights[1] * (right.Profit / _maxPossibleProfit) + _weights[0] * right.Utility - _weights[2] *
+                _weights[1] * (right.Profit / _maxPossibleProfit) + _weights[0] * (right.Utility / _maxPossibleUtility) - _weights[2] *
                     (right.TimeOfExecution / IBranchAndBoundHelper.MAX_TIME_WITH_WORKING) // right
-                - _weights[1] * (left.Profit / _maxPossibleProfit) - _weights[0] * left.Utility + _weights[2] *
+                - _weights[1] * (left.Profit / _maxPossibleProfit) - _weights[0] * (left.Utility / _maxPossibleUtility) + _weights[2] *
                     (left.TimeOfExecution / IBranchAndBoundHelper.MAX_TIME_WITH_WORKING) // left
                     ) * 1000));
                 var tmpWorkTime = workTime;
