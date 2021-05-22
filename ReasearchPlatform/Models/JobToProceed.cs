@@ -22,6 +22,16 @@ namespace ResearchPlatform.Models
             Utility = 0.0;
         }
 
+        public JobToProceed(JobToProceed job) : base(job)
+        {
+            Utility = job.Utility;
+            Profit = job.Profit;
+            ComfortOfWork = job.ComfortOfWork;
+            TimeOfExecution = job.TimeOfExecution;
+            Reliability = job.Reliability;
+            PossibilityOfNextJobs = job.PossibilityOfNextJobs;
+        }
+
         public override bool Equals(object obj)
         {
             return obj is JobToProceed proceed &&

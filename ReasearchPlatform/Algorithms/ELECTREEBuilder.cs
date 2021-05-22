@@ -68,13 +68,18 @@ namespace ResearchPlatform.Algorithms
             }
 
             var maxUtility = _sortedJobs.Max(j => j.Utility);
+            var jobsWithUtility = new List<JobToProceed>();
 
             _sortedJobs.ForEach(job =>
             {
-                job.Utility /= maxUtility;
+                var withUtility = new JobToProceed(job)
+                {
+                    Utility = job.Utility / maxUtility
+                };
+                jobsWithUtility.Add(withUtility);
             });
 
-            return _sortedJobs;
+            return jobsWithUtility;
         }
 
         public void Run()

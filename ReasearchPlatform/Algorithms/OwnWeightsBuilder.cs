@@ -26,16 +26,22 @@ namespace ResearchPlatform.Algorithms
             var maxPossOfNextJobs = _jobs.Max(job => job.PossibilityOfNextJobs);
             var maxComfortOfWork = _jobs.Max(job => job.ComfortOfWork);
 
+            var jobsWithUtility = new List<JobToProceed>();
+
             _jobs.ForEach(job => {
-                job.Utility =
+                var withUtility = new JobToProceed(job)
+                {
+                    Utility =
                     (maxProfit == 0 ? 0 : (_weights[(int)Criteria.Profit] * ((job.Profit + Math.Abs(minProfit < 0 ? minProfit : 0)) / maxProfit))) +
                     (job.TimeOfExecution == 0 ? 0 : (_weights[(int)Criteria.DrivingTime] * (minTimeOfExec / job.TimeOfExecution))) +
                     (maxClientOpinion == 0 ? 0 : (_weights[(int)Criteria.CustomerReliability] * (job.ClientOpinion / maxClientOpinion))) +
                     (maxPossOfNextJobs == 0 ? 0 : (_weights[(int)Criteria.CompletedJobs] * (job.PossibilityOfNextJobs / maxPossOfNextJobs))) +
-                    (maxComfortOfWork == 0 ? 0 : (_weights[(int)Criteria.ComfortOfWork] * (job.ComfortOfWork / maxComfortOfWork)));
+                    (maxComfortOfWork == 0 ? 0 : (_weights[(int)Criteria.ComfortOfWork] * (job.ComfortOfWork / maxComfortOfWork)))
+                };
+                jobsWithUtility.Add(withUtility);
             });
 
-            return _jobs;
+            return jobsWithUtility;
         }
 
         public void Run()

@@ -174,12 +174,18 @@ namespace ResearchPlatform.Algorithms
             var minUtility = _jobs.Min(j => j.Utility);
             var maxUtility = _jobs.Max(j => j.Utility) + Math.Abs(minUtility < 0 ? minUtility : 0);
 
+            var jobsWithUtility = new List<JobToProceed>();
+
             _jobs.ForEach(job =>
             {
-                job.Utility = (job.Utility + Math.Abs(minUtility < 0 ? minUtility : 0)) / maxUtility;
+                var withUtility = new JobToProceed(job)
+                {
+                    Utility = (job.Utility + Math.Abs(minUtility < 0 ? minUtility : 0)) / maxUtility
+                };
+                jobsWithUtility.Add(withUtility);
             });
 
-            return _jobs;
+            return jobsWithUtility;
         }
     }
 }
