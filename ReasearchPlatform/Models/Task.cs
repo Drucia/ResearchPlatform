@@ -35,6 +35,9 @@ namespace ResearchPlatform.Models
 
         public void Run()
         {
+            if (_searchTreeAlgorithms.Where(toRun => toRun).Count() == 0)
+                return;
+
             var criteriaWatch = Stopwatch.StartNew();
             _criteriaBuilder.Run();
             criteriaWatch.Stop();
