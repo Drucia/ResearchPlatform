@@ -31,7 +31,7 @@ namespace ResearchPlatform.Helpers
         {
             var tmpWorkTime = 0.0;
             var jobsToDo = new List<JobToProceed>(allJobs);
-            jobsToDo.Sort((left, right) => (int)(right.Profit - left.Profit));
+            jobsToDo.Sort((left, right) => (int)((right.Profit / right.TimeOfExecution) - (left.Profit / left.TimeOfExecution)));
             var maxPossProfit = 0.0;
 
             while (jobsToDo.Count > 0 && tmpWorkTime <= IBranchAndBoundHelper.MAX_TIME_WITH_WORKING)
@@ -56,7 +56,7 @@ namespace ResearchPlatform.Helpers
         {
             var tmpWorkTime = 0.0;
             var jobsToDo = new List<JobToProceed>(allJobs);
-            jobsToDo.Sort((left, right) => (int)((right.Utility - left.Utility) * 1000));
+            jobsToDo.Sort((left, right) => (int)(((right.Utility / right.TimeOfExecution) - (left.Utility / left.TimeOfExecution)) * 1000));
             var maxPossUtility = 0.0;
 
             while (jobsToDo.Count > 0 && tmpWorkTime <= IBranchAndBoundHelper.MAX_TIME_WITH_WORKING)
