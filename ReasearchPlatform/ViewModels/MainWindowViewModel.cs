@@ -337,9 +337,9 @@ namespace ResearchPlatform.ViewModels
 
         private List<string> GetInputFileList()
         {
-            return Directory.GetFiles("./")
+            return Directory.GetFiles("Assets")
                 .Where(filename => filename.Contains(INPUT_FILE))
-                .Select(filename => filename.Split("./")[1])
+                .Select(filename => filename.Split("Assets\\")[1])
                 .ToList();
         }
 
@@ -347,7 +347,7 @@ namespace ResearchPlatform.ViewModels
         {
             if (SelectedInputFile != null)
             {
-                using StreamReader r = new StreamReader(SelectedInputFile);
+                using StreamReader r = new StreamReader($"Assets\\{SelectedInputFile}");
                 string json = r.ReadToEnd();
                 Input = JsonConvert.DeserializeObject<Models.Input>(json);
             }
